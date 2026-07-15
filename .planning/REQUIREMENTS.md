@@ -163,17 +163,96 @@ Deferred beyond the initial release and not mapped to the v1 roadmap.
 
 ## Traceability
 
-Roadmap phase mappings will be populated after roadmap approval. Every v1 requirement must map to exactly one phase.
-
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| All v1 requirements | Pending roadmap | Pending |
+| LESS-01 | Phase 1 | Pending |
+| LESS-02 | Phase 1 | Pending |
+| LESS-03 | Phase 7 | Pending |
+| LESS-04 | Phase 7 | Pending |
+| LESS-05 | Phase 7 | Pending |
+| LESS-06 | Phase 7 | Pending |
+| LESS-07 | Phase 2 | Pending |
+| ANLY-01 | Phase 2 | Pending |
+| ANLY-02 | Phase 2 | Pending |
+| ANLY-03 | Phase 2 | Pending |
+| ANLY-04 | Phase 2 | Pending |
+| ANLY-05 | Phase 2 | Pending |
+| ANLY-06 | Phase 2 | Pending |
+| ANLY-07 | Phase 2 | Pending |
+| ANLY-08 | Phase 1 | Pending |
+| ANLY-09 | Phase 7 | Pending |
+| EXER-01 | Phase 1 | Pending |
+| EXER-02 | Phase 1 | Pending |
+| EXER-03 | Phase 1 | Pending |
+| EXER-04 | Phase 3 | Pending |
+| EXER-05 | Phase 4 | Pending |
+| EXER-06 | Phase 5 | Pending |
+| EXER-07 | Phase 1 | Pending |
+| EXER-08 | Phase 3 | Pending |
+| EXER-09 | Phase 3 | Pending |
+| EXER-10 | Phase 4 | Pending |
+| EXER-11 | Phase 5 | Pending |
+| EVAL-01 | Phase 1 | Pending |
+| EVAL-02 | Phase 3 | Pending |
+| EVAL-03 | Phase 5 | Pending |
+| EVAL-04 | Phase 1 | Pending |
+| EVAL-05 | Phase 1 | Pending |
+| EVAL-06 | Phase 3 | Pending |
+| EVAL-07 | Phase 5 | Pending |
+| EVAL-08 | Phase 5 | Pending |
+| EVAL-09 | Phase 5 | Pending |
+| EVAL-10 | Phase 5 | Pending |
+| REVW-01 | Phase 6 | Pending |
+| REVW-02 | Phase 6 | Pending |
+| REVW-03 | Phase 6 | Pending |
+| REVW-04 | Phase 6 | Pending |
+| REVW-05 | Phase 6 | Pending |
+| REVW-06 | Phase 6 | Pending |
+| REVW-07 | Phase 6 | Pending |
+| REVW-08 | Phase 6 | Pending |
+| MODL-01 | Phase 1 | Pending |
+| MODL-02 | Phase 1 | Pending |
+| MODL-03 | Phase 1 | Pending |
+| MODL-04 | Phase 8 | Pending |
+| MODL-05 | Phase 3 | Pending |
+| MODL-06 | Phase 2 | Pending |
+| MODL-07 | Phase 2 | Pending |
+| MODL-08 | Phase 6 | Pending |
+| MODL-09 | Phase 8 | Pending |
+| MODL-10 | Phase 8 | Pending |
+| MODL-11 | Phase 8 | Pending |
+| MODL-12 | Phase 1 | Pending |
+| AIOP-01 | Phase 2 | Pending |
+| AIOP-02 | Phase 2 | Pending |
+| AIOP-03 | Phase 2 | Pending |
+| AIOP-04 | Phase 5 | Pending |
+| AIOP-05 | Phase 7 | Pending |
+| AIOP-06 | Phase 7 | Pending |
+| AIOP-07 | Phase 2 | Pending |
+| AIOP-08 | Phase 5 | Pending |
+| AIOP-09 | Phase 2 | Pending |
+| AIOP-10 | Phase 5 | Pending |
+| AIOP-11 | Phase 5 | Pending |
+| AIOP-12 | Phase 2 | Pending |
+| PLAT-01 | Phase 9 | Pending |
+| PLAT-02 | Phase 9 | Pending |
+| PLAT-03 | Phase 1 | Pending |
+| PLAT-04 | Phase 9 | Pending |
+| PLAT-05 | Phase 3 | Pending |
+| PLAT-06 | Phase 2 | Pending |
+| PLAT-07 | Phase 9 | Pending |
+| PLAT-08 | Phase 5 | Pending |
+| PLAT-09 | Phase 1 | Pending |
+| PLAT-10 | Phase 1 | Pending |
+| PLAT-11 | Phase 9 | Pending |
+| PLAT-12 | Phase 9 | Pending |
+| PLAT-13 | Phase 9 | Pending |
 
 **Coverage:**
 - v1 requirements: 82 total
-- Mapped to phases: 0
-- Unmapped: 82 — pending roadmap creation
+- Mapped to phases: 82
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-07-16*
-*Last updated: 2026-07-16 after initial scoping*
+*Last updated: 2026-07-16 after roadmap draft*
