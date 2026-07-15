@@ -1,0 +1,28 @@
+services:
+  api:
+    build:
+      context: ./apps/api
+    env_file:
+      - .env
+    ports:
+      - "${APP_PORT:-8000}:8000"
+    volumes:
+      - ./apps/api:/app
+      - app-data:/app/data
+
+  web:
+    build:
+      context: ./apps/web
+    env_file:
+      - .env
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./apps/web:/app
+      - web-node-modules:/app/node_modules
+    depends_on:
+      - api
+
+volumes:
+  app-data:
+  web-node-modules:
