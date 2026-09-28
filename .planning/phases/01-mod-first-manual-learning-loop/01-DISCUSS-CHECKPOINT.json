@@ -1,7 +1,8 @@
 {
   "phase": "1",
   "phase_name": "Mod-First Manual Learning Loop",
-  "updated": "2026-07-16",
+  "spec_version": "0.2.0",
+  "updated": "2026-09-28",
   "status": "in_progress",
   "selected_areas": [
     "Learner path and screens",
@@ -30,8 +31,16 @@
       "Phase 1 uses clear panel and session-mode boundaries so later customization does not require redesign."
     ]
   },
+  "project_level_decisions": [
+    "Spec 0.2.0 introduces explicit versioned planning governance; accepted decisions are superseded rather than semantically overwritten.",
+    "LAIT remains headless-capable and transport-independent at the application boundary.",
+    "MCP is the preferred future generic agent integration adapter but does not change Phase 1 or v1 scope.",
+    "External AI orchestration may drive tutoring flow while LAIT remains the source of truth for durable learning state."
+  ],
   "deferred_ideas": [
     "Full Workspace API and Workspace Module with movable, dockable, resizable panels, splits, tabs, saved layouts, and perspectives; target later architecture work around Phases 6-8.",
-    "Additional exercise-session modes such as Classic, Exam, Game, and Reading."
+    "Additional exercise-session modes such as Classic, Exam, Game, and Reading.",
+    "Production MCP adapter and DeepSeek Harness integration; validate only after a working vertical learning slice exists.",
+    "PracticeSession as a possible first-class core entity; defer until concrete orchestration/practice requirements justify it."
   ]
 }
