@@ -1,0 +1,37 @@
+{
+  "phase": "1",
+  "phase_name": "Mod-First Manual Learning Loop",
+  "updated": "2026-07-16",
+  "status": "in_progress",
+  "selected_areas": [
+    "Learner path and screens",
+    "Manual learning-unit capture",
+    "Gap Fill practice and feedback",
+    "Mod-First proof surface"
+  ],
+  "areas_completed": [
+    "Learner path and screens"
+  ],
+  "current_area": "Manual learning-unit capture",
+  "decisions": {
+    "Learner path and screens": [
+      "The Lesson is the persistent primary workspace; the Lesson List is only the entry point.",
+      "Stages are Source, Learning Units, Generate Exercises, Practice, and Feedback.",
+      "Completing a stage unlocks and automatically expands the next stage.",
+      "Every unlocked stage remains accessible and can be expanded or collapsed independently.",
+      "Expanded and collapsed state is remembered per lesson.",
+      "A title is suggested from the first meaningful source line or heading and is editable before creation.",
+      "If no suitable title exists, use Untitled Lesson.",
+      "The title is user-facing metadata only; each lesson has an immutable internal ID.",
+      "The full source is available in a collapsible panel.",
+      "Learning units, exercises, and feedback show relevant source excerpts with one-click navigation to the full-source location.",
+      "Starting practice enters a distraction-free Focus Practice Mode showing only exercise, feedback, and navigation.",
+      "Ending practice restores the prior Lesson Workspace state.",
+      "Phase 1 uses clear panel and session-mode boundaries so later customization does not require redesign."
+    ]
+  },
+  "deferred_ideas": [
+    "Full Workspace API and Workspace Module with movable, dockable, resizable panels, splits, tabs, saved layouts, and perspectives; target later architecture work around Phases 6-8.",
+    "Additional exercise-session modes such as Classic, Exam, Game, and Reading."
+  ]
+}

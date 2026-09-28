@@ -69,3 +69,4 @@ prompts/generated/
 .gsd/tmp/
 .gsd/generated/
 .mcp/
+.codex/
