@@ -75,14 +75,16 @@ Recent decisions affecting current and future work:
 
 ### Pending Todos
 
-- Continue Phase 1 discussion at `Manual learning-unit capture`.
+- Plan Phase 1 from the finalized `01-CONTEXT.md`.
+- Review generated Phase 1 plans for context fidelity, scope control, dependency order, and Mod-First acceptance coverage before execution.
 - After a working vertical learning slice exists, consider a small MCP integration spike as an architectural acceptance test; do not add it to current Phase 1 scope.
 
 ### Blockers/Concerns
 
 - Phase planning must resolve manifest v1 details, AI evaluation thresholds, scheduler parameters, and responsive interaction contracts at the phases where they first matter.
-- Learning Unit semantics remain the most important unresolved Phase 1 domain decision.
-- Future MCP schemas and DeepSeek Harness packaging are intentionally deferred; designing them before the application use cases exist would create premature contract debt.
+- No unresolved discussion blocker prevents Phase 1 planning.
+- Planning must preserve the Learning Unit, Gap Fill, proof-module, visibility, session, and application command/query decisions recorded in `01-CONTEXT.md`.
+- Future MCP schemas and DeepSeek Harness packaging remain deferred and must not expand Phase 1 scope.
 
 ## Deferred Items
 
