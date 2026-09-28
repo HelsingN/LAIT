@@ -1,13 +1,20 @@
 ---
-gsd_state_version: '1.0'
+gsd_state_version: 1.0
+milestone: v1.0
+milestone_name: milestone
+current_phase: 1
+current_phase_name: Mod-First Manual Learning Loop
 status: planning
-spec_version: '0.2.0'
+stopped_at: Phase 1 context gathered
+last_updated: "2026-09-28T17:23:48.026Z"
+last_activity: 2026-09-28
+last_activity_desc: Introduced versioned planning governance and accepted the future MCP / external AI-orchestration direction without changing v1 scope
 progress:
-  total_phases: 9
+  total_phases: 1
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
-  percent: 0
+spec_version: 0.2.0
 ---
 
 # Project State
@@ -33,6 +40,7 @@ Progress: [░░░░░░░░░░] 0%
 ## Performance Metrics
 
 **Velocity:**
+
 - Total plans completed: 0
 - Average duration: —
 - Total execution time: 0.0 hours
@@ -44,6 +52,7 @@ Progress: [░░░░░░░░░░] 0%
 | - | - | - | - |
 
 **Recent Trend:**
+
 - Last 5 plans: None
 - Trend: Not started
 
@@ -66,14 +75,16 @@ Recent decisions affecting current and future work:
 
 ### Pending Todos
 
-- Continue Phase 1 discussion at `Manual learning-unit capture`.
+- Plan Phase 1 from the finalized `01-CONTEXT.md`.
+- Review generated Phase 1 plans for context fidelity, scope control, dependency order, and Mod-First acceptance coverage before execution.
 - After a working vertical learning slice exists, consider a small MCP integration spike as an architectural acceptance test; do not add it to current Phase 1 scope.
 
 ### Blockers/Concerns
 
 - Phase planning must resolve manifest v1 details, AI evaluation thresholds, scheduler parameters, and responsive interaction contracts at the phases where they first matter.
-- Learning Unit semantics remain the most important unresolved Phase 1 domain decision.
-- Future MCP schemas and DeepSeek Harness packaging are intentionally deferred; designing them before the application use cases exist would create premature contract debt.
+- No unresolved discussion blocker prevents Phase 1 planning.
+- Planning must preserve the Learning Unit, Gap Fill, proof-module, visibility, session, and application command/query decisions recorded in `01-CONTEXT.md`.
+- Future MCP schemas and DeepSeek Harness packaging remain deferred and must not expand Phase 1 scope.
 
 ## Deferred Items
 
@@ -87,6 +98,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-09-28
-Stopped at: Version governance established; future MCP/external orchestration direction recorded; Phase 1 discussion remains on Manual learning-unit capture
-Resume file: `.planning/phases/01-mod-first-manual-learning-loop/01-DISCUSS-CHECKPOINT.json`
+Last session: 2026-09-28T17:23:48.014Z
+Stopped at: Phase 1 context gathered
+Resume file: .planning/phases/01-mod-first-manual-learning-loop/01-CONTEXT.md
