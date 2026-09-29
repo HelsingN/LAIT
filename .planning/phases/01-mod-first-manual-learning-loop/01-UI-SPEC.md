@@ -1,10 +1,11 @@
 ---
 phase: "01"
 slug: "mod-first-manual-learning-loop"
-status: draft
+status: approved
 shadcn_initialized: false
 preset: none
 created: "2026-09-28"
+reviewed_at: "2026-09-28T22:43:00+03:00"
 ---
 
 # Phase 01 — UI Design Contract
@@ -49,6 +50,7 @@ No login, no language picker, no maintainer page.
 
 ### Lesson Workspace (primary)
 
+- Focal point: the expanded active stage panel. In Focus Practice Mode the focal point is the Gap Fill sentence and answer control.
 - Stages in order: **Source** → **Learning Units** → **Generate Exercises** → **Practice** → **Feedback**.
 - Completing a stage unlocks and auto-expands the next. Every unlocked stage can expand/collapse independently.
 - Persist expand/collapse per lesson in `localStorage` keyed by immutable lesson id (research A4).
@@ -157,6 +159,13 @@ Do not use accent for secondary buttons, body links that are not CTAs, or decora
 | Generate failed (no accepted) | No accepted units to practice. Accept at least one draft unit, then generate again. |
 | Generate failed (generic) | Exercise generation failed. Check your accepted units and try Generate Exercises again. |
 | Error state (load) | Could not load this lesson. Return to the lesson list and open it again. |
+| Create failed | Could not create the lesson. Check the pasted text and try Create Lesson again. |
+| Create pending | Creating… |
+| List pending | Loading… |
+| Generate pending | Generating… |
+| Submit pending | Checking… |
+| Submit failed | Could not submit. Try again. |
+| Feedback before attempts | No attempts yet. Start Practice to begin. |
 | Practice frozen hint | Learning units are locked while practice is open. Exit Practice to edit them. |
 | Feedback correct | Correct. The expected answer is "{unit}". |
 | Feedback incorrect | Your answer: "{submitted}". Expected: "{unit}". |
@@ -176,36 +185,56 @@ Untitled fallback title: `Untitled Lesson` (D-03).
 
 ## UI Considerations
 
-> Shape-rooted UI state coverage for Phase 1 learner surfaces. Empty/error COPY references `## Copywriting Contract` rows.
+> Probe write-back after UI-SPEC verification. Copy strings stay in `## Copywriting Contract`. Explicit rows are truths. Backstop rows are viewport checks.
 
-Applicable state considerations resolved: 22 covered, 2 backstop, 0 unresolved
-
-| Category | Element(s) | Status | Resolution / Reason |
-|----------|------------|--------|---------------------|
-| empty | Lesson List | ✅ covered | Renders Copywriting empty state heading/body plus Create Lesson CTA |
-| empty | Learning Units list | ✅ covered | Renders empty units heading/body; Add disabled until source selection exists |
-| empty | Generate Exercises result | ✅ covered | No items until successful generate; failed empty-accepted uses generate-failed copy |
-| empty | Feedback stage pre-practice | ✅ covered | Stage remains locked until practice has produced at least one Attempt; after unlock with zero attempts show "No attempts yet. Start Practice to begin." |
-| loading | Lesson List / Lesson get | ✅ covered | Inline label "Loading…" in list/workspace header; no full-page blocker |
-| loading | Generate Exercises | ✅ covered | Button busy state + "Generating…" until terminal status returns (synchronous command) |
-| loading | Practice submit | ✅ covered | Submit Answer disabled with "Checking…" until feedback payload returns |
-| error | Lesson List / Lesson get | ✅ covered | Load error copy + link back to `/` |
-| error | Overlap on Add | ✅ covered | Inline overlap error; existing unit unchanged |
-| error | Generate failed | ✅ covered | Status region shows generate-failed copy; Generate remains available |
-| error | Practice submit transport | ✅ covered | Inline "Could not submit. Try again." without leaving Focus Mode; answer field retains input |
-| populated | Lesson List | ✅ covered | Rows show title; typical 1–20 lessons scroll in the list column |
-| populated | Learning Units | ✅ covered | Each row: unit text, draft\|accepted badge, Accept (if draft), Delete, excerpt jump |
-| populated | Gap Fill item | ✅ covered | Sentence with blank, chip bank or text input, Submit Answer |
-| partial | Draft + accepted mix | ✅ covered | List shows both; Generate uses accepted only; draft rows stay visible until Accept/Delete |
-| partial | Feedback fields | ✅ covered | Show answer, reference, explanation, used/missed chunk; omit natural alternative when null |
-| overflow | Lesson List titles | ✅ covered | Title truncates to one line with ellipsis; full title in `title` attribute |
-| overflow | Source panel | ✅ covered | Panel body scrolls vertically inside stage; page does not freeze |
-| overflow | Chip bank | ✅ covered | Chips wrap within bank well; bank scrolls if taller than 40vh |
-| zero-one-many | Lesson List | ✅ covered | Zero → empty state; one → single row; many → stacked rows |
-| zero-one-many | Accepted units / Gap Fill passes | ✅ covered | Zero accepted → generate fails; one → typed pass only; many → drag then typed |
-| long-text | Lesson title | 🧪 backstop | Display truncates; create form input wraps to 2 lines max then scrolls |
-| long-text | Source / Gap Fill sentence | 🧪 backstop | Source and sentence reflow wrap; blank stays inline; no horizontal page scroll at 320px width |
-| long-text | Unit row text | ✅ covered | Unit text wraps to two lines then ellipsis; full text on excerpt jump highlight |
+- Lesson List empty — resolved (explicit): Zero lessons shows "No lessons yet", the paste body, and Create Lesson.
+- Lesson List loading — resolved (explicit): The list header shows "Loading…". There is no full-page blocker.
+- Lesson List error — resolved (explicit): Load failure shows "Could not load this lesson. Return to the lesson list and open it again." and a link to `/`.
+- Lesson List populated — resolved (explicit): Each row shows the lesson title and an open affordance. Typical volume is 1–20 rows in one scrolling column.
+- Lesson List partial — resolved (explicit): A row with no stored title shows `Untitled Lesson`.
+- Lesson List overflow — resolved (explicit): The title truncates to one line with an ellipsis. The full title is in the `title` attribute.
+- Lesson List zero-one-many — resolved (explicit): Zero uses the empty state. One row and many rows use the same row layout.
+- Lesson List long-text — { statement: "A lesson title truncates to one line in the list and wraps to at most two lines in the create field.", verification: backstop }
+- Create Lesson empty — resolved (explicit): Source field is empty. Title is suggested from the first meaningful line, otherwise `Untitled Lesson`.
+- Create Lesson loading — resolved (explicit): Create Lesson is disabled and its label is "Creating…" until `lesson.create` returns.
+- Create Lesson error — resolved (explicit): Failure shows "Could not create the lesson. Check the pasted text and try Create Lesson again." The pasted text stays in the field.
+- Create Lesson partial — resolved (explicit): Source can be filled while the title is still the suggestion. Clearing the title stores `Untitled Lesson`.
+- Create Lesson overflow — resolved (explicit): The source field scrolls inside itself. The page does not grow without a bound.
+- Create Lesson long-text — { statement: "The create-title field wraps to two lines, then scrolls.", verification: backstop }
+- Lesson Workspace shell — resolved (explicit): The shell is navigation among stages. It has no separate empty, loading, or error state. Those states render inside the open stage. The expanded active stage is the focal point.
+- Lesson Workspace overflow — resolved (explicit): The stage column scrolls vertically. Stage labels are the fixed names Source, Learning Units, Generate Exercises, Practice, and Feedback.
+- Source overflow — resolved (explicit): The source panel body scrolls vertically. The page does not freeze.
+- Source long-text — { statement: "Source text and the Gap Fill sentence wrap, the blank stays inline, and there is no horizontal page scroll at 320px width.", verification: backstop }
+- Learning Units empty — resolved (explicit): Zero units shows "No learning units" and "Select a phrase in the source, then choose Add Learning Unit." Add Learning Unit does nothing until a span is selected.
+- Learning Units loading — resolved (explicit): The workspace header shows "Loading…" while `learning_unit.list` is in flight.
+- Learning Units error — resolved (explicit): An overlapping selection shows "That selection overlaps an existing unit. Choose a non-overlapping span." The existing unit stays.
+- Learning Units populated — resolved (explicit): Each row shows the unit text, a draft or accepted badge, Accept when draft, Delete, and the excerpt jump.
+- Learning Units partial — resolved (explicit): Draft and accepted rows stay in one list. Generate Exercises uses accepted units only.
+- Learning Units overflow — resolved (explicit): Unit text wraps to two lines, then ellipsis. The excerpt jump shows the full span.
+- Learning Units zero-one-many — resolved (explicit): Zero is the empty state. One and many use the same row.
+- Learning Units long-text — resolved (explicit): Unit text wraps to two lines, then ellipsis.
+- Generate Exercises empty — resolved (explicit): No exercise rows until generation succeeds.
+- Generate Exercises loading — resolved (explicit): The button is busy and reads "Generating…" until the command returns a terminal status.
+- Generate Exercises error — resolved (explicit): No accepted units shows "No accepted units to practice. Accept at least one draft unit, then generate again." Any other failure shows "Exercise generation failed. Check your accepted units and try Generate Exercises again." Generate Exercises stays available.
+- Generate Exercises populated — resolved (explicit): Success unlocks and expands Practice. Item count equals the accepted-unit count for the upcoming passes.
+- Generate Exercises partial — resolved (explicit): Draft units remain visible and are not generated.
+- Generate Exercises overflow — resolved (explicit): The status text wraps inside the stage. It does not cover other stages.
+- Generate Exercises zero-one-many — resolved (explicit): Zero accepted units fails generation. One accepted unit later skips the drag pass. Many accepted units run drag, then typed input.
+- Generate Exercises long-text — resolved (explicit): Status copy wraps inside the stage.
+- Focus Practice empty — resolved (explicit): Start Practice stays disabled until generation has succeeded.
+- Focus Practice loading — resolved (explicit): Submit Answer is disabled and reads "Checking…" until feedback returns.
+- Focus Practice error — resolved (explicit): Transport failure shows "Could not submit. Try again." Focus Mode stays open and the answer field keeps its input.
+- Focus Practice partial — resolved (explicit): One accepted unit shows typed input only. Two or more show the chip bank on the first pass.
+- Focus Practice overflow — resolved (explicit): Chips wrap in the bank. The bank scrolls if it is taller than 40vh.
+- Focus Practice long-text — { statement: "The Gap Fill sentence wraps, the blank stays inline, and the page does not scroll horizontally at 320px.", verification: backstop }
+- Feedback empty — resolved (explicit): Before any Attempt, Feedback stays locked. After unlock with zero attempts it shows "No attempts yet. Start Practice to begin."
+- Feedback loading — resolved (explicit): Feedback does not render its own spinner. Submit Answer shows "Checking…" until the payload arrives.
+- Feedback error — resolved (explicit): A failed submit does not open a feedback card. The practice error stays inline.
+- Feedback populated — resolved (explicit): The card shows the submitted answer, the expected unit, the D-18 explanation, and used or missed. Continue moves to the next item without leaving the session.
+- Feedback partial — resolved (explicit): A null natural alternative is omitted. The other four fields still render.
+- Feedback overflow — resolved (explicit): Feedback text wraps inside the card.
+- Feedback zero-one-many — resolved (explicit): The learner sees one feedback card at a time.
+- Feedback long-text — resolved (explicit): Submitted and expected text wrap inside the card.
 
 ---
 
@@ -219,14 +248,14 @@ Applicable state considerations resolved: 22 covered, 2 backstop, 0 unresolved
 
 ## Checker Sign-Off
 
-- [ ] Dimension 1 Copywriting: PASS
-- [ ] Dimension 2 Visuals: PASS
-- [ ] Dimension 3 Color: PASS
-- [ ] Dimension 4 Typography: PASS
-- [ ] Dimension 5 Spacing: PASS
-- [ ] Dimension 6 Registry Safety: PASS
-- [ ] Dimension 7 Inventory Provenance: PASS
+- [x] Dimension 1 Copywriting: FLAG — single-word Accept, Continue, and Delete stay as locked in CONTEXT.md
+- [x] Dimension 2 Visuals: FLAG — focal point is the expanded stage; in Focus Practice Mode it is the Gap Fill sentence
+- [x] Dimension 3 Color: PASS
+- [x] Dimension 4 Typography: PASS
+- [x] Dimension 5 Spacing: PASS
+- [x] Dimension 6 Registry Safety: PASS
+- [x] Dimension 7 Inventory Provenance: PASS
 
-**Approval:** pending
+**Approval:** approved 2026-09-28
 
 **Dimension 7 note:** Component Inventory section omitted because `Tool: none` (no installed design-system package to enumerate). Provenance N/A by template rule.
