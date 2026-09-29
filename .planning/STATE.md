@@ -5,8 +5,8 @@ milestone_name: milestone
 current_phase: 1
 current_phase_name: Mod-First Manual Learning Loop
 status: planning
-stopped_at: Phase 1 context gathered
-last_updated: "2026-09-28T17:23:48.026Z"
+stopped_at: Phase 1 UI-SPEC approved
+last_updated: "2026-09-29T01:46:03.598Z"
 last_activity: 2026-09-28
 last_activity_desc: Introduced versioned planning governance and accepted the future MCP / external AI-orchestration direction without changing v1 scope
 progress:
@@ -98,6 +98,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-09-28T17:23:48.014Z
-Stopped at: Phase 1 context gathered
-Resume file: .planning/phases/01-mod-first-manual-learning-loop/01-CONTEXT.md
+Last session: 2026-09-29T01:46:03.581Z
+Stopped at: Phase 1 UI-SPEC approved
+Resume file: .planning/phases/01-mod-first-manual-learning-loop/01-UI-SPEC.md
