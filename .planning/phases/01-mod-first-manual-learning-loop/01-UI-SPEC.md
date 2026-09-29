@@ -22,7 +22,7 @@ reviewed_at: "2026-09-28T22:43:00+03:00"
 | Preset | not applicable |
 | Component library | none — CSS design tokens + scoped module styles (source: `01-RESEARCH.md` Standard Stack / STACK.md) |
 | Icon library | none in Phase 1 — use text labels and native affordances; Lucide only if a later phase adopts a component kit |
-| Font | Source Sans 3 (UI/body) + Source Serif 4 (lesson source and Gap Fill sentence) via Google Fonts or self-hosted WOFF2 |
+| Font | Source Sans 3 (UI/body) + Source Serif 4 (lesson source and Gap Fill sentence). Self-hosted WOFF2 or local/system fallback. No runtime dependency on Google Fonts |
 
 **shadcn gate:** `components.json` absent; no `frontend/` or `src/` application UI yet. Upstream research explicitly defers a component framework. Do not initialize shadcn in Phase 1.
 
@@ -125,7 +125,7 @@ Exceptions: 44×44px minimum hit target for icon-only or chip drag handles on to
 | Heading | 20px | 600 | 1.2 |
 | Display | 28px | 600 | 1.2 |
 
-Weights used: **400** and **600** only. Lesson source and Gap Fill sentence use Source Serif 4 at Body size; all chrome (nav, buttons, labels, feedback chrome) uses Source Sans 3.
+Weights used: **400** and **600** only. Lesson source and Gap Fill sentence use Source Serif 4 at Body size; all chrome (nav, buttons, labels, feedback chrome) uses Source Sans 3. Ship both families as self-hosted WOFF2, with a local or system fallback. No runtime request to Google Fonts or any other font CDN.
 
 ---
 
@@ -216,7 +216,7 @@ Untitled fallback title: `Untitled Lesson` (D-03).
 - Generate Exercises empty — resolved (explicit): No exercise rows until generation succeeds.
 - Generate Exercises loading — resolved (explicit): The button is busy and reads "Generating…" until the command returns a terminal status.
 - Generate Exercises error — resolved (explicit): No accepted units shows "No accepted units to practice. Accept at least one draft unit, then generate again." Any other failure shows "Exercise generation failed. Check your accepted units and try Generate Exercises again." Generate Exercises stays available.
-- Generate Exercises populated — resolved (explicit): Success unlocks and expands Practice. Item count equals the accepted-unit count for the upcoming passes.
+- Generate Exercises populated — resolved (explicit): Success unlocks and expands Practice. Generated exercise-definition count equals the accepted-unit count. Practice presents each generated unit once per enabled pass: drag + typed for N > 1, typed only for N = 1.
 - Generate Exercises partial — resolved (explicit): Draft units remain visible and are not generated.
 - Generate Exercises overflow — resolved (explicit): The status text wraps inside the stage. It does not cover other stages.
 - Generate Exercises zero-one-many — resolved (explicit): Zero accepted units fails generation. One accepted unit later skips the drag pass. Many accepted units run drag, then typed input.
