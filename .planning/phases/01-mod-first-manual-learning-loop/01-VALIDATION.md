@@ -19,18 +19,24 @@ created: "2026-09-28"
 |----------|-------|
 | **Framework** | pytest 9.x (backend); Vitest 5.0.x (frontend) |
 | **Config file** | none — Wave 0 / plan 01-01 installs `pyproject.toml` and Vitest config |
-| **Quick run command** | `uv run pytest -q` and `npx vitest run` (use `npx --prefix frontend vitest run` once frontend exists) |
-| **Full suite command** | `uv run pytest` and `npx --prefix frontend vitest run` and `docker compose up -d --wait` and the OpenAPI client diff |
+| **Quick run command** | Task `<automated>` command only. Do not use Compose or the OpenAPI diff as the quick command. |
+| **Full suite command** | Wave 8 only: `uv run pytest -q` and `npx --prefix frontend vitest run` and `docker compose up -d --wait` and the OpenAPI client diff |
 | **Estimated runtime** | unknown until Wave 0; target under 120 seconds |
 
 ---
 
 ## Sampling Rate
 
-- **After every task commit:** Run `uv run pytest -q` and `npx --prefix frontend vitest run`
-- **After every plan wave:** Run `uv run pytest` and `npx --prefix frontend vitest run` and `docker compose up -d --wait` and `git diff --exit-code -- frontend/src/api/generated` after `uv run python -m lait.adapters.http.export_openapi` and `npm --prefix frontend run openapi:generate`
-- **Before `/gsd-verify-work`:** Full suite must be green
-- **Max feedback latency:** 120 seconds
+Progressive gates. Do not run a later wave's command before the plan that creates it.
+
+- **After every task commit:** Run that task's `<automated>` command only.
+- **Wave 1 (01-01):** `uv run pytest -q` for the tests that exist. No Compose. No OpenAPI diff. No frontend Vitest.
+- **Wave 2 and later, only after 01-10 is green:** `docker compose up -d --wait` is a legal gate. Do not run Compose before 01-10.
+- **Wave 5 and later, only after 01-06 is green:** `npx --prefix frontend vitest run` for frontend tasks. Do not require Vitest before the frontend test files exist.
+- **OpenAPI gate only after 01-08 (wave 7):** `uv run python -m lait.adapters.http.export_openapi`, then `npm --prefix frontend run openapi:generate`, then `git diff --exit-code -- frontend/src/api/generated`. Do not run this gate on waves 1–6.
+- **Final wave (wave 8, plan 01-09):** full suite — `uv run pytest -q`, `npx --prefix frontend vitest run`, `docker compose up -d --wait`, and the OpenAPI dirty-diff.
+- **Before `/gsd-verify-work`:** the wave 8 full suite must be green.
+- **Max feedback latency:** 120 seconds. Compose is a wave gate, not the per-task check.
 
 ---
 
@@ -53,7 +59,7 @@ created: "2026-09-28"
 | 01-05-T1 | 01-05 | 4 | EXER-01 | T-01-12 | Generate only from accepted units; status stored | unit | `uv run pytest backend/tests/application/test_exercise_generate.py -q` | ❌ W0 | ⬜ pending |
 | 01-05-T1 | 01-05 | 4 | EXER-02 | T-01-13 | One item; unit set freezes | unit | `uv run pytest backend/tests/application/test_practice_start.py -q` | ❌ W0 | ⬜ pending |
 | 01-05-T1 | 01-05 | 4 | EXER-07 | T-01-12 | Submit, feedback, next item, session stays open | unit | `uv run pytest backend/tests/application/test_submit_attempt.py -q` | ❌ W0 | ⬜ pending |
-| 01-11-T1 | 01-11 | 5 | EXER-07 | T-01-14 | Finish and start-over HTTP routes; Start Over keeps Attempts | unit | `uv run pytest backend/tests/application/test_practice_finish_and_start_over.py -q` | ❌ W0 | ⬜ pending |
+| 01-11-T1 | 01-11 | 5 | EXER-07 | T-01-14 | practice.start_over keeps Attempts; HTTP only maps DTOs | unit | `uv run pytest backend/tests/application/test_practice_finish_and_start_over.py -q` | ❌ W0 | ⬜ pending |
 | 01-06-T1 | 01-06 | 5 | LESS-01 | T-01-15 | Create Lesson UI + empty/loading copy | component | `npx --prefix frontend vitest run src/features/lesson/LessonWorkspacePage.test.tsx` | ❌ W0 | ⬜ pending |
 | 01-06-T3 | 01-06 | 5 | LESS-02 | T-01-15 | Lesson List UI states | component | `npx --prefix frontend vitest run src/features/lesson/LessonListPage.test.tsx` | ❌ W0 | ⬜ pending |
 | 01-06-T2 | 01-06 | 5 | ANLY-08 | T-01-15 | Unit capture UI; overlap copy | component | `npx --prefix frontend vitest run src/features/lesson/LearningUnitsStage.test.tsx` | ❌ W0 | ⬜ pending |

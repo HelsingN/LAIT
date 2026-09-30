@@ -60,5 +60,5 @@ Each later phase adds one vertical slice on top of this skeleton without alterin
 ## Plan Decisions Locked Here
 
 1. **Generate status (EXER-01):** Server persists only terminal `completed` or `failed` inside `exercise.generate`'s transaction. UI shows locked copy "Generating…" while the TanStack mutation is pending; after return, UI reads the stored terminal status. No persisted `queued`/`running` in Phase 1.
-2. **Start-over (D-10/D-19):** Abandon in-progress non-attempt state, then call `practice.start` again on the same frozen accepted set. Do not overload `practice.finish`.
+2. **Start-over (D-10/D-19):** Application command `practice.start_over` abandons in-progress non-attempt state, then calls `practice.start` on the same frozen accepted set. HTTP only maps the DTO onto that command. Do not overload `practice.finish`. Do not put the orchestration in the router.
 3. **OpenAPI generator:** `@hey-api/openapi-ts` pinned in `frontend/package.json`; scripts `openapi:export` (backend) + `openapi:generate` (frontend); CI fails on `git diff --exit-code -- frontend/src/api/generated`.

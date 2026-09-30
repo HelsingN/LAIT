@@ -351,9 +351,12 @@ Handlers under `tests/application` must not start FastAPI. HTTP tests, if any, o
 
 ### Sampling Rate
 
-- **Per task commit:** `uv run pytest -q` and `npx vitest run`
-- **Per wave merge:** `uv run pytest` and `npx vitest run` and `docker compose up -d --wait` and the OpenAPI diff command
-- **Phase gate:** Full suite green, Compose healthcheck green, generated client diff empty
+Progressive gates. Same contract as `01-VALIDATION.md`.
+
+- **Per task commit:** that task's `<automated>` command only.
+- **Compose:** only after plan 01-10.
+- **OpenAPI dirty-diff:** only after plan 01-08.
+- **Phase gate (wave 8):** pytest, Vitest, `docker compose up -d --wait`, and an empty generated-client diff.
 
 ### Wave 0 Gaps
 
