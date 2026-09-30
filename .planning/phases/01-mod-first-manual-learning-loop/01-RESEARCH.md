@@ -297,10 +297,10 @@ Do not build MCP in Phase 1 (ADR-014). Do not use FastAPI `BackgroundTasks` for 
 
 **If this table is empty:** N/A — confirmation needed for A1–A6 before they become locked.
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **OpenAPI generator package** — STACK requires a pinned generator and a dirty-diff failure [CITED: .planning/research/STACK.md:36] but does not name the package. The plan picks one, legitimacy-checks it, then locks the CI commands below.
-2. **Non-terminal generate status** — EXER-01 needs a recoverable status. Persist it. Phase 1 may commit only `completed` or `failed`.
+1. **OpenAPI generator package** — RESOLVED: pin `@hey-api/openapi-ts` (SKELETON + plan 01-08 legitimacy gate); STACK dirty-diff failure stays [CITED: .planning/research/STACK.md:36].
+2. **Non-terminal generate status** — RESOLVED: `exercise.generate` persists only terminal `completed` | `failed`; UI "Generating…" is client pending (SKELETON / plan 01-05).
 
 ## Environment Availability
 

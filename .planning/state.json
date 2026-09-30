@@ -1,0 +1,58 @@
+{
+  "contract": "1.0.0",
+  "flavor": "core",
+  "milestone": "v1.0",
+  "phases": [
+    {
+      "number": "1",
+      "name": "Mod-First Manual Learning Loop",
+      "status": "planned"
+    },
+    {
+      "number": "2",
+      "name": "AI-Assisted Learning-Unit Review",
+      "status": "pending"
+    },
+    {
+      "number": "3",
+      "name": "Assisted Chunk Retrieval",
+      "status": "pending"
+    },
+    {
+      "number": "4",
+      "name": "Resumable Sentence Reconstruction",
+      "status": "pending"
+    },
+    {
+      "number": "5",
+      "name": "Trustworthy Keyword Recall",
+      "status": "pending"
+    },
+    {
+      "number": "6",
+      "name": "Weak-Unit Review Loop",
+      "status": "pending"
+    },
+    {
+      "number": "7",
+      "name": "Resilient Lesson Lifecycle",
+      "status": "pending"
+    },
+    {
+      "number": "8",
+      "name": "Public Contract Parity",
+      "status": "pending"
+    },
+    {
+      "number": "9",
+      "name": "Responsive Local Release",
+      "status": "pending"
+    }
+  ],
+  "next": {
+    "command": "/gsd-execute-phase 1",
+    "label": "Execute phase 01",
+    "reason": "Phase 01 of 9 — plans verified, not started"
+  },
+  "updated_at": "2026-09-30T15:28:10.938Z"
+}
