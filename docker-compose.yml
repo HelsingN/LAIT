@@ -1,28 +1,41 @@
+# Local stack: Alembic upgrade head, then /health. apps/api and apps/web are retired.
 services:
   api:
     build:
-      context: ./apps/api
-    env_file:
-      - .env
+      context: ./backend
+      dockerfile: ../Dockerfile.api
+      additional_contexts:
+        workspace: .
+    environment:
+      LAIT_DATABASE_URL: sqlite:////app/data/lait.db
     ports:
       - "${APP_PORT:-8000}:8000"
     volumes:
-      - ./apps/api:/app
       - app-data:/app/data
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=3)",
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 24
+      start_period: 30s
 
   web:
     build:
-      context: ./apps/web
-    env_file:
-      - .env
+      context: ./frontend
+      dockerfile: ../Dockerfile.web
+      additional_contexts:
+        workspace: .
     ports:
-      - "5173:5173"
-    volumes:
-      - ./apps/web:/app
-      - web-node-modules:/app/node_modules
+      - "${WEB_PORT:-5173}:5173"
     depends_on:
-      - api
+      api:
+        condition: service_healthy
 
 volumes:
   app-data:
-  web-node-modules:

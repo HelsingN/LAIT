@@ -1,0 +1,24 @@
+# API image. Compose build context is backend/; lockfile comes from the workspace context.
+# apps/api is not a build context. uvicorn starts only after Alembic upgrade head.
+FROM python:3.14-slim-bookworm
+
+COPY --from=ghcr.io/astral-sh/uv:0.12.21 /uv /usr/local/bin/uv
+
+WORKDIR /app
+
+ENV UV_LINK_MODE=copy \
+    UV_PROJECT_ENVIRONMENT=/app/.venv \
+    PATH="/app/.venv/bin:${PATH}" \
+    PYTHONPATH=/app/backend \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    LAIT_DATABASE_URL=sqlite:////app/data/lait.db
+
+COPY --from=workspace pyproject.toml uv.lock ./
+RUN uv sync --frozen --no-dev --no-install-project
+
+COPY . ./backend
+COPY --from=workspace docker/api_entrypoint.py /usr/local/bin/api_entrypoint.py
+
+EXPOSE 8000
+ENTRYPOINT ["python", "/usr/local/bin/api_entrypoint.py"]

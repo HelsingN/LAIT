@@ -1,0 +1,16 @@
+# Web image. Compose build context is frontend/; nginx config comes from the workspace context.
+# apps/web is not a build context.
+FROM node:24-bookworm-slim AS build
+
+WORKDIR /src
+COPY package.json package-lock.json ./
+RUN npm ci --no-audit --no-fund
+COPY . ./
+RUN npm run build
+
+FROM nginx:1.28-alpine
+
+COPY --from=workspace docker/web-nginx.conf /etc/nginx/conf.d/default.conf
+COPY --from=build /src/dist /usr/share/nginx/html
+
+EXPOSE 5173
