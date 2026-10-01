@@ -54,6 +54,7 @@ class ModuleRecord:
     capabilities: tuple[str, ...]
     dependencies: tuple[str, ...]
     contribution: ExerciseContribution | None
+    package: str = ""
 
 
 def parse_catalog_entry(entry: dict) -> ModuleRecord:
@@ -67,6 +68,8 @@ def parse_catalog_entry(entry: dict) -> ModuleRecord:
     if parsed.api_version != SUPPORTED_API_VERSION:
         raise CatalogInvalidError("api_incompatible", "module API version is not supported")
     contribution = _parse_contribution(entry.get("contribution"), parsed.category)
+    raw_package = entry.get("package", "")
+    package = raw_package if isinstance(raw_package, str) else ""
     return ModuleRecord(
         module_id=parsed.module_id,
         module_version=parsed.module_version,
@@ -75,6 +78,7 @@ def parse_catalog_entry(entry: dict) -> ModuleRecord:
         capabilities=tuple(parsed.capabilities),
         dependencies=tuple(parsed.dependencies),
         contribution=contribution,
+        package=package,
     )
 
 

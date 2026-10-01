@@ -143,7 +143,9 @@ def test_generate_skips_drafts_and_persists_only_terminal_status(tmp_path: Path)
     assert set(outcome.accepted_unit_ids) == {accepted.id}
     statuses = {row[0] for row in _rows(tmp_path, "select status from exercise_generations")}
     assert statuses <= {"completed", "failed"}
-    unit_ids = [row[0] for row in _rows(tmp_path, "select learning_unit_id from exercise_definitions")]
+    unit_ids = [
+        row[0] for row in _rows(tmp_path, "select learning_unit_id from exercise_definitions")
+    ]
     assert unit_ids == [accepted.id]
 
 

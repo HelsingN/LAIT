@@ -28,9 +28,38 @@ def load_bundled_catalog() -> list[ModuleRecord]:
     records: list[ModuleRecord] = []
     for manifest_path in bundled_manifest_paths():
         document = json.loads(manifest_path.read_text(encoding="utf-8"))
-        contribution = _load_contribution(manifest_path.parent.name)
-        records.append(parse_catalog_entry({"manifest": document, "contribution": contribution}))
+        package = manifest_path.parent.name
+        contribution = _load_contribution(package)
+        records.append(
+            parse_catalog_entry(
+                {"manifest": document, "contribution": contribution, "package": package}
+            )
+        )
     return records
+
+
+def load_generate(package: str):
+    """Import a bundled module's generate callable. The package name comes from the catalog."""
+    module = importlib.import_module(f"{_MODULES_PACKAGE}.{_package_name(package)}.generate")
+    generate = getattr(module, "generate", None)
+    if not callable(generate):
+        raise CatalogLoadError(f"bundled module {package} has no generate")
+    return generate
+
+
+def load_evaluate(package: str):
+    """Import a bundled module's evaluate callable. The package name comes from the catalog."""
+    module = importlib.import_module(f"{_MODULES_PACKAGE}.{_package_name(package)}.evaluate")
+    evaluate = getattr(module, "evaluate", None)
+    if not callable(evaluate):
+        raise CatalogLoadError(f"bundled module {package} has no evaluate")
+    return evaluate
+
+
+def _package_name(package: str) -> str:
+    if not package.isidentifier():
+        raise CatalogLoadError("bundled module package is invalid")
+    return package
 
 
 def _load_contribution(package: str) -> dict[str, str] | ExerciseContribution:

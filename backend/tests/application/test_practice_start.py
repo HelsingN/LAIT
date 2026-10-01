@@ -44,7 +44,11 @@ def _accept_unit(repository, lesson_id: str, unit_id: str):
     from lait.application.commands.learning_unit_accept import LearningUnitAccept
     from lait.application.commands.learning_unit_accept import handle as accept_unit
 
-    return accept_unit(LearningUnitAccept(lesson_id=lesson_id, unit_id=unit_id), repository, repository)
+    return accept_unit(
+        LearningUnitAccept(lesson_id=lesson_id, unit_id=unit_id),
+        repository,
+        repository,
+    )
 
 
 def _generate(repository, lesson_id: str):
@@ -133,7 +137,8 @@ def test_start_rejects_stale_generation_after_accept_or_remove(tmp_path: Path) -
 
 def test_draft_only_add_does_not_invalidate_generation(tmp_path: Path) -> None:
     from lait.application.commands.practice_start import PracticeStart, handle
-    from lait.application.queries.practice_get import QUERY_NAME, handle as current_item
+    from lait.application.queries.practice_get import QUERY_NAME
+    from lait.application.queries.practice_get import handle as current_item
 
     source = "alpha beta"
     repository = _repository(tmp_path)
@@ -160,7 +165,8 @@ def test_practice_get_returns_one_current_typed_item_for_one_unit(tmp_path: Path
     source = "I was responsible for rolling out the migration."
     repository = _repository(tmp_path)
     lesson = _lesson(repository, source)
-    unit = _accept_unit(repository, lesson.id, _add(repository, lesson.id, source, "rolling out").id)
+    added = _add(repository, lesson.id, source, "rolling out")
+    unit = _accept_unit(repository, lesson.id, added.id)
     _generate(repository, lesson.id)
 
     session = handle(PracticeStart(lesson_id=lesson.id), repository, repository, _registry())
