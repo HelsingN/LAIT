@@ -13,6 +13,7 @@ from lait.application.queries.practice_get import view_for
 from lait.catalog.validation import ModuleRecord
 from lait.domain.learning_unit import ACCEPTED
 from lait.domain.practice_session import (
+    DRAG,
     OPEN,
     TYPED,
     ExerciseDefinition,
@@ -66,16 +67,20 @@ def handle(
 
 
 def pass_items_for(definitions: tuple[ExerciseDefinition, ...]) -> tuple[PassItem, ...]:
-    """One typed item per definition. Drag-then-typed sequencing is the next slice."""
-    ordered = tuple(sorted(definitions, key=lambda definition: definition.position))
+    """N>1 walks drag for every unit, then typed. One unit is typed only."""
+    ordered = tuple(
+        sorted(definitions, key=lambda definition: (definition.start, definition.learning_unit_id))
+    )
+    modes = (DRAG, TYPED) if len(ordered) > 1 else (TYPED,)
+    steps = [(mode, definition) for mode in modes for definition in ordered]
     return tuple(
         PassItem(
             position=index,
-            mode=TYPED,
+            mode=mode,
             learning_unit_id=definition.learning_unit_id,
             definition_id=definition.id,
         )
-        for index, definition in enumerate(ordered)
+        for index, (mode, definition) in enumerate(steps)
     )
 
 
