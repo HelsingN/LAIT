@@ -39,7 +39,7 @@ This roadmap grows the product through vertical MVP slices that keep the learnin
 
 Plans:
 - [x] 01-01-PLAN.md
-- [ ] 01-02-PLAN.md
+- [x] 01-02-PLAN.md
 - [ ] 01-03-PLAN.md
 - [ ] 01-04-PLAN.md
 - [ ] 01-05-PLAN.md
@@ -213,7 +213,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Mod-First Manual Learning Loop | 1/11 | In Progress|  |
+| 1. Mod-First Manual Learning Loop | 2/11 | In Progress|  |
 | 2. AI-Assisted Learning-Unit Review | 0/TBD | Not started | - |
 | 3. Assisted Chunk Retrieval | 0/TBD | Not started | - |
 | 4. Resumable Sentence Reconstruction | 0/TBD | Not started | - |

@@ -4,16 +4,16 @@ milestone: v1.0
 current_phase: 01
 current_phase_name: Mod-First Manual Learning Loop
 status: executing
-stopped_at: Completed 01-01-PLAN.md
-last_updated: "2026-10-01T04:52:37.964Z"
+stopped_at: Completed 01-02-PLAN.md
+last_updated: "2026-10-01T05:30:12.012Z"
 last_activity: 2026-10-01
 last_activity_desc: Phase 01 execution started
-state_head: baaec4296f2d98081c66040c982ffa643ac19a8b
+state_head: 28fc5c2cfe2d3c5c0f427c0f4cf228390b5c759b
 progress:
   total_phases: 9
   completed_phases: 0
   total_plans: 11
-  completed_plans: 1
+  completed_plans: 2
 milestone_name: milestone
 spec_version: 0.2.0
 ---
@@ -31,7 +31,7 @@ Current planning/specification baseline: `.planning/VERSION.md` (`0.2.0`)
 ## Current Position
 
 Phase: 01 (Mod-First Manual Learning Loop) — EXECUTING
-Plan: 2 of 11
+Plan: 3 of 11
 Status: Ready to execute
 Current discussion area: Complete
 Last activity: 2026-10-01 — Phase 01 execution started
@@ -63,6 +63,7 @@ Progress: [░░░░░░░░░░] 0%
 | Plan | Duration | Tasks | Files |
 |------|----------|-------|-------|
 | Phase 01 P01 | 18 min | 2 tasks | 53 files |
+| Phase 01 P02 | 25 min | 3 tasks | 19 files |
 
 ## Accumulated Context
 
@@ -82,6 +83,9 @@ Recent decisions affecting current and future work:
 - [Phase 01]: Omitted lesson title is suggested from the first meaningful line; a blank title stores Untitled Lesson
 - [Phase 01]: Lesson source is capped at 100000 Unicode code points in the handler and the HTTP DTO
 - [Phase 01]: lesson.list orders by created_at descending, then lesson id ascending
+- [Phase 01]: D-21 confirmed: visibility stays on exercise contributions; Phase 1 values are learner and maintainer; experimental is rejected
+- [Phase 01]: describe() allowlists public fields and marks every live catalog row active; list_visible_for filters on contribution visibility only
+- [Phase 01]: Supported module api_version is 1; core.exercise-api 0.1.0 resolves dependency specs; runtime checks use Pydantic mirrored by the manifest schema
 
 ### Pending Todos
 
@@ -107,6 +111,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-10-01T04:52:16.752Z
-Stopped at: Completed 01-01-PLAN.md
+Last session: 2026-10-01T05:30:11.971Z
+Stopped at: Completed 01-02-PLAN.md
 Resume file: None

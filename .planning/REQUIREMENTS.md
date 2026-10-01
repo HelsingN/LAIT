@@ -68,8 +68,8 @@
 
 ### Mod-First Extension Contracts
 
-- [ ] **MODL-01**: Maintainer can start the application only when every bundled module manifest is valid, API-compatible, uniquely identified, and has resolvable declared dependencies.
-- [ ] **MODL-02**: Maintainer can inspect which bundled modules and capabilities are active without accessing private module implementation details.
+- [x] **MODL-01**: Maintainer can start the application only when every bundled module manifest is valid, API-compatible, uniquely identified, and has resolvable declared dependencies.
+- [x] **MODL-02**: Maintainer can inspect which bundled modules and capabilities are active without accessing private module implementation details.
 - [ ] **MODL-03**: Maintainer can add a bundled exercise module through the public exercise contracts, static module catalog, and frontend renderer registry without modifying core domain services.
 - [ ] **MODL-04**: Maintainer can run the same exercise-module conformance suite against Gap Fill, Chunk Completion, Sentence Reconstruction, Keyword Recall, and a proof-of-concept exercise module.
 - [ ] **MODL-05**: Maintainer can register language behavior through a language-module contract that provides normalization, tokenization, punctuation handling, and directionality metadata without embedding English rules in core services.
@@ -210,8 +210,8 @@ Deferred beyond the initial release and not mapped to the v1 roadmap.
 | REVW-06 | Phase 6 | Pending |
 | REVW-07 | Phase 6 | Pending |
 | REVW-08 | Phase 6 | Pending |
-| MODL-01 | Phase 1 | Pending |
-| MODL-02 | Phase 1 | Pending |
+| MODL-01 | Phase 1 | Complete |
+| MODL-02 | Phase 1 | Complete |
 | MODL-03 | Phase 1 | Pending |
 | MODL-04 | Phase 8 | Pending |
 | MODL-05 | Phase 3 | Pending |
