@@ -1,4 +1,4 @@
-"""Gap Fill definitions. One accepted unit yields one blanked sentence."""
+"""Gap Fill definitions. Each accepted unit blanks only its own span."""
 
 from __future__ import annotations
 
@@ -16,9 +16,11 @@ BLANK = "______"
 
 
 def generate(source: str, units: Sequence[AcceptedUnit]) -> GenerateResult:
-    if len(units) != 1:
-        return GenerateResult(items=(), chip_unit_ids=())
-    return GenerateResult(items=(_item_for(source, units[0]),), chip_unit_ids=())
+    ordered = tuple(sorted(units, key=lambda unit: (unit.start, unit.learning_unit_id)))
+    return GenerateResult(
+        items=tuple(_item_for(source, unit) for unit in ordered),
+        chip_unit_ids=tuple(unit.learning_unit_id for unit in ordered),
+    )
 
 
 def _item_for(source: str, unit: AcceptedUnit) -> ExerciseItem:
