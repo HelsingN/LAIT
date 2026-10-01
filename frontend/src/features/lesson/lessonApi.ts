@@ -135,3 +135,100 @@ export function generateExercises(lessonId: string): Promise<GenerationResult> {
     method: "POST",
   }).then((response) => readJson<GenerationResult>(response));
 }
+
+export type PracticeSegment = {
+  kind: string;
+  text: string;
+};
+
+export type PracticeItem = {
+  mode: string;
+  learning_unit_id: string;
+  exercise_type: string;
+  position: number;
+  start: number;
+  end: number;
+  target_text: string;
+  sentence: string;
+  segments: PracticeSegment[];
+  chip_unit_ids: string[];
+};
+
+export type PracticeView = {
+  session_id: string;
+  lesson_id: string;
+  open: boolean;
+  cursor: number;
+  current: PracticeItem | null;
+};
+
+export type AttemptResult = {
+  attempt_id: string;
+  session_open: boolean;
+  cursor: number;
+  category: string;
+  submitted: string;
+  expected: string;
+  explanation: string;
+  chunks_used: string[];
+  chunks_missed: string[];
+  natural_alternative: string | null;
+  learning_unit_id: string;
+  span_start: number;
+  span_end: number;
+  unit_text: string;
+};
+
+export type AttemptSubmission = {
+  kind: string;
+  text: string;
+  submittedUnitId: string | null;
+  targetLearningUnitId: string;
+};
+
+export function startPractice(lessonId: string): Promise<PracticeView> {
+  return fetch("/api/practice-sessions", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ lesson_id: lessonId }),
+  }).then((response) => readJson<PracticeView>(response));
+}
+
+export function getPractice(sessionId: string): Promise<PracticeView> {
+  return fetch(`/api/practice-sessions/${encodeURIComponent(sessionId)}`).then((response) =>
+    readJson<PracticeView>(response),
+  );
+}
+
+export function submitAttempt(sessionId: string, submission: AttemptSubmission): Promise<AttemptResult> {
+  const body: {
+    kind: string;
+    text: string;
+    target_learning_unit_id: string;
+    submitted_unit_id?: string;
+  } = {
+    kind: submission.kind,
+    text: submission.text,
+    target_learning_unit_id: submission.targetLearningUnitId,
+  };
+  if (submission.submittedUnitId) {
+    body.submitted_unit_id = submission.submittedUnitId;
+  }
+  return fetch(`/api/practice-sessions/${encodeURIComponent(sessionId)}/attempts`, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify(body),
+  }).then((response) => readJson<AttemptResult>(response));
+}
+
+export function finishPractice(sessionId: string): Promise<PracticeView> {
+  return fetch(`/api/practice-sessions/${encodeURIComponent(sessionId)}/finish`, {
+    method: "POST",
+  }).then((response) => readJson<PracticeView>(response));
+}
+
+export function startOverPractice(sessionId: string): Promise<PracticeView> {
+  return fetch(`/api/practice-sessions/${encodeURIComponent(sessionId)}/start-over`, {
+    method: "POST",
+  }).then((response) => readJson<PracticeView>(response));
+}
