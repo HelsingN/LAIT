@@ -42,7 +42,7 @@ Plans:
 - [x] 01-02-PLAN.md
 - [x] 01-03-PLAN.md
 - [x] 01-04-PLAN.md
-- [ ] 01-05-PLAN.md
+- [x] 01-05-PLAN.md
 - [ ] 01-06-PLAN.md
 - [ ] 01-07-PLAN.md
 - [ ] 01-08-PLAN.md
@@ -213,7 +213,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Mod-First Manual Learning Loop | 5/11 | In Progress|  |
+| 1. Mod-First Manual Learning Loop | 6/11 | In Progress|  |
 | 2. AI-Assisted Learning-Unit Review | 0/TBD | Not started | - |
 | 3. Assisted Chunk Retrieval | 0/TBD | Not started | - |
 | 4. Resumable Sentence Reconstruction | 0/TBD | Not started | - |

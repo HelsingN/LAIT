@@ -1,10 +1,10 @@
 ---
 schema_version: 1
-open_count: 1
+open_count: 0
 waived_count: 0
-fixed_count: 4
+fixed_count: 5
 total_count: 5
-last_updated: 2026-10-01T07:37:22.959Z
+last_updated: 2026-10-01T10:30:03.236Z
 ---
 
 # Broken Windows Ledger
@@ -15,7 +15,7 @@ last_updated: 2026-10-01T07:37:22.959Z
 
 | id | phase | kind | file | line | description | status | reason | recorded_at | resolved_at |
 |----|-------|------|------|------|-------------|--------|--------|-------------|-------------|
-| 1 | 01 | stub | backend/lait/adapters/persistence/repositories.py | 80 | has_open_practice_session returns false until plan 01-05 binds an open PracticeSession | open |  | 2026-10-01T06:23:57.512Z |  |
+| 1 | 01 | stub | backend/lait/adapters/persistence/repositories.py | 80 | has_open_practice_session returns false until plan 01-05 binds an open PracticeSession | fixed |  | 2026-10-01T06:23:57.512Z | 2026-10-01T10:30:03.236Z |
 | 2 | 01 | deviation | frontend/.dockerignore |  | Context-local dockerignore so host node_modules are not copied into the web image | fixed |  | 2026-10-01T06:57:38.623Z | 2026-10-01T06:58:40.893Z |
 | 3 | 01 | deviation | docker/web-nginx.conf |  | nginx proxies /api and /health so the static frontend can reach the api service | fixed |  | 2026-10-01T06:57:39.338Z | 2026-10-01T06:58:41.564Z |
 | 4 | 01 | deviation | backend/lait/domain/exercise.py |  | Shared exercise types added so Gap Fill and proof share one public contract | fixed |  | 2026-10-01T07:35:58.283Z | 2026-10-01T07:37:22.322Z |
@@ -30,10 +30,10 @@ last_updated: 2026-10-01T07:37:22.959Z
     "file": "backend/lait/adapters/persistence/repositories.py",
     "line": 80,
     "description": "has_open_practice_session returns false until plan 01-05 binds an open PracticeSession",
-    "status": "open",
+    "status": "fixed",
     "reason": "",
     "recorded_at": "2026-10-01T06:23:57.512Z",
-    "resolved_at": null,
+    "resolved_at": "2026-10-01T10:30:03.236Z",
     "milestone": "v1.0"
   },
   {
