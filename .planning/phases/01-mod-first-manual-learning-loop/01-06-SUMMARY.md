@@ -145,7 +145,7 @@ Each task was committed atomically:
 2. **Task 2: Expand Learning Units interaction tests** - `30d3668` (test)
 3. **Task 3: Expand list/create UI-SPEC copy states** - `98b73f1` (test), `18b4a3e` (feat)
 
-**Plan metadata:** pending docs commit
+**Plan metadata:** `35bba49` (docs: complete lesson workspace stage plan)
 
 ## Files Created/Modified
 
