@@ -24,8 +24,8 @@ const lesson = {
 const unit = {
   id: "unit-1",
   lesson_id: lessonId,
-  start: 23,
-  end: 34,
+  start: 22,
+  end: 33,
   text: "rolling out",
   status: "accepted",
   created_at: "2026-10-01T00:00:00+00:00",
@@ -37,8 +37,8 @@ const typedItem = {
   learning_unit_id: "unit-1",
   exercise_type: "gap-fill",
   position: 0,
-  start: 23,
-  end: 34,
+  start: 22,
+  end: 33,
   target_text: "rolling out",
   sentence: "I was responsible for ______ the migration.",
   segments: [
@@ -61,8 +61,8 @@ const attempt = {
   chunks_missed: ["rolling out"],
   natural_alternative: null,
   learning_unit_id: "unit-1",
-  span_start: 23,
-  span_end: 34,
+  span_start: 22,
+  span_end: 33,
   unit_text: "rolling out",
 };
 
