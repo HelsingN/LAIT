@@ -10,7 +10,7 @@ from sqlalchemy.engine import Engine, make_url
 from sqlalchemy.orm import sessionmaker
 
 from alembic import command
-from lait.adapters.persistence.lesson_repository import SqlAlchemyLessonRepository
+from lait.adapters.persistence.repositories import RepositoryBundle
 from lait.application.ports import LessonRepository
 
 _BACKEND_ROOT = Path(__file__).resolve().parents[3]
@@ -40,7 +40,7 @@ def migrate(database_url: str) -> None:
 def open_repository(database_url: str) -> LessonRepository:
     engine = make_engine(database_url)
     factory = sessionmaker(bind=engine, expire_on_commit=False)
-    return SqlAlchemyLessonRepository(factory)
+    return RepositoryBundle(factory)
 
 
 def _ensure_sqlite_directory(database_url: str) -> None:

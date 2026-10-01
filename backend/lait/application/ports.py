@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import Protocol
 
+from lait.domain.learning_unit import LearningUnit
 from lait.domain.lesson import Lesson
 
 
@@ -13,3 +14,15 @@ class LessonRepository(Protocol):
     def get(self, lesson_id: str) -> Lesson | None: ...
 
     def list_lessons(self) -> list[Lesson]: ...
+
+
+class LearningUnitRepository(Protocol):
+    def add_unit(self, unit: LearningUnit) -> None: ...
+
+    def get_unit(self, unit_id: str) -> LearningUnit | None: ...
+
+    def list_units(self, lesson_id: str) -> list[LearningUnit]: ...
+
+    def save_unit(self, unit: LearningUnit) -> None: ...
+
+    def has_open_practice_session(self, lesson_id: str) -> bool: ...
