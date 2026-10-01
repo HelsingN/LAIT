@@ -34,10 +34,11 @@ export function CreateLessonForm() {
     <form className={styles.form} onSubmit={onSubmit}>
       <label className={styles.field}>
         <span>Title</span>
-        <input
+        <textarea
           className={styles.titleInput}
           value={shownTitle}
           maxLength={200}
+          rows={2}
           onChange={(event) => {
             setTitleTouched(true);
             setTitle(event.target.value);

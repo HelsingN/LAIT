@@ -91,8 +91,8 @@ it("falls back to Untitled Lesson and puts the full title in the title attribute
     ),
   );
   renderList();
-  expect(await screen.findByText("Untitled Lesson")).toBeInTheDocument();
-  expect(screen.getByTitle(longTitle)).toHaveTextContent(longTitle);
+  expect(await screen.findByTitle(longTitle)).toHaveTextContent(longTitle);
+  expect(screen.getByText("Untitled Lesson", { selector: "span" })).toBeInTheDocument();
   expect(screen.getAllByRole("link", { name: "Open" })).toHaveLength(2);
   const listCss = readFileSync(join(directory, "LessonListPage.module.css"), "utf8");
   expect(listCss).toMatch(/\.rowTitle\s*\{[^}]*text-overflow:\s*ellipsis/s);
