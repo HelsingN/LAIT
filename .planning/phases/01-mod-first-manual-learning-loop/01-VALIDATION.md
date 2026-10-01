@@ -52,6 +52,7 @@ Progressive gates. Do not run a later wave's command before the plan that create
 | 01-02-T2 | 01-02 | 2 | MODL-02 | T-01-05 | `describe()` returns public fields; live rows are `active` | unit | `uv run pytest backend/tests/catalog/test_describe.py -q` | ❌ W0 | ⬜ pending |
 | 01-02-T2 | 01-02 | 2 | MODL-03 | T-01-06 | Proof catalog entry registers; learner list hides it | unit | `uv run pytest backend/tests/catalog/test_list_visible_for.py -q` | ❌ W0 | ⬜ pending |
 | 01-03-T1 | 01-03 | 2 | ANLY-08 | T-01-07 | Exact span; overlap rejected; touching edges allowed | unit | `uv run pytest backend/tests/domain/test_spans.py backend/tests/application/test_learning_unit_add.py -q` | ❌ W0 | ⬜ pending |
+| 01-03-T2 | 01-03 | 2 | ANLY-08 | T-01-08 | Logical-removed span does not block re-add; new id | unit | `uv run pytest backend/tests/application/test_learning_unit_remove.py::test_logical_removed_span_can_be_readded_as_new_unit -q` | ❌ W0 | ⬜ pending |
 | 01-04-T1 | 01-04 | 3 | EXER-03 | T-01-09 | Gap Fill via registry; one unit skips drag (module) | unit | `uv run pytest backend/tests/modules/exercise_gap_fill/test_generate.py -q` | ❌ W0 | ⬜ pending |
 | 01-04-T1 | 01-04 | 3 | EVAL-01 | T-01-09 | Drag checks unit id; typed match is trim and casefold | unit | `uv run pytest backend/tests/modules/exercise_gap_fill/test_evaluate.py -q` | ❌ W0 | ⬜ pending |
 | 01-04-T1 | 01-04 | 3 | EVAL-04 | T-01-10 | Only `correct` and `incorrect` | unit | `uv run pytest backend/tests/modules/exercise_gap_fill/test_evaluate.py -q` | ❌ W0 | ⬜ pending |
@@ -62,7 +63,7 @@ Progressive gates. Do not run a later wave's command before the plan that create
 | 01-11-T1 | 01-11 | 5 | EXER-07 | T-01-14 | practice.start_over keeps Attempts; HTTP only maps DTOs | unit | `uv run pytest backend/tests/application/test_practice_finish_and_start_over.py -q` | ❌ W0 | ⬜ pending |
 | 01-06-T1 | 01-06 | 5 | LESS-01 | T-01-15 | Create Lesson UI + empty/loading copy | component | `npx --prefix frontend vitest run src/features/lesson/LessonWorkspacePage.test.tsx` | ❌ W0 | ⬜ pending |
 | 01-06-T3 | 01-06 | 5 | LESS-02 | T-01-15 | Lesson List UI states | component | `npx --prefix frontend vitest run src/features/lesson/LessonListPage.test.tsx` | ❌ W0 | ⬜ pending |
-| 01-06-T2 | 01-06 | 5 | ANLY-08 | T-01-15 | Unit capture UI; overlap copy | component | `npx --prefix frontend vitest run src/features/lesson/LearningUnitsStage.test.tsx` | ❌ W0 | ⬜ pending |
+| 01-06-T2 | 01-06 | 5 | ANLY-08 | T-01-15 | Unit capture UI; overlap copy; emoji UTF-16 offsets become code points | component | `npx --prefix frontend vitest run src/features/lesson/LearningUnitsStage.test.tsx --reporter=verbose` | ❌ W0 | ⬜ pending |
 | 01-06-T1 | 01-06 | 5 | EXER-01 | T-01-16 | Generating… then terminal status UI | component | `npx --prefix frontend vitest run src/features/lesson/LessonWorkspacePage.test.tsx` | ❌ W0 | ⬜ pending |
 | 01-07-T1 | 01-07 | 6 | EXER-02 | T-01-17 | Focus Practice Mode one item | component | `npx --prefix frontend vitest run src/features/lesson/FocusPracticeMode.test.tsx` | ❌ W0 | ⬜ pending |
 | 01-07-T1 | 01-07 | 6 | EXER-03 | T-01-17 | Gap Fill renderer via registry | component | `npx --prefix frontend vitest run src/registries/renderers/gapFillRenderer.test.tsx` | ❌ W0 | ⬜ pending |
