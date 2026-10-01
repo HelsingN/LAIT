@@ -10,6 +10,7 @@ from typing import Annotated
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 LIVE_VISIBILITY = frozenset({"learner", "maintainer"})
+SUPPORTED_API_VERSION = 1
 CORE_APIS: dict[str, tuple[int, ...]] = {"core.exercise-api": (0, 1, 0)}
 
 _DEPENDENCY = re.compile(r"^(\S+?)(?:\s*>=\s*(\d+(?:\.\d+)*))?$")
@@ -63,6 +64,8 @@ def parse_catalog_entry(entry: dict) -> ModuleRecord:
         parsed = ModuleManifestModel.model_validate(manifest)
     except ValidationError as exc:
         raise CatalogInvalidError("invalid_manifest", "manifest failed schema validation") from exc
+    if parsed.api_version != SUPPORTED_API_VERSION:
+        raise CatalogInvalidError("api_incompatible", "module API version is not supported")
     contribution = _parse_contribution(entry.get("contribution"), parsed.category)
     return ModuleRecord(
         module_id=parsed.module_id,
@@ -76,6 +79,8 @@ def parse_catalog_entry(entry: dict) -> ModuleRecord:
 
 
 def validate_catalog(modules: Sequence[ModuleRecord]) -> tuple[ModuleRecord, ...]:
+    if len(modules) == 0:
+        raise CatalogInvalidError("empty_catalog", "catalog has no modules")
     seen: dict[str, ModuleRecord] = {}
     for module in modules:
         if module.module_id in seen:
@@ -107,8 +112,8 @@ def _parse_contribution(raw: object, category: str) -> ExerciseContribution | No
                 "visibility must be learner or maintainer",
             )
         exercise_type = raw.get("exercise_type")
-        if not isinstance(exercise_type, str):
-            exercise_type = ""
+        if not isinstance(exercise_type, str) or exercise_type.strip() == "":
+            raise CatalogInvalidError("missing_contribution_field", "exercise_type is required")
         return ExerciseContribution(exercise_type=exercise_type, visibility=str(visibility))
     if raw is not None:
         raise CatalogInvalidError("invalid_manifest", "contribution is exercise metadata only")

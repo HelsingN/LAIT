@@ -16,7 +16,7 @@
     "module_id": { "type": "string", "minLength": 1 },
     "name": { "type": "string", "minLength": 1 },
     "module_version": { "type": "string", "minLength": 1 },
-    "api_version": { "type": "integer" },
+    "api_version": { "type": "integer", "const": 1 },
     "publisher": { "type": "string" },
     "category": { "type": "string", "enum": ["exercise"] },
     "capabilities": {
