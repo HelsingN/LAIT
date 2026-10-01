@@ -1,6 +1,6 @@
 """Session freeze gate for learning-unit mutations.
 
-Plan 01-05 replaces SqlAlchemyLearningUnitRepository.has_open_practice_session.
+Plan 01-05 replaces repositories.has_open_practice_session.
 These commands keep calling this function and do not import practice_session.
 """
 
