@@ -23,6 +23,7 @@ This roadmap grows the product through vertical MVP slices that keep the learnin
 ## Phase Details
 
 ### Phase 1: Mod-First Manual Learning Loop
+
 **Goal:** A learner can launch the local application and complete a source-to-feedback Gap Fill workflow, while maintainers can observe that it runs through documented public contracts.
 **Mode:** mvp
 **Depends on:** Nothing (first phase)
@@ -33,14 +34,27 @@ This roadmap grows the product through vertical MVP slices that keep the learnin
   3. Learner receives deterministic result-category feedback containing their answer, the reference, target chunks used or missed, a concise explanation, an optional natural alternative, and the next-exercise action without leaving the session.
   4. Maintainer can inspect active modules and capabilities, invoke the workflow through documented commands and queries, add a proof exercise contribution through the public registry and renderer seams without changing core domain services, and see startup reject invalid or incompatible module catalogs.
   5. Maintainer can generate the TypeScript client from OpenAPI, have CI detect an unreviewed contract/client mismatch, and test the core, persistence adapter, and bundled modules independently.
+
 **Plans:** TBD
 
 Plans:
+- [x] 01-01-PLAN.md
+- [ ] 01-02-PLAN.md
+- [ ] 01-03-PLAN.md
+- [ ] 01-04-PLAN.md
+- [ ] 01-05-PLAN.md
+- [ ] 01-06-PLAN.md
+- [ ] 01-07-PLAN.md
+- [ ] 01-08-PLAN.md
+- [ ] 01-09-PLAN.md
+- [ ] 01-10-PLAN.md
+- [ ] 01-11-PLAN.md
 - [ ] To be defined during `$gsd-plan-phase 1`
 
 **UI hint:** yes
 
 ### Phase 2: AI-Assisted Learning-Unit Review
+
 **Goal:** A learner can turn a preserved source revision into reviewed lexical learning units through a durable, transparent, and safely bounded AI workflow.
 **Mode:** mvp
 **Depends on:** Phase 1
@@ -51,6 +65,7 @@ Plans:
   3. Learner can inspect the immutable source revision behind every candidate and is told which configured provider may receive source text before the first transmission.
   4. Maintainer can replace either the OpenAI-compatible provider or the analysis feature independently, with validated outputs and trace records that distinguish retryable, permanent, refusal, and uncertain dispositions.
   5. Pasted text remains untrusted data separated from instructions and cannot grant model tools or application privileges.
+
 **Plans:** TBD
 
 Plans:
@@ -59,6 +74,7 @@ Plans:
 **UI hint:** yes
 
 ### Phase 3: Assisted Chunk Retrieval
+
 **Goal:** A learner can practice accepted units with Chunk Completion using English-owned normalization and explicit assistance evidence.
 **Mode:** mvp
 **Depends on:** Phase 2
@@ -68,6 +84,7 @@ Plans:
   2. Learner can retry after feedback or reveal the relevant source, and each action is retained as distinct assistance evidence rather than independent recall.
   3. Deterministic comparison follows language-module rules for whitespace, capitalization, punctuation, contractions, and accepted variants, while source and answer text remain intact UTF-8.
   4. Learner can inspect the relevant original source directly from feedback.
+
 **Plans:** TBD
 
 Plans:
@@ -76,6 +93,7 @@ Plans:
 **UI hint:** yes
 
 ### Phase 4: Resumable Sentence Reconstruction
+
 **Goal:** A learner can reconstruct progressively less-supported sentences and resume an interrupted practice session without losing progress.
 **Mode:** mvp
 **Depends on:** Phase 3
@@ -83,6 +101,7 @@ Plans:
 **Success Criteria** (what must be TRUE):
   1. Learner can complete Sentence Reconstruction exercises supplied through the public Exercise Registry as part of the existing lesson session.
   2. Learner can leave or refresh an in-progress session and resume at the correct exercise with all prior submissions and progress intact.
+
 **Plans:** TBD
 
 Plans:
@@ -91,6 +110,7 @@ Plans:
 **UI hint:** yes
 
 ### Phase 5: Trustworthy Keyword Recall
+
 **Goal:** A learner can complete the full four-stage retrieval progression and receive evidence-linked semantic feedback that is safe, calibrated, and honest about uncertainty.
 **Mode:** mvp
 **Depends on:** Phase 4
@@ -101,6 +121,7 @@ Plans:
   3. Learner can flag or override a questionable AI judgment without erasing the original evaluation, and all model-generated feedback renders without executable active content.
   4. Maintainer can run semantic evaluation against a versioned human-curated corpus with a deterministic fake provider and inspect provider usage and estimated cost without exposing secrets to the browser or logs.
   5. Product validation demonstrates that at least 80% of generated exercises are usable after learning-unit review on the agreed sample.
+
 **Plans:** TBD
 
 Plans:
@@ -109,6 +130,7 @@ Plans:
 **UI hint:** yes
 
 ### Phase 6: Weak-Unit Review Loop
+
 **Goal:** A learner can revisit weak learning units through an explainable due queue and have each review outcome shape future scheduling.
 **Mode:** mvp
 **Depends on:** Phase 5
@@ -118,6 +140,7 @@ Plans:
   2. Learner can open an explainable queue of due learning units whose order reflects correctness, failures, elapsed time, assistance, and self-rating through the public scheduler contract.
   3. Learner can complete a due-review exercise, rate it easy, difficult, or mastered, and observe the resulting review state affect future due work.
   4. Maintainer can inspect and recompute review state from recorded scheduler identity, version, parameters, inputs, and outcome; the plain-text importer and scheduler are registered through category-specific public contracts and can be replaced without changing core learning workflows.
+
 **Plans:** TBD
 
 Plans:
@@ -126,6 +149,7 @@ Plans:
 **UI hint:** yes
 
 ### Phase 7: Resilient Lesson Lifecycle
+
 **Goal:** A learner can safely evolve and manage lessons across source revisions and provider failures without losing historical learning evidence.
 **Mode:** mvp
 **Depends on:** Phase 6
@@ -135,6 +159,7 @@ Plans:
   2. Learner can edit source text, retain the previously analyzed source as an immutable revision, and explicitly re-analyze without replacing accepted units or historical exercises.
   3. Learner can retry eligible AI work without duplicating accepted learning units, exercises, or attempts.
   4. Learner retains access to lessons, learning units, attempts, feedback, and due-review data while the configured AI provider is unavailable.
+
 **Plans:** TBD
 
 Plans:
@@ -143,6 +168,7 @@ Plans:
 **UI hint:** yes
 
 ### Phase 8: Public Contract Parity
+
 **Goal:** Maintainers can prove the complete learning workflow and a proof module obey versioned public extension boundaries with explicit compatibility and storage ownership.
 **Mode:** mvp
 **Depends on:** Phase 7
@@ -152,6 +178,7 @@ Plans:
   2. Maintainer can add and run the proof exercise module without core changes, private cross-module imports, or writes to another component's private storage.
   3. Maintainer can validate explicit extension API and schema versions, identify incompatible modules before startup, and follow recorded compatibility or migration notes.
   4. Core-owned and module-owned records remain separately governed, typed or schema-versioned, and migrated by their responsible components while the learner workflow remains functional.
+
 **Plans:** TBD
 
 Plans:
@@ -160,6 +187,7 @@ Plans:
 **UI hint:** yes
 
 ### Phase 9: Responsive Local Release
+
 **Goal:** A learner can reliably complete the entire lesson-to-review workflow on supported desktop and mobile browsers from a durable local installation.
 **Mode:** mvp
 **Depends on:** Phase 8
@@ -170,6 +198,7 @@ Plans:
   3. SQLite data survives container restart, uses WAL with bounded writes and busy handling, and can be consistently backed up, restored, and migrated toward PostgreSQL without changing core contracts.
   4. Maintainer can verify fresh-volume startup, restart, interrupted AI work, concurrent session/job writes, migrations, and persisted data without manual database edits.
   5. Maintainer can run the primary workflow on Chromium plus targeted WebKit and mobile-emulation projects.
+
 **Plans:** TBD
 
 Plans:
@@ -184,7 +213,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Mod-First Manual Learning Loop | 0/TBD | Not started | - |
+| 1. Mod-First Manual Learning Loop | 1/11 | In Progress|  |
 | 2. AI-Assisted Learning-Unit Review | 0/TBD | Not started | - |
 | 3. Assisted Chunk Retrieval | 0/TBD | Not started | - |
 | 4. Resumable Sentence Reconstruction | 0/TBD | Not started | - |

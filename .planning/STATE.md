@@ -2,18 +2,18 @@
 gsd_state_version: "1.0"
 milestone: v1.0
 current_phase: 01
-current_phase_name: mod-first-manual-learning-loop
-status: Ready to execute
-stopped_at: Phase 1 plans verified
-last_updated: "2026-10-01T03:20:44.852Z"
+current_phase_name: Mod-First Manual Learning Loop
+status: executing
+stopped_at: Completed 01-01-PLAN.md
+last_updated: "2026-10-01T04:52:37.964Z"
 last_activity: 2026-10-01
-last_activity_desc: Phase 1 plans verified
-state_head: 35f35818cb78dd2f81f2e048c08ce5819b1be563
+last_activity_desc: Phase 01 execution started
+state_head: baaec4296f2d98081c66040c982ffa643ac19a8b
 progress:
   total_phases: 9
   completed_phases: 0
   total_plans: 11
-  completed_plans: 0
+  completed_plans: 1
 milestone_name: milestone
 spec_version: 0.2.0
 ---
@@ -26,15 +26,15 @@ See: `.planning/PROJECT.md`
 Current planning/specification baseline: `.planning/VERSION.md` (`0.2.0`)
 
 **Core value:** A learner can turn their own professional English text into reliable progressive-retrieval practice that helps them recall and produce useful language independently.
-**Current focus:** Phase 1 — Mod-First Manual Learning Loop
+**Current focus:** Phase 01 — Mod-First Manual Learning Loop
 
 ## Current Position
 
-Phase: 01 (mod-first-manual-learning-loop) — READY TO EXECUTE
-Plan: 0 of 11 in current phase
+Phase: 01 (Mod-First Manual Learning Loop) — EXECUTING
+Plan: 2 of 11
 Status: Ready to execute
 Current discussion area: Complete
-Last activity: 2026-10-01 — Phase 1 plans verified
+Last activity: 2026-10-01 — Phase 01 execution started
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -58,6 +58,11 @@ Progress: [░░░░░░░░░░] 0%
 - Trend: Not started
 
 *Updated after each plan completion*
+**Per-Plan Metrics:**
+
+| Plan | Duration | Tasks | Files |
+|------|----------|-------|-------|
+| Phase 01 P01 | 18 min | 2 tasks | 53 files |
 
 ## Accumulated Context
 
@@ -73,6 +78,10 @@ Recent decisions affecting current and future work:
 - [ADR-013]: Planning/specification baselines are versioned; accepted decisions are superseded rather than semantically overwritten.
 - [ADR-014]: LAIT remains a standalone, headless-capable application; MCP is the preferred future generic agent-integration adapter and is not a v1 dependency.
 - [ADR-015]: External agent frameworks may orchestrate tutoring/conversation, while LAIT remains the authoritative learning engine and durable learning-state owner.
+- [Phase 01]: D-23 handler names are the published application boundary; HTTP only maps DTOs
+- [Phase 01]: Omitted lesson title is suggested from the first meaningful line; a blank title stores Untitled Lesson
+- [Phase 01]: Lesson source is capped at 100000 Unicode code points in the handler and the HTTP DTO
+- [Phase 01]: lesson.list orders by created_at descending, then lesson id ascending
 
 ### Pending Todos
 
@@ -98,6 +107,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-10-01T03:20:44.852Z
-Stopped at: Phase 1 plans verified
-Resume file: .planning/phases/01-mod-first-manual-learning-loop/01-01-PLAN.md
+Last session: 2026-10-01T04:52:16.752Z
+Stopped at: Completed 01-01-PLAN.md
+Resume file: None
