@@ -4,16 +4,16 @@ milestone: v1.0
 current_phase: 01
 current_phase_name: Mod-First Manual Learning Loop
 status: executing
-stopped_at: Completed 01-05-PLAN.md
-last_updated: "2026-10-01T10:30:01.174Z"
+stopped_at: Completed 01-06-PLAN.md
+last_updated: "2026-10-01T20:38:30.000Z"
 last_activity: 2026-10-01
 last_activity_desc: Phase 01 execution started
-state_head: 19cce38d9ec37f38a02afec514eaf229366a302b
+state_head: 18b4a3e0fa3b6c79f080713be41c10b837a773a2
 progress:
   total_phases: 9
   completed_phases: 0
   total_plans: 11
-  completed_plans: 6
+  completed_plans: 7
 milestone_name: milestone
 spec_version: 0.2.0
 ---
@@ -31,7 +31,7 @@ Current planning/specification baseline: `.planning/VERSION.md` (`0.2.0`)
 ## Current Position
 
 Phase: 01 (Mod-First Manual Learning Loop) — EXECUTING
-Plan: 6 of 11
+Plan: 7 of 11
 Status: Ready to execute
 Current discussion area: Complete
 Last activity: 2026-10-01 — Phase 01 execution started
@@ -68,6 +68,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 01 P10 | 31 min | 2 tasks | 10 files |
 | Phase 01 P04 | 17 min | 3 tasks | 11 files |
 | Phase 01 P05 | 2h 38m | 2 tasks | 16 files |
+| Phase 01 P06 | 10h 1m | 3 tasks | 23 files |
 
 ## Accumulated Context
 
@@ -106,6 +107,10 @@ Recent decisions affecting current and future work:
 - [Phase 01]: An open PracticeSession is the freeze flag; unit command modules stay unchanged
 - [Phase 01]: N greater than 1 is drag then typed in span order; one accepted unit is typed only
 - [Phase 01]: Attempt.learning_unit_id uses ON DELETE RESTRICT and copies the code-point span and unit text at submit
+- [Phase 01]: Lesson workspace keeps the five stage labels mounted; loading and load errors render inside the open stage
+- [Phase 01]: learning_unit.add receives Unicode code points; Start Practice enables only for the generated accepted-unit set
+- [Phase 01]: Learner exercise types come from GET /api/exercise-registry?visibility=learner
+- [Phase 01]: Create Lesson title is a two-line textarea; a blank title still stores Untitled Lesson
 
 ### Pending Todos
 
@@ -131,6 +136,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-10-01T10:30:01.132Z
-Stopped at: Completed 01-05-PLAN.md
+Last session: 2026-10-01T20:38:30.000Z
+Stopped at: Completed 01-06-PLAN.md
 Resume file: None

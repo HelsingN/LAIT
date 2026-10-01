@@ -8,8 +8,8 @@
 
 ### Lessons and Sources
 
-- [ ] **LESS-01**: Learner can create a lesson by pasting English plain text without configuring an account or language.
-- [ ] **LESS-02**: Learner can view a list of active lessons and open any lesson in the local learner context.
+- [x] **LESS-01**: Learner can create a lesson by pasting English plain text without configuring an account or language.
+- [x] **LESS-02**: Learner can view a list of active lessons and open any lesson in the local learner context.
 - [ ] **LESS-03**: Learner can rename an existing lesson.
 - [ ] **LESS-04**: Learner can edit lesson source text while the previously analyzed source remains preserved as an immutable revision.
 - [ ] **LESS-05**: Learner can archive a lesson and restore it without losing its source, learning units, exercises, attempts, or review history.
@@ -25,12 +25,12 @@
 - [ ] **ANLY-05**: Learner can accept an extracted learning unit.
 - [ ] **ANLY-06**: Learner can edit an extracted learning unit while retaining its source occurrence and generation provenance.
 - [ ] **ANLY-07**: Learner can reject an extracted learning unit and undo that rejection before leaving the review workflow.
-- [ ] **ANLY-08**: Learner can manually add a learning unit linked to the lesson and, when applicable, a source occurrence.
+- [x] **ANLY-08**: Learner can manually add a learning unit linked to the lesson and, when applicable, a source occurrence.
 - [ ] **ANLY-09**: Learner can explicitly re-analyze an edited source revision without silently replacing accepted units or historical exercises from an earlier revision.
 
 ### Exercises and Sessions
 
-- [ ] **EXER-01**: Learner can generate exercises only from accepted learning units and can see a recoverable status while generation runs.
+- [x] **EXER-01**: Learner can generate exercises only from accepted learning units and can see a recoverable status while generation runs.
 - [ ] **EXER-02**: Learner can start an exercise session for a lesson and receive one exercise at a time.
 - [ ] **EXER-03**: Learner can complete Gap Fill exercises supplied through the Exercise Registry.
 - [ ] **EXER-04**: Learner can complete Chunk Completion exercises supplied through the Exercise Registry.
@@ -165,8 +165,8 @@ Deferred beyond the initial release and not mapped to the v1 roadmap.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| LESS-01 | Phase 1 | Pending |
-| LESS-02 | Phase 1 | Pending |
+| LESS-01 | Phase 1 | Complete |
+| LESS-02 | Phase 1 | Complete |
 | LESS-03 | Phase 7 | Pending |
 | LESS-04 | Phase 7 | Pending |
 | LESS-05 | Phase 7 | Pending |
@@ -179,9 +179,9 @@ Deferred beyond the initial release and not mapped to the v1 roadmap.
 | ANLY-05 | Phase 2 | Pending |
 | ANLY-06 | Phase 2 | Pending |
 | ANLY-07 | Phase 2 | Pending |
-| ANLY-08 | Phase 1 | Pending |
+| ANLY-08 | Phase 1 | Complete |
 | ANLY-09 | Phase 7 | Pending |
-| EXER-01 | Phase 1 | Pending |
+| EXER-01 | Phase 1 | Complete |
 | EXER-02 | Phase 1 | Pending |
 | EXER-03 | Phase 1 | Pending |
 | EXER-04 | Phase 3 | Pending |
