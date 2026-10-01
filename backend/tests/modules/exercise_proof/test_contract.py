@@ -76,17 +76,16 @@ def test_proof_satisfies_the_same_public_exercise_protocol_as_gap_fill() -> None
     assert gap_manifest["dependencies"] == proof_manifest["dependencies"]
     assert gap_manifest["api_version"] == proof_manifest["api_version"]
 
-    from lait.modules.exercise_proof.evaluate import evaluate as proof_evaluate
-    from lait.modules.exercise_proof.generate import generate as proof_generate
-
     from lait.modules.exercise_gap_fill.evaluate import evaluate as gap_evaluate
     from lait.modules.exercise_gap_fill.generate import generate as gap_generate
     from lait.modules.exercise_proof.contribution import CONTRIBUTION
+    from lait.modules.exercise_proof.evaluate import evaluate as proof_evaluate
+    from lait.modules.exercise_proof.generate import generate as proof_generate
 
     assert CONTRIBUTION.exercise_type == "proof"
     assert CONTRIBUTION.visibility == "maintainer"
-    proof_generate_source = Path(proof_generate.__file__).read_text(encoding="utf-8")
-    proof_evaluate_source = Path(proof_evaluate.__file__).read_text(encoding="utf-8")
+    proof_generate_source = Path(inspect.getfile(proof_generate)).read_text(encoding="utf-8")
+    proof_evaluate_source = Path(inspect.getfile(proof_evaluate)).read_text(encoding="utf-8")
     assert "exercise_gap_fill" not in proof_generate_source
     assert "exercise_gap_fill" not in proof_evaluate_source
 
