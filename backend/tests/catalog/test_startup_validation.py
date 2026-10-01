@@ -42,9 +42,8 @@ def _entry(
 
 
 def test_visibility_on_universal_manifest_refuses_startup(tmp_path: Path) -> None:
-    from lait.catalog.validation import CatalogInvalidError
-
     from lait.adapters.http.app import create_app
+    from lait.catalog.validation import CatalogInvalidError
 
     entry = _entry(extra_manifest={"visibility": "learner"})
     with pytest.raises(CatalogInvalidError) as caught:
@@ -53,9 +52,8 @@ def test_visibility_on_universal_manifest_refuses_startup(tmp_path: Path) -> Non
 
 
 def test_duplicate_module_id_refuses_startup(tmp_path: Path) -> None:
-    from lait.catalog.validation import CatalogInvalidError
-
     from lait.adapters.http.app import create_app
+    from lait.catalog.validation import CatalogInvalidError
 
     entries = [
         _entry(module_id="official.exercise.gap-fill", exercise_type="gap-fill"),
@@ -71,9 +69,8 @@ def test_duplicate_module_id_refuses_startup(tmp_path: Path) -> None:
 
 
 def test_unresolved_dependency_refuses_startup(tmp_path: Path) -> None:
-    from lait.catalog.validation import CatalogInvalidError
-
     from lait.adapters.http.app import create_app
+    from lait.catalog.validation import CatalogInvalidError
 
     entry = _entry(dependencies=["missing.module>=0.1.0"])
     with pytest.raises(CatalogInvalidError) as caught:
@@ -82,9 +79,8 @@ def test_unresolved_dependency_refuses_startup(tmp_path: Path) -> None:
 
 
 def test_experimental_visibility_is_rejected(tmp_path: Path) -> None:
-    from lait.catalog.validation import CatalogInvalidError
-
     from lait.adapters.http.app import create_app
+    from lait.catalog.validation import CatalogInvalidError
 
     entry = _entry(visibility="experimental")
     with pytest.raises(CatalogInvalidError) as caught:
@@ -113,3 +109,55 @@ def test_universal_manifests_and_schema_omit_visibility() -> None:
         document = json.loads(path.read_text(encoding="utf-8"))
         assert "visibility" not in document
         assert document["category"] == "exercise"
+
+
+def test_missing_exercise_type_refuses_startup(tmp_path: Path) -> None:
+    from lait.adapters.http.app import create_app
+    from lait.catalog.validation import CatalogInvalidError
+
+    entry = _entry(omit_contribution_fields=("exercise_type",))
+    with pytest.raises(CatalogInvalidError) as caught:
+        create_app(_database_url(tmp_path), catalog_entries=[entry])
+    assert caught.value.code == "missing_contribution_field"
+
+
+def test_empty_catalog_refuses_startup(tmp_path: Path) -> None:
+    from lait.adapters.http.app import create_app
+    from lait.catalog.validation import CatalogInvalidError
+
+    with pytest.raises(CatalogInvalidError) as caught:
+        create_app(_database_url(tmp_path), catalog_entries=[])
+    assert caught.value.code == "empty_catalog"
+
+
+def test_api_incompatible_manifest_refuses_startup(tmp_path: Path) -> None:
+    from lait.adapters.http.app import create_app
+    from lait.catalog.validation import CatalogInvalidError
+
+    entry = _entry(extra_manifest={"api_version": 2})
+    with pytest.raises(CatalogInvalidError) as caught:
+        create_app(_database_url(tmp_path), catalog_entries=[entry])
+    assert caught.value.code == "api_incompatible"
+
+
+def test_unsatisfied_dependency_version_refuses_startup(tmp_path: Path) -> None:
+    from lait.adapters.http.app import create_app
+    from lait.catalog.validation import CatalogInvalidError
+
+    entry = _entry(dependencies=["core.exercise-api>=9.0.0"])
+    with pytest.raises(CatalogInvalidError) as caught:
+        create_app(_database_url(tmp_path), catalog_entries=[entry])
+    assert caught.value.code == "unresolved_dependency"
+
+
+def test_valid_catalog_describe_length_is_two(tmp_path: Path) -> None:
+    from fastapi.testclient import TestClient
+
+    from lait.adapters.http.app import create_app
+    from lait.application.queries.module_registry_describe import handle
+    from lait.catalog.loader import load_bundled_catalog
+    from lait.catalog.validation import validate_catalog
+
+    client = TestClient(create_app(_database_url(tmp_path)))
+    assert client.get("/health").status_code == 200
+    assert len(handle(validate_catalog(load_bundled_catalog()))) == 2
