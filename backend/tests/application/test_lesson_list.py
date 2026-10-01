@@ -16,7 +16,8 @@ def _repository(tmp_path: Path):
 
 
 def test_lesson_list_and_get_round_trip(tmp_path: Path) -> None:
-    from lait.application.commands.lesson_create import LessonCreate, handle as create_lesson
+    from lait.application.commands.lesson_create import LessonCreate
+    from lait.application.commands.lesson_create import handle as create_lesson
     from lait.application.queries.lesson_get import QUERY_NAME as GET_NAME
     from lait.application.queries.lesson_get import LessonNotFoundError
     from lait.application.queries.lesson_get import handle as get_lesson

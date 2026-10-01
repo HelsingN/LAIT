@@ -1,0 +1,26 @@
+.page {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: var(--space-3xl) var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.page a {
+  color: var(--color-accent);
+  font-weight: 600;
+}
+
+.source {
+  margin: 0;
+  padding: var(--space-lg);
+  background: var(--color-secondary);
+  font-family: var(--font-source);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  overflow: auto;
+  max-height: 70vh;
+}
