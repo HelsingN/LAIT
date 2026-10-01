@@ -224,11 +224,7 @@ def test_http_maps_generate_start_get_and_submit_only(tmp_path: Path) -> None:
     assert "practice.start" in operation_ids
     assert "practice.get" in operation_ids
     assert "exercise.submit_attempt" in operation_ids
-    assert "practice.finish" not in operation_ids
-    assert "practice.start_over" not in operation_ids
     practice_router = Path("backend/lait/adapters/http/routers/practice.py").read_text(
         encoding="utf-8"
     )
-    assert "practice.finish" not in practice_router
-    assert "practice.start_over" not in practice_router
     assert "lait.adapters.persistence" not in practice_router

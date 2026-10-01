@@ -8,6 +8,8 @@ from datetime import datetime
 from lait.domain.exercise import PromptSegment
 
 OPEN = "open"
+CLOSED = "closed"
+ABANDONED = "abandoned"
 COMPLETED = "completed"
 FAILED = "failed"
 DRAG = "drag"

@@ -28,6 +28,7 @@ from lait.domain.practice_session import (
     ExerciseGeneration,
     PassItem,
     PracticeSession,
+    PracticeSessionNotFoundError,
 )
 
 
@@ -207,6 +208,14 @@ class SqlAlchemyPracticeRepository:
             session.add_all(item_rows)
             session.commit()
 
+    def set_practice_session_status(self, session_id: str, status: str) -> None:
+        with self._session_factory() as session:
+            row = session.get(PracticeSessionRow, session_id)
+            if row is None:
+                raise PracticeSessionNotFoundError(session_id)
+            row.status = status
+            session.commit()
+
     def get_practice_session(self, session_id: str) -> PracticeSession | None:
         with self._session_factory() as session:
             row = session.get(PracticeSessionRow, session_id)
@@ -364,6 +373,9 @@ class RepositoryBundle:
 
     def get_practice_session(self, session_id: str) -> PracticeSession | None:
         return self._practice.get_practice_session(session_id)
+
+    def set_practice_session_status(self, session_id: str, status: str) -> None:
+        self._practice.set_practice_session_status(session_id, status)
 
     def add_attempt(self, attempt: Attempt, cursor: int) -> None:
         self._practice.add_attempt(attempt, cursor)

@@ -27,12 +27,10 @@ def handle(session_id: str, units: LearningUnitRepository) -> PracticeView:
 
 def view_for(practice: PracticeSession, generation: ExerciseGeneration) -> PracticeView:
     current: CurrentItem | None = None
-    if practice.cursor < len(practice.items):
+    if is_open_session(practice.status) and practice.cursor < len(practice.items):
         item = practice.items[practice.cursor]
         definition = next(
-            candidate
-            for candidate in generation.definitions
-            if candidate.id == item.definition_id
+            candidate for candidate in generation.definitions if candidate.id == item.definition_id
         )
         current = CurrentItem(
             mode=item.mode,

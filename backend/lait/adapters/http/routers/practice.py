@@ -1,4 +1,4 @@
-"""Map practice DTOs onto start, get, and submit. Finish routes belong to a later plan."""
+"""Map practice DTOs onto start, get, submit, finish, and start over."""
 
 from __future__ import annotations
 
@@ -7,8 +7,12 @@ from pydantic import BaseModel, ConfigDict
 
 from lait.application.commands.exercise_submit_attempt import SubmitAttempt
 from lait.application.commands.exercise_submit_attempt import handle as submit_attempt
+from lait.application.commands.practice_finish import PracticeFinish
+from lait.application.commands.practice_finish import handle as finish_practice
 from lait.application.commands.practice_start import PracticeStart
 from lait.application.commands.practice_start import handle as start_practice
+from lait.application.commands.practice_start_over import PracticeStartOver
+from lait.application.commands.practice_start_over import handle as start_over_practice
 from lait.application.queries.lesson_get import LessonNotFoundError
 from lait.application.queries.practice_get import handle as get_practice
 from lait.domain.practice_session import (
@@ -181,3 +185,40 @@ def post_attempt(session_id: str, body: SubmitBody, request: Request) -> SubmitR
         span_end=result.span_end,
         unit_text=result.unit_text,
     )
+
+
+@router.post(
+    "/api/practice-sessions/{session_id}/finish",
+    operation_id="practice.finish",
+)
+def post_practice_finish(session_id: str, request: Request) -> PracticeResponse:
+    try:
+        view = finish_practice(PracticeFinish(session_id=session_id), _repository(request))
+    except PracticeSessionNotFoundError as exc:
+        raise HTTPException(status_code=404, detail="Practice session not found") from exc
+    return _practice_response(view)
+
+
+@router.post(
+    "/api/practice-sessions/{session_id}/start-over",
+    operation_id="practice.start_over",
+)
+def post_practice_start_over(session_id: str, request: Request) -> PracticeResponse:
+    repository = _repository(request)
+    try:
+        view = start_over_practice(
+            PracticeStartOver(session_id=session_id),
+            repository,
+            repository,
+            _registry(request),
+        )
+    except PracticeSessionNotFoundError as exc:
+        raise HTTPException(status_code=404, detail="Practice session not found") from exc
+    except LessonNotFoundError as exc:
+        raise HTTPException(status_code=404, detail="Lesson not found") from exc
+    except StaleGenerationError as exc:
+        raise HTTPException(
+            status_code=409,
+            detail="Generate exercises again before practice",
+        ) from exc
+    return _practice_response(view)
