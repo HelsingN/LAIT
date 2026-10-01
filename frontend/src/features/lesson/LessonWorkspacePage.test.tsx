@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 import "@testing-library/jest-dom/vitest";
 import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
@@ -122,9 +123,11 @@ describe("Lesson workspace shell", () => {
       "Practice",
       "Feedback",
     ]);
-    expect(column).toHaveTextContent(
-      "Could not load this lesson. Return to the lesson list and open it again.",
-    );
+    expect(
+      await within(column).findByText(
+        "Could not load this lesson. Return to the lesson list and open it again.",
+      ),
+    ).toBeInTheDocument();
     expect(within(column).getByRole("link", { name: "Lessons" })).toHaveAttribute("href", "/");
   });
 
@@ -140,10 +143,7 @@ describe("Lesson workspace shell", () => {
       "Practice",
       "Feedback",
     ]);
-    const workspaceCss = readFileSync(
-      new URL("./LessonWorkspacePage.module.css", import.meta.url),
-      "utf8",
-    );
+    const workspaceCss = readFileSync(join(testDirectory, "LessonWorkspacePage.module.css"), "utf8");
     expect(workspaceCss).toMatch(/\.stageColumn\s*\{[^}]*overflow-y:\s*auto/s);
     expect(column.className).not.toBe("");
   });
@@ -156,7 +156,7 @@ describe("Lesson workspace shell", () => {
     await screen.findByRole("heading", { name: "Rolling out" });
     await user.click(screen.getByRole("button", { name: "Source", expanded: false }));
     const sourceBody = await screen.findByTestId("source-body");
-    const sourceCss = readFileSync(new URL("./stages/SourceStage.module.css", import.meta.url), "utf8");
+    const sourceCss = readFileSync(join(testDirectory, "stages", "SourceStage.module.css"), "utf8");
     expect(sourceCss).toMatch(/\.sourceBody\s*\{[^}]*overflow-y:\s*auto/s);
     expect(sourceCss).toMatch(/overflow-wrap:\s*anywhere/);
     expect(sourceBody.querySelector("script")).toBeNull();
@@ -328,7 +328,7 @@ describe("Lesson workspace shell", () => {
   });
 
   it("does not reference module_registry.describe in lesson feature source", () => {
-    const root = dirname(fileURLToPath(import.meta.url));
+    const root = testDirectory;
     const files = walk(root).filter((file) => /\.(ts|tsx)$/.test(file) && !file.endsWith(".test.tsx"));
     const source = files.map((file) => readFileSync(file, "utf8")).join("\n");
     expect(source).not.toContain("/api/module-registry");
@@ -336,6 +336,8 @@ describe("Lesson workspace shell", () => {
     expect(source).not.toContain("official.exercise.gap-fill");
   });
 });
+
+const testDirectory = dirname(fileURLToPath(import.meta.url));
 
 function walk(directory: string): string[] {
   const entries = readdirSync(directory, { withFileTypes: true });

@@ -1,0 +1,17 @@
+.sourceBody {
+  margin: 0;
+  max-height: 40vh;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+  font-family: var(--font-source);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+.highlight {
+  background: var(--color-accent);
+  color: var(--color-dominant);
+}
