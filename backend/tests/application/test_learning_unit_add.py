@@ -159,6 +159,41 @@ def test_touching_edges_create_two_units(tmp_path: Path) -> None:
     assert {unit.id for unit in list_units(lesson.id, repository)} == {first.id, second.id}
 
 
+def test_same_phrase_in_two_places_creates_two_units(tmp_path: Path) -> None:
+    from lait.application.commands.learning_unit_add import LearningUnitAdd, handle
+    from lait.application.queries.learning_unit_list import handle as list_units
+
+    source = "rolling out the rolling out"
+    phrase = "rolling out"
+    first_start = source.index(phrase)
+    second_start = source.index(phrase, first_start + len(phrase))
+    repository = _repository(tmp_path)
+    lesson = _lesson(repository, source)
+
+    first = handle(
+        LearningUnitAdd(
+            lesson_id=lesson.id,
+            start=first_start,
+            end=first_start + len(phrase),
+        ),
+        repository,
+        repository,
+    )
+    second = handle(
+        LearningUnitAdd(
+            lesson_id=lesson.id,
+            start=second_start,
+            end=second_start + len(phrase),
+        ),
+        repository,
+        repository,
+    )
+
+    assert first.id != second.id
+    assert first.text == second.text == phrase
+    assert {unit.id for unit in list_units(lesson.id, repository)} == {first.id, second.id}
+
+
 def test_offsets_are_unicode_code_points_not_utf16(tmp_path: Path) -> None:
     from lait.application.commands.learning_unit_add import LearningUnitAdd, handle
     from lait.domain.learning_unit import SpanOutOfRangeError
