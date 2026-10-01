@@ -4,16 +4,16 @@ milestone: v1.0
 current_phase: 01
 current_phase_name: Mod-First Manual Learning Loop
 status: executing
-stopped_at: Completed 01-02-PLAN.md
-last_updated: "2026-10-01T05:30:12.012Z"
+stopped_at: Completed 01-03-PLAN.md
+last_updated: "2026-10-01T06:23:56.244Z"
 last_activity: 2026-10-01
 last_activity_desc: Phase 01 execution started
-state_head: 28fc5c2cfe2d3c5c0f427c0f4cf228390b5c759b
+state_head: f06b7cc8f5baf4e3a90eb91d9b827a976be27d82
 progress:
   total_phases: 9
   completed_phases: 0
   total_plans: 11
-  completed_plans: 2
+  completed_plans: 3
 milestone_name: milestone
 spec_version: 0.2.0
 ---
@@ -31,7 +31,7 @@ Current planning/specification baseline: `.planning/VERSION.md` (`0.2.0`)
 ## Current Position
 
 Phase: 01 (Mod-First Manual Learning Loop) — EXECUTING
-Plan: 3 of 11
+Plan: 4 of 11
 Status: Ready to execute
 Current discussion area: Complete
 Last activity: 2026-10-01 — Phase 01 execution started
@@ -64,6 +64,7 @@ Progress: [░░░░░░░░░░] 0%
 |------|----------|-------|-------|
 | Phase 01 P01 | 18 min | 2 tasks | 53 files |
 | Phase 01 P02 | 25 min | 3 tasks | 19 files |
+| Phase 01 P03 | 48 min | 3 tasks | 18 files |
 
 ## Accumulated Context
 
@@ -86,6 +87,10 @@ Recent decisions affecting current and future work:
 - [Phase 01]: D-21 confirmed: visibility stays on exercise contributions; Phase 1 values are learner and maintainer; experimental is rejected
 - [Phase 01]: describe() allowlists public fields and marks every live catalog row active; list_visible_for filters on contribution visibility only
 - [Phase 01]: Supported module api_version is 1; core.exercise-api 0.1.0 resolves dependency specs; runtime checks use Pydantic mirrored by the manifest schema
+- [Phase 01]: learning_unit.remove sets removed_at and keeps the row; re-add inserts a new id
+- [Phase 01]: Source span offsets are Unicode code points (Python str indices) in persistence and HTTP
+- [Phase 01]: Unit commands call reject_if_unit_set_frozen, which reads has_open_practice_session and gets false until plan 01-05
+- [Phase 01]: Learning-unit lesson foreign key is ON DELETE RESTRICT; this plan creates no ON DELETE CASCADE
 
 ### Pending Todos
 
@@ -111,6 +116,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-10-01T05:30:11.971Z
-Stopped at: Completed 01-02-PLAN.md
+Last session: 2026-10-01T06:23:41.891Z
+Stopped at: Completed 01-03-PLAN.md
 Resume file: None
