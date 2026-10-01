@@ -5,15 +5,15 @@ current_phase: 01
 current_phase_name: Mod-First Manual Learning Loop
 status: executing
 stopped_at: Completed 01-03-PLAN.md
-last_updated: "2026-10-01T06:23:56.244Z"
+last_updated: "2026-10-01T06:57:37.879Z"
 last_activity: 2026-10-01
 last_activity_desc: Phase 01 execution started
-state_head: f06b7cc8f5baf4e3a90eb91d9b827a976be27d82
+state_head: dfc2f072696ce35d78bf0b3fdaeab02ad43467e9
 progress:
   total_phases: 9
   completed_phases: 0
   total_plans: 11
-  completed_plans: 3
+  completed_plans: 4
 milestone_name: milestone
 spec_version: 0.2.0
 ---
@@ -65,6 +65,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 01 P01 | 18 min | 2 tasks | 53 files |
 | Phase 01 P02 | 25 min | 3 tasks | 19 files |
 | Phase 01 P03 | 48 min | 3 tasks | 18 files |
+| Phase 01 P10 | 31 min | 2 tasks | 10 files |
 
 ## Accumulated Context
 
@@ -91,6 +92,8 @@ Recent decisions affecting current and future work:
 - [Phase 01]: Source span offsets are Unicode code points (Python str indices) in persistence and HTTP
 - [Phase 01]: Unit commands call reject_if_unit_set_frozen, which reads has_open_practice_session and gets false until plan 01-05
 - [Phase 01]: Learning-unit lesson foreign key is ON DELETE RESTRICT; this plan creates no ON DELETE CASCADE
+- [Phase 01]: Compose build contexts are backend and frontend; uv.lock is copied from an additional workspace context
+- [Phase 01]: API entrypoint runs Alembic upgrade head and only then execs uvicorn so /health cannot pass early
 
 ### Pending Todos
 
