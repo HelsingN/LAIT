@@ -180,3 +180,57 @@ def test_practice_get_returns_one_current_typed_item_for_one_unit(tmp_path: Path
     assert "______" in view.current.sentence
     assert not hasattr(view, "items")
     assert repository.has_open_practice_session(lesson.id) is True
+
+
+def test_two_unit_lesson_yields_drag_then_typed_in_span_order(tmp_path: Path) -> None:
+    from lait.application.commands.exercise_submit_attempt import SubmitAttempt
+    from lait.application.commands.exercise_submit_attempt import handle as submit
+    from lait.application.commands.practice_start import PracticeStart, handle
+    from lait.application.queries.practice_get import handle as current_item
+
+    source = "zzzz middle aaaa"
+    repository = _repository(tmp_path)
+    lesson = _lesson(repository, source)
+    later = _accept_unit(repository, lesson.id, _add(repository, lesson.id, source, "aaaa").id)
+    earlier = _accept_unit(repository, lesson.id, _add(repository, lesson.id, source, "zzzz").id)
+    assert source.index("zzzz") < source.index("aaaa")
+    outcome = _generate(repository, lesson.id)
+    assert outcome.definition_count == 2
+
+    session = handle(PracticeStart(lesson_id=lesson.id), repository, repository, _registry())
+    modes: list[str] = []
+    unit_ids: list[str] = []
+    view = current_item(session.session_id, repository)
+    while view.current is not None:
+        assert not hasattr(view, "items")
+        assert view.current.mode in {"drag", "typed"}
+        modes.append(view.current.mode)
+        unit_ids.append(view.current.learning_unit_id)
+        if view.current.mode == "drag":
+            submit(
+                SubmitAttempt(
+                    session_id=session.session_id,
+                    kind="drag",
+                    text=view.current.target_text,
+                    submitted_unit_id=view.current.learning_unit_id,
+                ),
+                repository,
+                _registry(),
+            )
+        else:
+            submit(
+                SubmitAttempt(
+                    session_id=session.session_id,
+                    kind="typed",
+                    text=view.current.target_text,
+                ),
+                repository,
+                _registry(),
+            )
+        view = current_item(session.session_id, repository)
+
+    assert modes == ["drag", "drag", "typed", "typed"]
+    assert unit_ids == [earlier.id, later.id, earlier.id, later.id]
+    assert view.open is True
+    assert view.current is None
+    assert repository.has_open_practice_session(lesson.id) is True
