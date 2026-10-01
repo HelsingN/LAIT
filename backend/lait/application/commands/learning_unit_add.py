@@ -7,6 +7,7 @@ from dataclasses import dataclass
 from datetime import UTC, datetime
 from uuid import uuid4
 
+from lait.application.commands.unit_set_freeze import reject_if_unit_set_frozen
 from lait.application.ports import LearningUnitRepository, LessonRepository
 from lait.application.queries.lesson_get import LessonNotFoundError
 from lait.domain.learning_unit import (
@@ -36,6 +37,7 @@ def handle(
     now: Callable[[], datetime] | None = None,
     new_id: Callable[[], str] | None = None,
 ) -> LearningUnit:
+    reject_if_unit_set_frozen(command.lesson_id, units)
     if command.start is None or command.end is None or command.start == command.end:
         raise MissingSpanError("A learning unit requires a non-empty source selection")
 
