@@ -4,16 +4,16 @@ milestone: v1.0
 current_phase: 01
 current_phase_name: Mod-First Manual Learning Loop
 status: executing
-stopped_at: Completed 01-06-PLAN.md
-last_updated: "2026-10-01T20:38:30.000Z"
+stopped_at: Completed 01-11-PLAN.md
+last_updated: "2026-10-01T23:33:18.355Z"
 last_activity: 2026-10-01
 last_activity_desc: Phase 01 execution started
-state_head: 18b4a3e0fa3b6c79f080713be41c10b837a773a2
+state_head: cd869f343d7f04eeb70b7af514a9fbaac43f099b
 progress:
   total_phases: 9
   completed_phases: 0
   total_plans: 11
-  completed_plans: 7
+  completed_plans: 8
 milestone_name: milestone
 spec_version: 0.2.0
 ---
@@ -31,7 +31,7 @@ Current planning/specification baseline: `.planning/VERSION.md` (`0.2.0`)
 ## Current Position
 
 Phase: 01 (Mod-First Manual Learning Loop) — EXECUTING
-Plan: 7 of 11
+Plan: 8 of 11
 Status: Ready to execute
 Current discussion area: Complete
 Last activity: 2026-10-01 — Phase 01 execution started
@@ -69,6 +69,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 01 P04 | 17 min | 3 tasks | 11 files |
 | Phase 01 P05 | 2h 38m | 2 tasks | 16 files |
 | Phase 01 P06 | 10h 1m | 3 tasks | 23 files |
+| Phase 01 P11 | 1h 45m | 1 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -111,6 +112,10 @@ Recent decisions affecting current and future work:
 - [Phase 01]: learning_unit.add receives Unicode code points; Start Practice enables only for the generated accepted-unit set
 - [Phase 01]: Learner exercise types come from GET /api/exercise-registry?visibility=learner
 - [Phase 01]: Create Lesson title is a two-line textarea; a blank title still stores Untitled Lesson
+- [Phase 01]: practice.finish sets status closed and unfreezes because no open session remains
+- [Phase 01]: practice.start_over sets status abandoned, keeps Attempt rows, then calls practice.start
+- [Phase 01]: A refused practice.start after abandon restores the session to open so units stay frozen
+- [Phase 01]: POST finish and start-over only map DTOs; the router does not call practice.start
 
 ### Pending Todos
 
@@ -136,6 +141,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-10-01T20:38:30.000Z
-Stopped at: Completed 01-06-PLAN.md
+Last session: 2026-10-01T23:33:18.301Z
+Stopped at: Completed 01-11-PLAN.md
 Resume file: None
