@@ -4,16 +4,16 @@ milestone: v1.0
 current_phase: 01
 current_phase_name: Mod-First Manual Learning Loop
 status: executing
-stopped_at: Completed 01-03-PLAN.md
-last_updated: "2026-10-01T06:57:37.879Z"
+stopped_at: Completed 01-04-PLAN.md
+last_updated: "2026-10-01T07:37:26.614Z"
 last_activity: 2026-10-01
 last_activity_desc: Phase 01 execution started
-state_head: dfc2f072696ce35d78bf0b3fdaeab02ad43467e9
+state_head: eb614138570a777603e8816e6b7bdccc4685ddea
 progress:
   total_phases: 9
   completed_phases: 0
   total_plans: 11
-  completed_plans: 4
+  completed_plans: 5
 milestone_name: milestone
 spec_version: 0.2.0
 ---
@@ -31,7 +31,7 @@ Current planning/specification baseline: `.planning/VERSION.md` (`0.2.0`)
 ## Current Position
 
 Phase: 01 (Mod-First Manual Learning Loop) — EXECUTING
-Plan: 4 of 11
+Plan: 5 of 11
 Status: Ready to execute
 Current discussion area: Complete
 Last activity: 2026-10-01 — Phase 01 execution started
@@ -66,6 +66,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 01 P02 | 25 min | 3 tasks | 19 files |
 | Phase 01 P03 | 48 min | 3 tasks | 18 files |
 | Phase 01 P10 | 31 min | 2 tasks | 10 files |
+| Phase 01 P04 | 17 min | 3 tasks | 11 files |
 
 ## Accumulated Context
 
@@ -94,6 +95,11 @@ Recent decisions affecting current and future work:
 - [Phase 01]: Learning-unit lesson foreign key is ON DELETE RESTRICT; this plan creates no ON DELETE CASCADE
 - [Phase 01]: Compose build contexts are backend and frontend; uv.lock is copied from an additional workspace context
 - [Phase 01]: API entrypoint runs Alembic upgrade head and only then execs uvicorn so /health cannot pass early
+- [Phase 01]: Shared exercise types live in lait.domain.exercise so Gap Fill and proof implement one contract and core never names a module id
+- [Phase 01]: Drag grading compares learning_unit_id. Matching chip text with a different id is incorrect
+- [Phase 01]: Typed match is strip plus casefold on both sides. Internal space, punctuation, and apostrophes stay significant
+- [Phase 01]: RESULT_CATEGORIES keeps acceptable, partial, and uncertain. Gap Fill returns only correct or incorrect
+- [Phase 01]: The Gap Fill sentence window is the previous terminator or start through the next terminator or end, and it stays inside the module
 
 ### Pending Todos
 
@@ -119,6 +125,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-10-01T06:23:41.891Z
-Stopped at: Completed 01-03-PLAN.md
+Last session: 2026-10-01T07:35:56.997Z
+Stopped at: Completed 01-04-PLAN.md
 Resume file: None
