@@ -4,16 +4,16 @@ milestone: v1.0
 current_phase: 01
 current_phase_name: Mod-First Manual Learning Loop
 status: executing
-stopped_at: Completed 01-08-PLAN.md
-last_updated: "2026-10-02T00:40:12.098Z"
+stopped_at: Completed 01-09-PLAN.md
+last_updated: "2026-10-02T01:01:52.462Z"
 last_activity: 2026-10-01
 last_activity_desc: Phase 01 execution started
-state_head: 0f55d8851ba219963f0e7c6441940bde18a710c1
+state_head: 7d54659bcef374408d71b7e2b842b33097cdf457
 progress:
   total_phases: 9
   completed_phases: 0
   total_plans: 11
-  completed_plans: 10
+  completed_plans: 11
 milestone_name: milestone
 spec_version: 0.2.0
 ---
@@ -31,7 +31,7 @@ Current planning/specification baseline: `.planning/VERSION.md` (`0.2.0`)
 ## Current Position
 
 Phase: 01 (Mod-First Manual Learning Loop) — EXECUTING
-Plan: 9 of 11
+Plan: 10 of 11
 Status: Ready to execute
 Current discussion area: Complete
 Last activity: 2026-10-01 — Phase 01 execution started
@@ -72,6 +72,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 01 P11 | 1h 45m | 1 tasks | 8 files |
 | Phase 01 P07 | 24 min | 3 tasks | 17 files |
 | Phase 01-mod-first-manual-learning-loop P08 | 33 min | 3 tasks | 32 files |
+| Phase 01 P09 | 12 min | 3 tasks | 13 files |
 
 ## Accumulated Context
 
@@ -123,6 +124,10 @@ Recent decisions affecting current and future work:
 - [Phase 01]: Exit Practice calls practice.finish; Start Over calls practice.start_over and does not assemble abandon-plus-start
 - [Phase 01]: Workspace attempt rows are the submit responses kept in memory; Start Over does not clear them
 - [Phase 01-mod-first-manual-learning-loop]: Pin @hey-api/openapi-ts at exactly 0.99.0 and use D-23 names as OpenAPI operationIds
+- [Phase 01]: Maintainer removal deletes the proof manifest and the ProofRenderer registration only
+- [Phase 01]: Proof removal tests use a temp manifest overlay and do not edit Core or application source
+- [Phase 01]: Application tests do not import the FastAPI app; HTTP DTO tests live under adapters/http
+- [Phase 01]: CI runs domain, persistence, and modules separately from the application suite, and still runs the full pytest gate
 
 ### Pending Todos
 
@@ -148,6 +153,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-10-02T00:40:12.045Z
-Stopped at: Completed 01-08-PLAN.md
+Last session: 2026-10-02T01:01:16.181Z
+Stopped at: Completed 01-09-PLAN.md
 Resume file: None

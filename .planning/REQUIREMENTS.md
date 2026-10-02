@@ -70,7 +70,7 @@
 
 - [x] **MODL-01**: Maintainer can start the application only when every bundled module manifest is valid, API-compatible, uniquely identified, and has resolvable declared dependencies.
 - [x] **MODL-02**: Maintainer can inspect which bundled modules and capabilities are active without accessing private module implementation details.
-- [ ] **MODL-03**: Maintainer can add a bundled exercise module through the public exercise contracts, static module catalog, and frontend renderer registry without modifying core domain services.
+- [x] **MODL-03**: Maintainer can add a bundled exercise module through the public exercise contracts, static module catalog, and frontend renderer registry without modifying core domain services.
 - [ ] **MODL-04**: Maintainer can run the same exercise-module conformance suite against Gap Fill, Chunk Completion, Sentence Reconstruction, Keyword Recall, and a proof-of-concept exercise module.
 - [ ] **MODL-05**: Maintainer can register language behavior through a language-module contract that provides normalization, tokenization, punctuation handling, and directionality metadata without embedding English rules in core services.
 - [ ] **MODL-06**: Maintainer can replace an AI provider behind declared capabilities without changing AI feature prompts, rubrics, or core domain logic.
@@ -79,7 +79,7 @@
 - [ ] **MODL-09**: Maintainer can evolve public extension contracts through explicit API and schema versions with compatibility validation and migration notes.
 - [ ] **MODL-10**: Maintainer can verify that bundled modules use only documented public contracts and never import another module's private implementation or modify its private storage.
 - [ ] **MODL-11**: Maintainer can store core-owned records separately from typed or schema-versioned module-owned data while keeping each component responsible for its migrations.
-- [ ] **MODL-12**: Integration developer can invoke documented application commands and queries without reading or writing internal database tables, preserving a future MCP adapter boundary.
+- [x] **MODL-12**: Integration developer can invoke documented application commands and queries without reading or writing internal database tables, preserving a future MCP adapter boundary.
 
 ### AI Operations, Privacy, and Reliability
 
@@ -100,14 +100,14 @@
 
 - [ ] **PLAT-01**: Learner can complete the entire lesson-to-review workflow at supported desktop browser widths.
 - [ ] **PLAT-02**: Learner can complete the entire lesson-to-review workflow at supported mobile browser widths using touch and the on-screen keyboard.
-- [ ] **PLAT-03**: Learner can run the application locally through a documented Docker Compose command that performs required migrations and reaches a health-checked ready state.
+- [x] **PLAT-03**: Learner can run the application locally through a documented Docker Compose command that performs required migrations and reaches a health-checked ready state.
 - [ ] **PLAT-04**: Learner's SQLite data survives normal container restart and can follow a documented migration path to PostgreSQL without changing core domain contracts.
 - [ ] **PLAT-05**: Learner's multilingual Unicode source, answers, and metadata are preserved as UTF-8 without destructive normalization even though the MVP processes English only.
 - [ ] **PLAT-06**: Learner can continue interacting with the UI while normal analysis or exercise generation runs, with no frozen page or unexplained indefinite spinner.
 - [ ] **PLAT-07**: Learner can receive a complete exercise set within five minutes for a documented normal-size lesson under the reference provider and environment.
 - [ ] **PLAT-08**: Product validation can demonstrate that at least 80% of generated exercises are usable after learning-unit review on the agreed evaluation sample.
 - [x] **PLAT-09**: Maintainer can generate a type-safe TypeScript API client from the FastAPI OpenAPI 3.1 contract and detect an unreviewed contract/client mismatch in CI.
-- [ ] **PLAT-10**: Maintainer can test core services, persistence adapters, and each module independently.
+- [x] **PLAT-10**: Maintainer can test core services, persistence adapters, and each module independently.
 - [ ] **PLAT-11**: Maintainer can verify the primary workflow on Chromium plus targeted WebKit and mobile-emulation projects.
 - [ ] **PLAT-12**: Maintainer can verify a fresh-volume startup, application restart, interrupted AI job, concurrent session/job writes, database migration, and data persistence without manual database edits.
 - [ ] **PLAT-13**: Maintainer can operate SQLite in WAL mode on local storage with bounded write transactions, busy handling, and a documented checkpoint and consistent backup/restore procedure.
@@ -212,7 +212,7 @@ Deferred beyond the initial release and not mapped to the v1 roadmap.
 | REVW-08 | Phase 6 | Pending |
 | MODL-01 | Phase 1 | Complete |
 | MODL-02 | Phase 1 | Complete |
-| MODL-03 | Phase 1 | Pending |
+| MODL-03 | Phase 1 | Complete |
 | MODL-04 | Phase 8 | Pending |
 | MODL-05 | Phase 3 | Pending |
 | MODL-06 | Phase 2 | Pending |
@@ -221,7 +221,7 @@ Deferred beyond the initial release and not mapped to the v1 roadmap.
 | MODL-09 | Phase 8 | Pending |
 | MODL-10 | Phase 8 | Pending |
 | MODL-11 | Phase 8 | Pending |
-| MODL-12 | Phase 1 | Pending |
+| MODL-12 | Phase 1 | Complete |
 | AIOP-01 | Phase 2 | Pending |
 | AIOP-02 | Phase 2 | Pending |
 | AIOP-03 | Phase 2 | Pending |
@@ -236,14 +236,14 @@ Deferred beyond the initial release and not mapped to the v1 roadmap.
 | AIOP-12 | Phase 2 | Pending |
 | PLAT-01 | Phase 9 | Pending |
 | PLAT-02 | Phase 9 | Pending |
-| PLAT-03 | Phase 1 | Pending |
+| PLAT-03 | Phase 1 | Complete |
 | PLAT-04 | Phase 9 | Pending |
 | PLAT-05 | Phase 3 | Pending |
 | PLAT-06 | Phase 2 | Pending |
 | PLAT-07 | Phase 9 | Pending |
 | PLAT-08 | Phase 5 | Pending |
 | PLAT-09 | Phase 1 | Complete |
-| PLAT-10 | Phase 1 | Pending |
+| PLAT-10 | Phase 1 | Complete |
 | PLAT-11 | Phase 9 | Pending |
 | PLAT-12 | Phase 9 | Pending |
 | PLAT-13 | Phase 9 | Pending |
