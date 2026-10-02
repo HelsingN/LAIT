@@ -1,0 +1,36 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+      - uses: astral-sh/setup-uv@v5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Install Python dependencies
+        run: uv sync --locked
+      - name: Install frontend dependencies
+        run: npm ci --prefix frontend
+      - name: pytest
+        run: uv run pytest -q
+      - name: vitest
+        run: npm --prefix frontend exec vitest run
+      - name: Compose health
+        run: docker compose up -d --wait
+      - name: Export OpenAPI
+        run: uv run python -m lait.adapters.http.export_openapi
+      - name: Generate OpenAPI client
+        run: npm --prefix frontend run openapi:generate
+      - name: Fail on generated client drift
+        run: git diff --exit-code -- frontend/src/api/generated
