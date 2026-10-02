@@ -45,25 +45,33 @@ def handle(
     if lesson is None:
         raise LessonNotFoundError(command.lesson_id)
     current_ids = _accepted_ids(units, command.lesson_id)
-    generation = units.latest_completed_generation(command.lesson_id)  # type: ignore[attr-defined]
+    latest = units.latest_completed_generation(command.lesson_id)  # type: ignore[attr-defined]
+    latest_matches = latest is not None and tuple(sorted(latest.accepted_unit_ids)) == current_ids
+    if latest_matches and latest is not None:
+        clock = now or (lambda: datetime.now(UTC))
+        mint = new_id or (lambda: str(uuid4()))
+        created_at = clock()
+        candidate = PracticeSession(
+            id=mint(),
+            lesson_id=command.lesson_id,
+            generation_id=latest.id,
+            status=OPEN,
+            cursor=0,
+            items=pass_items_for(latest.definitions),
+        )
+        stored = units.insert_open_practice_session(candidate, created_at)
+        generation = units.get_generation(stored.generation_id)  # type: ignore[attr-defined]
+        if generation is None or tuple(sorted(generation.accepted_unit_ids)) != current_ids:
+            raise StaleGenerationError(command.lesson_id)
+        return view_for(stored, generation)
+
+    existing = units.get_open_practice_session(command.lesson_id)  # type: ignore[attr-defined]
+    if existing is None:
+        raise StaleGenerationError(command.lesson_id)
+    generation = units.get_generation(existing.generation_id)  # type: ignore[attr-defined]
     if generation is None or tuple(sorted(generation.accepted_unit_ids)) != current_ids:
         raise StaleGenerationError(command.lesson_id)
-    if units.has_open_practice_session(command.lesson_id):
-        raise StaleGenerationError(command.lesson_id)
-
-    clock = now or (lambda: datetime.now(UTC))
-    mint = new_id or (lambda: str(uuid4()))
-    created_at = clock()
-    practice = PracticeSession(
-        id=mint(),
-        lesson_id=command.lesson_id,
-        generation_id=generation.id,
-        status=OPEN,
-        cursor=0,
-        items=pass_items_for(generation.definitions),
-    )
-    units.save_practice_session(practice, created_at)  # type: ignore[attr-defined]
-    return view_for(practice, generation)
+    return view_for(existing, generation)
 
 
 def pass_items_for(definitions: tuple[ExerciseDefinition, ...]) -> tuple[PassItem, ...]:

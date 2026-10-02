@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { Link, useParams } from "react-router";
 
 import { FocusPracticeMode } from "./FocusPracticeMode.tsx";
@@ -26,7 +26,11 @@ import { LearningUnitsStage } from "./stages/LearningUnitsStage.tsx";
 import { PracticeStage } from "./stages/PracticeStage.tsx";
 import { SourceStage } from "./stages/SourceStage.tsx";
 import {
+  clearOpenPracticeSessionId,
+  isPracticeOpen,
+  loadOpenPracticeSessionId,
   loadStageExpansion,
+  saveOpenPracticeSessionId,
   saveStageExpansion,
   type StageExpansion,
   type StageId,
@@ -59,6 +63,9 @@ export function LessonWorkspacePage() {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitPending, setSubmitPending] = useState(false);
   const [startError, setStartError] = useState<string | null>(null);
+  const [pendingStoredSession, setPendingStoredSession] = useState(
+    () => loadOpenPracticeSessionId(id) !== null,
+  );
 
   const lessonQuery = useQuery({
     queryKey: ["lesson", id],
@@ -89,6 +96,39 @@ export function LessonWorkspacePage() {
     },
   });
 
+  useEffect(() => {
+    const sessionId = loadOpenPracticeSessionId(id);
+    if (!sessionId) {
+      setPendingStoredSession(false);
+      return;
+    }
+    let cancelled = false;
+    setPendingStoredSession(true);
+    void getPractice(sessionId)
+      .then((view) => {
+        if (cancelled) {
+          return;
+        }
+        setPendingStoredSession(false);
+        if (view.open) {
+          setSession(view);
+          setFocused(true);
+          return;
+        }
+        clearOpenPracticeSessionId(id);
+      })
+      .catch(() => {
+        if (cancelled) {
+          return;
+        }
+        setPendingStoredSession(false);
+        clearOpenPracticeSessionId(id);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [id]);
+
   const units = unitsQuery.data?.learning_units ?? [];
   const acceptedIds = units.filter((unit) => unit.status === "accepted").map((unit) => unit.id);
   const practiceReady =
@@ -116,6 +156,7 @@ export function LessonWorkspacePage() {
     setStartError(null);
     try {
       const view = await startPractice(id);
+      saveOpenPracticeSessionId(id, view.session_id);
       setSession(view);
       setFeedback(null);
       setSubmitError(null);
@@ -162,6 +203,7 @@ export function LessonWorkspacePage() {
       return;
     }
     await finishPractice(session.session_id);
+    clearOpenPracticeSessionId(id);
     setFocused(false);
     setFeedbackUnlocked(true);
     setSession(null);
@@ -179,6 +221,7 @@ export function LessonWorkspacePage() {
       return;
     }
     const view = await startOverPractice(session.session_id);
+    saveOpenPracticeSessionId(id, view.session_id);
     setSession(view);
     setFeedback(null);
     setSubmitError(null);
@@ -261,7 +304,7 @@ export function LessonWorkspacePage() {
               lessonId={id}
               units={units}
               selection={selection}
-              practiceOpen={focused}
+              practiceOpen={isPracticeOpen(pendingStoredSession, session?.open === true)}
               onChanged={refreshUnits}
               onJump={jumpToUnit}
             />

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from sqlalchemy import ForeignKey, Integer, String, Text
+from sqlalchemy import ForeignKey, Index, Integer, String, Text, text
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 
@@ -82,6 +82,15 @@ class ExerciseDefinitionRow(Base):
 
 class PracticeSessionRow(Base):
     __tablename__ = "practice_sessions"
+    __table_args__ = (
+        Index(
+            "uq_practice_sessions_one_open_per_lesson",
+            "lesson_id",
+            unique=True,
+            sqlite_where=text("status = 'open'"),
+            postgresql_where=text("status = 'open'"),
+        ),
+    )
 
     id: Mapped[str] = mapped_column(String(64), primary_key=True)
     lesson_id: Mapped[str] = mapped_column(

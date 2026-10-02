@@ -6,6 +6,7 @@ import json
 from datetime import datetime
 
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session, sessionmaker
 
 from lait.adapters.persistence.lesson_repository import SqlAlchemyLessonRepository
@@ -182,6 +183,67 @@ class SqlAlchemyPracticeRepository:
                 return None
             return self._generation_in_session(session, row)
 
+    def get_open_practice_session(self, lesson_id: str) -> PracticeSession | None:
+        with self._session_factory() as session:
+            row = session.scalars(
+                select(PracticeSessionRow).where(
+                    PracticeSessionRow.lesson_id == lesson_id,
+                    PracticeSessionRow.status == OPEN,
+                )
+            ).first()
+            if row is None:
+                return None
+            return self._load_practice_session(session, row)
+
+    def insert_open_practice_session(
+        self, practice: PracticeSession, created_at: datetime
+    ) -> PracticeSession:
+        row = PracticeSessionRow(
+            id=practice.id,
+            lesson_id=practice.lesson_id,
+            generation_id=practice.generation_id,
+            status=practice.status,
+            cursor=practice.cursor,
+            created_at=created_at.isoformat(),
+        )
+        item_rows = [
+            PracticePassItemRow(
+                id=f"{practice.id}:{item.position}",
+                session_id=practice.id,
+                position=item.position,
+                mode=item.mode,
+                learning_unit_id=item.learning_unit_id,
+                definition_id=item.definition_id,
+            )
+            for item in practice.items
+        ]
+        with self._session_factory() as session:
+            try:
+                existing = session.scalars(
+                    select(PracticeSessionRow).where(
+                        PracticeSessionRow.lesson_id == practice.lesson_id,
+                        PracticeSessionRow.status == OPEN,
+                    )
+                ).first()
+                if existing is not None:
+                    return self._load_practice_session(session, existing)
+                session.add(row)
+                session.flush()
+                session.add_all(item_rows)
+                session.commit()
+                return practice
+            except IntegrityError:
+                session.rollback()
+                winner = session.scalars(
+                    select(PracticeSessionRow).where(
+                        PracticeSessionRow.lesson_id == practice.lesson_id,
+                        PracticeSessionRow.status == OPEN,
+                    )
+                ).first()
+                if winner is None:
+                    raise
+                return self._load_practice_session(session, winner)
+
     def save_practice_session(self, practice: PracticeSession, created_at: datetime) -> None:
         row = PracticeSessionRow(
             id=practice.id,
@@ -221,14 +283,17 @@ class SqlAlchemyPracticeRepository:
             row = session.get(PracticeSessionRow, session_id)
             if row is None:
                 return None
-            items = list(
-                session.scalars(
-                    select(PracticePassItemRow)
-                    .where(PracticePassItemRow.session_id == session_id)
-                    .order_by(PracticePassItemRow.position.asc())
-                ).all()
-            )
-            return _to_session(row, items)
+            return self._load_practice_session(session, row)
+
+    def _load_practice_session(self, session: Session, row: PracticeSessionRow) -> PracticeSession:
+        items = list(
+            session.scalars(
+                select(PracticePassItemRow)
+                .where(PracticePassItemRow.session_id == row.id)
+                .order_by(PracticePassItemRow.position.asc())
+            ).all()
+        )
+        return _to_session(row, items)
 
     def add_attempt(self, attempt: Attempt, cursor: int) -> None:
         row = AttemptRow(
@@ -322,6 +387,18 @@ class SqlAlchemyLearningUnitRepository:
             lesson_id
         )
 
+    def insert_open_practice_session(
+        self, practice: PracticeSession, created_at: datetime
+    ) -> PracticeSession:
+        return SqlAlchemyPracticeRepository(self._session_factory).insert_open_practice_session(
+            practice, created_at
+        )
+
+    def get_open_practice_session(self, lesson_id: str) -> PracticeSession | None:
+        return SqlAlchemyPracticeRepository(self._session_factory).get_open_practice_session(
+            lesson_id
+        )
+
 
 class RepositoryBundle:
     """Lesson, learning-unit, and practice ports over one session factory.
@@ -358,6 +435,14 @@ class RepositoryBundle:
 
     def has_open_practice_session(self, lesson_id: str) -> bool:
         return self._practice.has_open_practice_session(lesson_id)
+
+    def insert_open_practice_session(
+        self, practice: PracticeSession, created_at: datetime
+    ) -> PracticeSession:
+        return self._practice.insert_open_practice_session(practice, created_at)
+
+    def get_open_practice_session(self, lesson_id: str) -> PracticeSession | None:
+        return self._practice.get_open_practice_session(lesson_id)
 
     def save_generation(self, generation: ExerciseGeneration) -> None:
         self._practice.save_generation(generation)

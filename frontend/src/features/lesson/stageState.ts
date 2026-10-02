@@ -38,3 +38,30 @@ export function loadStageExpansion(lessonId: string): StageExpansion {
 export function saveStageExpansion(lessonId: string, expansion: StageExpansion): void {
   localStorage.setItem(stageStorageKey(lessonId), JSON.stringify(expansion));
 }
+
+export function practiceSessionStorageKey(lessonId: string): string {
+  return `lait.practice-session.${lessonId}`;
+}
+
+export function loadOpenPracticeSessionId(lessonId: string): string | null {
+  const stored = localStorage.getItem(practiceSessionStorageKey(lessonId));
+  if (!stored) {
+    return null;
+  }
+  return stored;
+}
+
+export function saveOpenPracticeSessionId(lessonId: string, sessionId: string): void {
+  localStorage.setItem(practiceSessionStorageKey(lessonId), sessionId);
+}
+
+export function clearOpenPracticeSessionId(lessonId: string): void {
+  localStorage.removeItem(practiceSessionStorageKey(lessonId));
+}
+
+export function isPracticeOpen(pendingStoredSession: boolean, sessionOpen: boolean): boolean {
+  if (pendingStoredSession) {
+    return true;
+  }
+  return sessionOpen;
+}
