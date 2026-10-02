@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Link, useParams } from "react-router";
 
 import { FocusPracticeMode } from "./FocusPracticeMode.tsx";
@@ -66,6 +66,8 @@ export function LessonWorkspacePage() {
   const [pendingStoredSession, setPendingStoredSession] = useState(
     () => loadOpenPracticeSessionId(id) !== null,
   );
+  const [startPending, setStartPending] = useState(false);
+  const startPendingRef = useRef(false);
 
   const lessonQuery = useQuery({
     queryKey: ["lesson", id],
@@ -153,6 +155,11 @@ export function LessonWorkspacePage() {
   }
 
   async function handleStart() {
+    if (startPendingRef.current) {
+      return;
+    }
+    startPendingRef.current = true;
+    setStartPending(true);
     setStartError(null);
     try {
       const view = await startPractice(id);
@@ -163,6 +170,9 @@ export function LessonWorkspacePage() {
       setFocused(true);
     } catch {
       setStartError("Could not start practice. Try again.");
+    } finally {
+      startPendingRef.current = false;
+      setStartPending(false);
     }
   }
 
@@ -330,7 +340,11 @@ export function LessonWorkspacePage() {
           expanded={expansion.practice}
           onToggle={() => toggleStage("practice")}
         >
-          <PracticeStage enabled={practiceReady} onStart={() => void handleStart()} />
+          <PracticeStage
+            enabled={practiceReady}
+            pending={startPending}
+            onStart={() => void handleStart()}
+          />
           {startError ? (
             <p className={styles.alert} role="alert">
               {startError}
