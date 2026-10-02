@@ -31,7 +31,7 @@
 ### Exercises and Sessions
 
 - [ ] **EXER-01**: Learner can generate exercises only from accepted learning units and can see a recoverable status while generation runs.
-- [ ] **EXER-02**: Learner can start an exercise session for a lesson and receive one exercise at a time.
+- [x] **EXER-02**: Learner can start an exercise session for a lesson and receive one exercise at a time.
 - [ ] **EXER-03**: Learner can complete Gap Fill exercises supplied through the Exercise Registry.
 - [ ] **EXER-04**: Learner can complete Chunk Completion exercises supplied through the Exercise Registry.
 - [ ] **EXER-05**: Learner can complete Sentence Reconstruction exercises supplied through the Exercise Registry.
@@ -182,7 +182,7 @@ Deferred beyond the initial release and not mapped to the v1 roadmap.
 | ANLY-08 | Phase 1 | Gaps Found |
 | ANLY-09 | Phase 7 | Pending |
 | EXER-01 | Phase 1 | Gaps Found |
-| EXER-02 | Phase 1 | Gaps Found |
+| EXER-02 | Phase 1 | Complete |
 | EXER-03 | Phase 1 | Gaps Found |
 | EXER-04 | Phase 3 | Pending |
 | EXER-05 | Phase 4 | Pending |

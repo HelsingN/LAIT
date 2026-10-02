@@ -35,7 +35,7 @@ This roadmap grows the product through vertical MVP slices that keep the learnin
   4. Maintainer can inspect active modules and capabilities, invoke the workflow through documented commands and queries, add a proof exercise contribution through the public registry and renderer seams without changing core domain services, and see startup reject invalid or incompatible module catalogs.
   5. Maintainer can generate the TypeScript client from OpenAPI, have CI detect an unreviewed contract/client mismatch, and test the core, persistence adapter, and bundled modules independently.
 
-**Plans:** TBD
+**Plans:** 12/12 plans executed
 
 Plans:
 - [x] 01-01-PLAN.md
@@ -49,7 +49,7 @@ Plans:
 - [x] 01-09-PLAN.md
 - [x] 01-10-PLAN.md
 - [x] 01-11-PLAN.md
-- [ ] To be defined during `$gsd-plan-phase 1`
+- [x] 01-12-PLAN.md — Return the same-generation open session and resume it after reload
 
 **UI hint:** yes
 
@@ -213,7 +213,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Mod-First Manual Learning Loop | 11/11 | In Progress|  |
+| 1. Mod-First Manual Learning Loop | 12/12 | In Progress|  |
 | 2. AI-Assisted Learning-Unit Review | 0/TBD | Not started | - |
 | 3. Assisted Chunk Retrieval | 0/TBD | Not started | - |
 | 4. Resumable Sentence Reconstruction | 0/TBD | Not started | - |
