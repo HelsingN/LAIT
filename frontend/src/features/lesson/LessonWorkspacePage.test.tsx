@@ -327,6 +327,88 @@ describe("Lesson workspace shell", () => {
     expect(screen.getByRole("button", { name: "Learning Units", expanded: false })).toBeInTheDocument();
   });
 
+  it("isPracticeOpen locks while a stored session is pending and then follows session.open", async () => {
+    const stageState = await import("./stageState.ts");
+    expect("isPracticeOpen" in stageState && "loadOpenPracticeSessionId" in stageState).toBe(true);
+    const isPracticeOpen = (
+      stageState as {
+        isPracticeOpen?: (pendingStoredSession: boolean, sessionOpen: boolean) => boolean;
+      }
+    ).isPracticeOpen;
+    expect(isPracticeOpen).toHaveLength(2);
+    expect(isPracticeOpen?.(true, false)).toBe(true);
+    expect(isPracticeOpen?.(false, true)).toBe(true);
+    expect(isPracticeOpen?.(false, false)).toBe(false);
+  });
+
+  it("resumes a stored open session into Focus Practice after the frozen hint", async () => {
+    const sessionId = "session-stored";
+    localStorage.setItem(`lait.practice-session.${lessonId}`, sessionId);
+    const practiceGet = deferred<Response>();
+    const calls = installFetch({ units: [acceptedUnit], practiceGet });
+    renderWorkspace();
+
+    const column = await screen.findByTestId("stage-column");
+    expect(screen.queryByRole("button", { name: "Exit Practice" })).not.toBeInTheDocument();
+    expect(
+      await within(column).findByText(
+        "Learning units are locked while practice is open. Exit Practice to edit them.",
+      ),
+    ).toBeInTheDocument();
+    expect(
+      calls.some(
+        (call) => call.method === "GET" && call.url === `/api/practice-sessions/${sessionId}`,
+      ),
+    ).toBe(true);
+    expect(calls.some((call) => call.url === "/api/practice-sessions" && call.method === "POST")).toBe(
+      false,
+    );
+    expect(calls.some((call) => call.url.includes("/finish"))).toBe(false);
+
+    practiceGet.resolve(
+      jsonResponse({
+        session_id: sessionId,
+        lesson_id: lessonId,
+        open: true,
+        cursor: 0,
+        current: null,
+      }),
+    );
+
+    expect(await screen.findByRole("button", { name: "Exit Practice" })).toBeInTheDocument();
+    expect(screen.queryByTestId("stage-column")).not.toBeInTheDocument();
+  });
+
+  it("clears a stored session that is not open and leaves the workspace unlocked", async () => {
+    const sessionId = "session-closed";
+    localStorage.setItem(`lait.practice-session.${lessonId}`, sessionId);
+    const practiceGet = deferred<Response>();
+    installFetch({ units: [acceptedUnit], practiceGet });
+    renderWorkspace();
+
+    const column = await screen.findByTestId("stage-column");
+    practiceGet.resolve(
+      jsonResponse({
+        session_id: sessionId,
+        lesson_id: lessonId,
+        open: false,
+        cursor: 0,
+        current: null,
+      }),
+    );
+
+    await waitFor(() => {
+      expect(localStorage.getItem(`lait.practice-session.${lessonId}`)).toBeNull();
+    });
+    expect(
+      screen.queryByText(
+        "Learning units are locked while practice is open. Exit Practice to edit them.",
+      ),
+    ).not.toBeInTheDocument();
+    expect(column).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Exit Practice" })).not.toBeInTheDocument();
+  });
+
   it("does not reference module_registry.describe in lesson feature source", () => {
     const root = testDirectory;
     const files = walk(root).filter((file) => /\.(ts|tsx)$/.test(file) && !file.endsWith(".test.tsx"));
@@ -352,6 +434,7 @@ function installFetch(options: {
   source?: string;
   generate?: ReturnType<typeof deferred<Response>>;
   generateResult?: Response;
+  practiceGet?: ReturnType<typeof deferred<Response>>;
 }): FetchCall[] {
   const calls: FetchCall[] = [];
   let units = options.units.map((unit) => ({ ...unit }));
@@ -406,6 +489,12 @@ function installFetch(options: {
           return options.generate.promise;
         }
         return options.generateResult ?? jsonResponse({ status: "failed" }, 500);
+      }
+      if (/\/api\/practice-sessions\/[^/]+$/.test(url) && method === "GET") {
+        if (options.practiceGet) {
+          return options.practiceGet.promise;
+        }
+        return new Response("missing", { status: 404 });
       }
       if (url.includes(`/api/lessons/${lessonId}`) && method === "GET") {
         return jsonResponse(lessonBody);

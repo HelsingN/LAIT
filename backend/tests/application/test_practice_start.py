@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import json
+import sqlite3
 from pathlib import Path
 
 import pytest
@@ -234,3 +236,114 @@ def test_two_unit_lesson_yields_drag_then_typed_in_span_order(tmp_path: Path) ->
     assert view.open is True
     assert view.current is None
     assert repository.has_open_practice_session(lesson.id) is True
+
+
+def _database(tmp_path: Path) -> tuple[object, str]:
+    from lait.adapters.persistence.database import migrate, open_repository
+
+    database_url = f"sqlite:///{(tmp_path / 'practice.db').as_posix()}"
+    migrate(database_url)
+    return open_repository(database_url), database_url
+
+
+def _open_session_ids(database_url: str) -> list[str]:
+    connection = sqlite3.connect(database_url.removeprefix("sqlite:///"))
+    try:
+        rows = connection.execute(
+            "select id from practice_sessions where status = 'open' order by id"
+        ).fetchall()
+    finally:
+        connection.close()
+    return [session_id for (session_id,) in rows]
+
+
+def _rewrite_open_generation_snapshot(database_url: str, unit_ids: list[str]) -> None:
+    connection = sqlite3.connect(database_url.removeprefix("sqlite:///"))
+    try:
+        connection.execute(
+            """
+            update exercise_generations
+            set accepted_unit_ids = ?
+            where id = (
+                select generation_id from practice_sessions where status = 'open'
+            )
+            """,
+            (json.dumps(unit_ids),),
+        )
+        connection.commit()
+    finally:
+        connection.close()
+
+
+def test_second_start_returns_the_same_open_session(tmp_path: Path) -> None:
+    from lait.application.commands.learning_unit_add import LearningUnitAdd
+    from lait.application.commands.learning_unit_add import handle as add_unit
+    from lait.application.commands.practice_start import PracticeStart, handle
+    from lait.domain.learning_unit import UnitSetFrozenError
+
+    source = "alpha beta"
+    repository, database_url = _database(tmp_path)
+    lesson = _lesson(repository, source)
+    _accept_unit(repository, lesson.id, _add(repository, lesson.id, source, "alpha").id)
+    _generate(repository, lesson.id)
+
+    first = handle(PracticeStart(lesson_id=lesson.id), repository, repository, _registry())
+    second = handle(PracticeStart(lesson_id=lesson.id), repository, repository, _registry())
+
+    assert second.session_id == first.session_id
+    assert _open_session_ids(database_url) == [first.session_id]
+    assert repository.has_open_practice_session(lesson.id) is True
+    with pytest.raises(UnitSetFrozenError):
+        add_unit(
+            LearningUnitAdd(lesson_id=lesson.id, start=0, end=len("alpha")),
+            repository,
+            repository,
+        )
+
+
+def test_generate_again_keeps_the_open_session_for_the_next_start(tmp_path: Path) -> None:
+    from lait.application.commands.practice_start import PracticeStart, handle
+
+    source = "alpha beta"
+    repository, database_url = _database(tmp_path)
+    lesson = _lesson(repository, source)
+    _accept_unit(repository, lesson.id, _add(repository, lesson.id, source, "alpha").id)
+    _generate(repository, lesson.id)
+    first = handle(PracticeStart(lesson_id=lesson.id), repository, repository, _registry())
+
+    _generate(repository, lesson.id)
+    second = handle(PracticeStart(lesson_id=lesson.id), repository, repository, _registry())
+
+    assert second.session_id == first.session_id
+    assert _open_session_ids(database_url) == [first.session_id]
+    assert repository.has_open_practice_session(lesson.id) is True
+
+
+def test_open_session_snapshot_mismatch_stays_open_and_frozen(tmp_path: Path) -> None:
+    from lait.application.commands.learning_unit_accept import LearningUnitAccept
+    from lait.application.commands.learning_unit_accept import handle as accept_unit
+    from lait.application.commands.practice_start import PracticeStart, handle
+    from lait.domain.learning_unit import UnitSetFrozenError
+    from lait.domain.practice_session import StaleGenerationError
+
+    source = "alpha beta"
+    repository, database_url = _database(tmp_path)
+    lesson = _lesson(repository, source)
+    accepted = _accept_unit(repository, lesson.id, _add(repository, lesson.id, source, "alpha").id)
+    draft = _add(repository, lesson.id, source, "beta")
+    _generate(repository, lesson.id)
+    first = handle(PracticeStart(lesson_id=lesson.id), repository, repository, _registry())
+    _rewrite_open_generation_snapshot(database_url, ["not-the-accepted-unit"])
+
+    with pytest.raises(StaleGenerationError):
+        handle(PracticeStart(lesson_id=lesson.id), repository, repository, _registry())
+
+    assert _open_session_ids(database_url) == [first.session_id]
+    with pytest.raises(UnitSetFrozenError):
+        accept_unit(
+            LearningUnitAccept(lesson_id=lesson.id, unit_id=draft.id),
+            repository,
+            repository,
+        )
+    assert repository.has_open_practice_session(lesson.id) is True
+    assert accepted.id != draft.id
