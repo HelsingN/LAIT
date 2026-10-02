@@ -1,22 +1,36 @@
-export type Lesson = {
-  id: string;
-  title: string;
-  source: string;
-  created_at: string;
-};
+import {
+  exerciseGenerate,
+  exerciseRegistryListVisibleFor,
+  exerciseSubmitAttempt,
+  learningUnitAccept,
+  learningUnitAdd,
+  learningUnitList,
+  learningUnitRemove,
+  lessonCreate,
+  lessonGet,
+  lessonList,
+  practiceFinish,
+  practiceGet,
+  practiceStart,
+  practiceStartOver,
+  type CurrentItemResponse,
+  type ExerciseRegistryItem,
+  type ExerciseRegistryResponse,
+  type GenerationResponse,
+  type LearningUnitResponse,
+  type LessonResponse,
+  type PracticeResponse,
+  type SegmentResponse,
+  type SubmitResponse,
+} from "../../api/generated/index.ts";
+
+export type Lesson = LessonResponse;
 
 export type LessonList = {
   lessons: Lesson[];
 };
 
-export type LearningUnit = {
-  id: string;
-  lesson_id: string;
-  start: number;
-  end: number;
-  text: string;
-  status: string;
-  created_at: string;
+export type LearningUnit = Omit<LearningUnitResponse, "removed_at"> & {
   removed_at: string | null;
 };
 
@@ -24,23 +38,11 @@ export type LearningUnitList = {
   learning_units: LearningUnit[];
 };
 
-export type LearnerExerciseType = {
-  exercise_type: string;
-  visibility: string;
-  module_id: string;
-};
+export type LearnerExerciseType = ExerciseRegistryItem;
 
-export type LearnerExerciseList = {
-  exercises: LearnerExerciseType[];
-};
+export type LearnerExerciseList = ExerciseRegistryResponse;
 
-export type GenerationResult = {
-  id: string;
-  lesson_id: string;
-  status: string;
-  accepted_unit_ids: string[];
-  definition_count: number;
-};
+export type GenerationResult = GenerationResponse;
 
 export class LearningUnitRequestError extends Error {
   readonly kind: "overlap" | "frozen";
@@ -52,35 +54,55 @@ export class LearningUnitRequestError extends Error {
   }
 }
 
-async function readJson<T>(response: Response): Promise<T> {
-  if (!response.ok) {
-    throw new Error(`Request failed with status ${response.status}`);
+type SdkPayload<T> = {
+  data?: T;
+  response?: Response;
+};
+
+async function readData<T>(pending: Promise<SdkPayload<T>>): Promise<T> {
+  const result = await pending;
+  if (result.data === undefined) {
+    throw new Error(`Request failed with status ${result.response?.status ?? 0}`);
   }
-  return (await response.json()) as T;
+  return result.data;
+}
+
+function asUnit(unit: LearningUnitResponse): LearningUnit {
+  return {
+    ...unit,
+    removed_at: unit.removed_at ?? null,
+  };
 }
 
 export function listLessons(): Promise<LessonList> {
-  return fetch("/api/lessons").then((response) => readJson<LessonList>(response));
+  return readData(lessonList());
 }
 
 export function createLesson(input: { source: string; title: string }): Promise<Lesson> {
-  return fetch("/api/lessons", {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify(input),
-  }).then((response) => readJson<Lesson>(response));
+  return readData(
+    lessonCreate({
+      body: input,
+    }),
+  );
 }
 
 export function getLesson(lessonId: string): Promise<Lesson> {
-  return fetch(`/api/lessons/${encodeURIComponent(lessonId)}`).then((response) =>
-    readJson<Lesson>(response),
+  return readData(
+    lessonGet({
+      path: { lesson_id: lessonId },
+    }),
   );
 }
 
-export function listLearningUnits(lessonId: string): Promise<LearningUnitList> {
-  return fetch(`/api/lessons/${encodeURIComponent(lessonId)}/learning-units`).then((response) =>
-    readJson<LearningUnitList>(response),
+export async function listLearningUnits(lessonId: string): Promise<LearningUnitList> {
+  const body = await readData(
+    learningUnitList({
+      path: { lesson_id: lessonId },
+    }),
   );
+  return {
+    learning_units: body.learning_units.map(asUnit),
+  };
 }
 
 export async function addLearningUnit(
@@ -88,96 +110,71 @@ export async function addLearningUnit(
   start: number,
   end: number,
 ): Promise<LearningUnit> {
-  const response = await fetch(`/api/lessons/${encodeURIComponent(lessonId)}/learning-units`, {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify({ start, end }),
+  const result = await learningUnitAdd({
+    path: { lesson_id: lessonId },
+    body: { start, end },
   });
-  if (response.status === 422) {
+  if (result.response?.status === 422) {
     throw new LearningUnitRequestError("overlap");
   }
-  if (response.status === 409) {
+  if (result.response?.status === 409) {
     throw new LearningUnitRequestError("frozen");
   }
-  return readJson<LearningUnit>(response);
+  if (result.data === undefined) {
+    throw new Error(`Request failed with status ${result.response?.status ?? 0}`);
+  }
+  return asUnit(result.data);
 }
 
 export async function acceptLearningUnit(lessonId: string, unitId: string): Promise<LearningUnit> {
-  const response = await fetch(
-    `/api/lessons/${encodeURIComponent(lessonId)}/learning-units/${encodeURIComponent(unitId)}/accept`,
-    { method: "POST" },
-  );
-  if (response.status === 409) {
+  const result = await learningUnitAccept({
+    path: { lesson_id: lessonId, unit_id: unitId },
+  });
+  if (result.response?.status === 409) {
     throw new LearningUnitRequestError("frozen");
   }
-  return readJson<LearningUnit>(response);
+  if (result.data === undefined) {
+    throw new Error(`Request failed with status ${result.response?.status ?? 0}`);
+  }
+  return asUnit(result.data);
 }
 
 export async function removeLearningUnit(lessonId: string, unitId: string): Promise<LearningUnit> {
-  const response = await fetch(
-    `/api/lessons/${encodeURIComponent(lessonId)}/learning-units/${encodeURIComponent(unitId)}/remove`,
-    { method: "POST" },
-  );
-  if (response.status === 409) {
+  const result = await learningUnitRemove({
+    path: { lesson_id: lessonId, unit_id: unitId },
+  });
+  if (result.response?.status === 409) {
     throw new LearningUnitRequestError("frozen");
   }
-  return readJson<LearningUnit>(response);
+  if (result.data === undefined) {
+    throw new Error(`Request failed with status ${result.response?.status ?? 0}`);
+  }
+  return asUnit(result.data);
 }
 
 export function listLearnerExerciseTypes(): Promise<LearnerExerciseList> {
-  return fetch("/api/exercise-registry?visibility=learner").then((response) =>
-    readJson<LearnerExerciseList>(response),
+  return readData(
+    exerciseRegistryListVisibleFor({
+      query: { visibility: "learner" },
+    }),
   );
 }
 
 export function generateExercises(lessonId: string): Promise<GenerationResult> {
-  return fetch(`/api/lessons/${encodeURIComponent(lessonId)}/exercises/generate`, {
-    method: "POST",
-  }).then((response) => readJson<GenerationResult>(response));
+  return readData(
+    exerciseGenerate({
+      path: { lesson_id: lessonId },
+    }),
+  );
 }
 
-export type PracticeSegment = {
-  kind: string;
-  text: string;
-};
+export type PracticeSegment = SegmentResponse;
 
-export type PracticeItem = {
-  mode: string;
-  learning_unit_id: string;
-  exercise_type: string;
-  position: number;
-  start: number;
-  end: number;
-  target_text: string;
-  sentence: string;
-  segments: PracticeSegment[];
-  chip_unit_ids: string[];
-};
+export type PracticeItem = CurrentItemResponse;
 
-export type PracticeView = {
-  session_id: string;
-  lesson_id: string;
-  open: boolean;
-  cursor: number;
-  current: PracticeItem | null;
-};
+export type PracticeView = PracticeResponse;
 
-export type AttemptResult = {
-  attempt_id: string;
-  session_open: boolean;
-  cursor: number;
-  category: string;
-  submitted: string;
-  expected: string;
-  explanation: string;
-  chunks_used: string[];
-  chunks_missed: string[];
-  natural_alternative: string | null;
-  learning_unit_id: string;
-  span_start: number;
-  span_end: number;
-  unit_text: string;
-};
+export type AttemptResult = SubmitResponse;
 
 export type AttemptSubmission = {
   kind: string;
@@ -187,20 +184,25 @@ export type AttemptSubmission = {
 };
 
 export function startPractice(lessonId: string): Promise<PracticeView> {
-  return fetch("/api/practice-sessions", {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify({ lesson_id: lessonId }),
-  }).then((response) => readJson<PracticeView>(response));
-}
-
-export function getPractice(sessionId: string): Promise<PracticeView> {
-  return fetch(`/api/practice-sessions/${encodeURIComponent(sessionId)}`).then((response) =>
-    readJson<PracticeView>(response),
+  return readData(
+    practiceStart({
+      body: { lesson_id: lessonId },
+    }),
   );
 }
 
-export function submitAttempt(sessionId: string, submission: AttemptSubmission): Promise<AttemptResult> {
+export function getPractice(sessionId: string): Promise<PracticeView> {
+  return readData(
+    practiceGet({
+      path: { session_id: sessionId },
+    }),
+  );
+}
+
+export function submitAttempt(
+  sessionId: string,
+  submission: AttemptSubmission,
+): Promise<AttemptResult> {
   const body: {
     kind: string;
     text: string;
@@ -214,21 +216,26 @@ export function submitAttempt(sessionId: string, submission: AttemptSubmission):
   if (submission.submittedUnitId) {
     body.submitted_unit_id = submission.submittedUnitId;
   }
-  return fetch(`/api/practice-sessions/${encodeURIComponent(sessionId)}/attempts`, {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify(body),
-  }).then((response) => readJson<AttemptResult>(response));
+  return readData(
+    exerciseSubmitAttempt({
+      path: { session_id: sessionId },
+      body,
+    }),
+  );
 }
 
 export function finishPractice(sessionId: string): Promise<PracticeView> {
-  return fetch(`/api/practice-sessions/${encodeURIComponent(sessionId)}/finish`, {
-    method: "POST",
-  }).then((response) => readJson<PracticeView>(response));
+  return readData(
+    practiceFinish({
+      path: { session_id: sessionId },
+    }),
+  );
 }
 
 export function startOverPractice(sessionId: string): Promise<PracticeView> {
-  return fetch(`/api/practice-sessions/${encodeURIComponent(sessionId)}/start-over`, {
-    method: "POST",
-  }).then((response) => readJson<PracticeView>(response));
+  return readData(
+    practiceStartOver({
+      path: { session_id: sessionId },
+    }),
+  );
 }
