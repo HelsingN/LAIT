@@ -31,6 +31,17 @@ npm run dev --prefix frontend
 
 Open `http://127.0.0.1:5173/`. The Vite dev server proxies `/api` and `/health` to port 8000. SQLite defaults to `data/lait.db` (WAL, `busy_timeout`).
 
+## OpenAPI client
+
+HTTP is a DTO adapter over the in-process commands and queries (`lesson.create`, `module_registry.describe`, and the rest of the D-23 names). Regenerate the TypeScript client after a route change:
+
+```powershell
+uv run python -m lait.adapters.http.export_openapi
+npm run openapi:generate --prefix frontend
+```
+
+`frontend/src/api/generated` is committed. CI runs the same export and `openapi:generate`, then `git diff --exit-code -- frontend/src/api/generated`. An interrupted generate leaves that tree dirty; do not commit a partial client. The generator is pinned at `@hey-api/openapi-ts@0.99.0`. The exported document and the client do not contain provider secrets.
+
 ## Docker Compose
 
 One command creates a fresh volume, runs Alembic `upgrade head`, and waits until `/health` is HTTP 200. No manual SQLite edits.

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 D23_OPERATION_IDS = frozenset(
@@ -45,3 +46,17 @@ def test_openapi_operation_ids_match_d23_names(tmp_path: Path) -> None:
     assert str(schema["openapi"]).startswith("3.1")
     missing = D23_OPERATION_IDS - _operation_ids(schema)
     assert missing == set()
+
+
+def test_export_openapi_writes_openapi_31_without_secrets(tmp_path: Path) -> None:
+    from lait.adapters.http.export_openapi import export_openapi
+
+    destination = tmp_path / "openapi.json"
+    written = export_openapi(destination)
+    text = written.read_text(encoding="utf-8")
+    schema = json.loads(text)
+    assert str(schema["openapi"]).startswith("3.1")
+    assert D23_OPERATION_IDS <= _operation_ids(schema)
+    assert "sk-" not in text
+    assert "BEGIN PRIVATE" not in text
+    assert "LAIT_DATABASE_URL" not in text

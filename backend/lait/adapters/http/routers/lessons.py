@@ -53,7 +53,7 @@ def _lesson_response(lesson: Lesson) -> LessonResponse:
     )
 
 
-@router.post("/api/lessons", status_code=201)
+@router.post("/api/lessons", status_code=201, operation_id="lesson.create")
 def post_lesson(body: LessonCreateBody, request: Request) -> LessonResponse:
     try:
         lesson = create_lesson(
@@ -65,13 +65,13 @@ def post_lesson(body: LessonCreateBody, request: Request) -> LessonResponse:
     return _lesson_response(lesson)
 
 
-@router.get("/api/lessons")
+@router.get("/api/lessons", operation_id="lesson.list")
 def get_lessons(request: Request) -> LessonListResponse:
     lessons = list_lessons(_repository(request))
     return LessonListResponse(lessons=[_lesson_response(lesson) for lesson in lessons])
 
 
-@router.get("/api/lessons/{lesson_id}")
+@router.get("/api/lessons/{lesson_id}", operation_id="lesson.get")
 def get_lesson_by_id(lesson_id: str, request: Request) -> LessonResponse:
     try:
         lesson = get_lesson(lesson_id, _repository(request))

@@ -43,7 +43,7 @@ def _registry(request: Request):
     return request.app.state.module_registry
 
 
-@router.get("/api/exercise-registry")
+@router.get("/api/exercise-registry", operation_id="exercise_registry.list_visible_for")
 def get_exercise_registry(visibility: str, request: Request) -> ExerciseRegistryResponse:
     rows = list_visible_for(visibility, _registry(request))
     return ExerciseRegistryResponse(
@@ -58,7 +58,7 @@ def get_exercise_registry(visibility: str, request: Request) -> ExerciseRegistry
     )
 
 
-@router.get("/api/module-registry")
+@router.get("/api/module-registry", operation_id="module_registry.describe")
 def get_module_registry(request: Request) -> ModuleRegistryResponse:
     rows = describe(_registry(request))
     return ModuleRegistryResponse(

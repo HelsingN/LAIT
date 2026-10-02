@@ -19,8 +19,18 @@ dev = [
   "ruff>=0.12",
 ]
 
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
 [tool.uv]
-package = false
+package = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["backend/lait"]
+
+[tool.hatch.build.targets.wheel.sources]
+"backend/lait" = "lait"
 
 [tool.pytest.ini_options]
 testpaths = ["backend/tests"]
