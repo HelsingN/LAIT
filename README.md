@@ -56,6 +56,15 @@ docker compose up -d --wait
 
 Copy `.env.example` to `.env` only to change `APP_PORT` or `WEB_PORT`. Compose starts without that file. `docker compose down -v` removes the volume.
 
+## Removing the proof exercise
+
+The proof exercise is a maintainer catalog entry. Gap Fill does not import it. To drop it from a build, delete only these two registrations:
+
+1. The proof catalog entry: `backend/lait/modules/exercise_proof/manifest.json`. The static catalog discovers `manifest.json` files under `backend/lait/modules/`. Leave `backend/lait/domain` and `backend/lait/application` unchanged.
+2. The frontend `ProofRenderer` registration in `frontend/src/registries/renderers/registry.ts` (`import { ProofRenderer }` and `registerRenderer("proof", ProofRenderer)`).
+
+Do not edit Core domain modules or application command handlers for this removal. The shipped catalog still includes the proof entry so `module_registry.describe` can show it. Tests that omit the entry use a temporary manifest overlay and do not delete the file above.
+
 ## Repository layout
 
 - `backend/` — FastAPI adapter, application handlers, SQLite persistence
