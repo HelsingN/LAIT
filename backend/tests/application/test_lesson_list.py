@@ -49,7 +49,14 @@ def test_http_routers_delegate_to_handlers_not_repositories() -> None:
 
 
 def test_lesson_list_ui_locks_copy_and_self_hosted_fonts() -> None:
-    page = Path("frontend/src/features/lesson/LessonListPage.tsx").read_text(encoding="utf-8")
+    # Create copy lives in the form the list page renders.
+    page = "\n".join(
+        Path(name).read_text(encoding="utf-8")
+        for name in (
+            "frontend/src/features/lesson/LessonListPage.tsx",
+            "frontend/src/features/lesson/CreateLessonForm.tsx",
+        )
+    )
     workspace = Path("frontend/src/features/lesson/LessonWorkspacePage.tsx").read_text(
         encoding="utf-8"
     )

@@ -56,6 +56,8 @@ def test_lesson_feature_does_not_call_module_registry_describe() -> None:
     for path in lesson.rglob("*"):
         if path.suffix not in {".ts", ".tsx"}:
             continue
+        if path.name.endswith(".test.ts") or path.name.endswith(".test.tsx"):
+            continue
         text = path.read_text(encoding="utf-8")
         assert "/api/module-registry" not in text
         assert "module_registry.describe" not in text

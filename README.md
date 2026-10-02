@@ -65,6 +65,31 @@ The proof exercise is a maintainer catalog entry. Gap Fill does not import it. T
 
 Do not edit Core domain modules or application command handlers for this removal. The shipped catalog still includes the proof entry so `module_registry.describe` can show it. Tests that omit the entry use a temporary manifest overlay and do not delete the file above.
 
+## Maintainer verify
+
+Run these as separate commands. An empty pytest path fails collection; do not treat a missing suite as success.
+
+```powershell
+uv run pytest -q
+```
+
+```powershell
+docker compose up -d --wait
+```
+
+```powershell
+uv run python -m lait.adapters.http.export_openapi
+npm run openapi:generate --prefix frontend
+git diff --exit-code -- frontend/src/api/generated
+```
+
+Independent backend suites, also separate from the full pytest gate:
+
+```powershell
+uv run pytest backend/tests/domain backend/tests/adapters/persistence backend/tests/modules -q
+uv run pytest backend/tests/application -q
+```
+
 ## Repository layout
 
 - `backend/` — FastAPI adapter, application handlers, SQLite persistence
