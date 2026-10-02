@@ -4,16 +4,16 @@ milestone: v1.0
 current_phase: 01
 current_phase_name: Mod-First Manual Learning Loop
 status: executing
-stopped_at: Completed 01-07-PLAN.md
-last_updated: "2026-10-01T23:59:15.776Z"
+stopped_at: Completed 01-08-PLAN.md
+last_updated: "2026-10-02T00:40:12.098Z"
 last_activity: 2026-10-01
 last_activity_desc: Phase 01 execution started
-state_head: c6d8b6698f78c38a0b15ca00a544063e429e1817
+state_head: 0f55d8851ba219963f0e7c6441940bde18a710c1
 progress:
   total_phases: 9
   completed_phases: 0
   total_plans: 11
-  completed_plans: 8
+  completed_plans: 10
 milestone_name: milestone
 spec_version: 0.2.0
 ---
@@ -71,6 +71,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 01 P06 | 10h 1m | 3 tasks | 23 files |
 | Phase 01 P11 | 1h 45m | 1 tasks | 8 files |
 | Phase 01 P07 | 24 min | 3 tasks | 17 files |
+| Phase 01-mod-first-manual-learning-loop P08 | 33 min | 3 tasks | 32 files |
 
 ## Accumulated Context
 
@@ -121,6 +122,7 @@ Recent decisions affecting current and future work:
 - [Phase 01]: The lesson page mounts rendererFor(exercise_type) only when that type is in the learner-visible list
 - [Phase 01]: Exit Practice calls practice.finish; Start Over calls practice.start_over and does not assemble abandon-plus-start
 - [Phase 01]: Workspace attempt rows are the submit responses kept in memory; Start Over does not clear them
+- [Phase 01-mod-first-manual-learning-loop]: Pin @hey-api/openapi-ts at exactly 0.99.0 and use D-23 names as OpenAPI operationIds
 
 ### Pending Todos
 
@@ -146,6 +148,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-10-01T23:58:54.527Z
-Stopped at: Completed 01-07-PLAN.md
+Last session: 2026-10-02T00:40:12.045Z
+Stopped at: Completed 01-08-PLAN.md
 Resume file: None

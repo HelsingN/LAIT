@@ -1,10 +1,10 @@
 ---
 schema_version: 1
-open_count: 0
+open_count: 1
 waived_count: 0
 fixed_count: 5
-total_count: 5
-last_updated: 2026-10-01T10:30:03.236Z
+total_count: 6
+last_updated: 2026-10-02T00:39:14.749Z
 ---
 
 # Broken Windows Ledger
@@ -20,6 +20,7 @@ last_updated: 2026-10-01T10:30:03.236Z
 | 3 | 01 | deviation | docker/web-nginx.conf |  | nginx proxies /api and /health so the static frontend can reach the api service | fixed |  | 2026-10-01T06:57:39.338Z | 2026-10-01T06:58:41.564Z |
 | 4 | 01 | deviation | backend/lait/domain/exercise.py |  | Shared exercise types added so Gap Fill and proof share one public contract | fixed |  | 2026-10-01T07:35:58.283Z | 2026-10-01T07:37:22.322Z |
 | 5 | 01 | deviation | backend/tests/modules/exercise_proof/test_contract.py |  | Proof contract test reads module source via inspect.getfile | fixed |  | 2026-10-01T07:35:58.919Z | 2026-10-01T07:37:22.959Z |
+| 6 | 01 | stub | frontend/src/api/generated/client/client.gen.ts | 214 | Generated fetch client leaves a TODO about returning errors; behavior is the upstream generator default. | open |  | 2026-10-02T00:39:14.749Z |  |
 
 ````json
 [
@@ -86,6 +87,19 @@ last_updated: 2026-10-01T10:30:03.236Z
     "reason": "",
     "recorded_at": "2026-10-01T07:35:58.919Z",
     "resolved_at": "2026-10-01T07:37:22.959Z",
+    "milestone": "v1.0"
+  },
+  {
+    "id": 6,
+    "kind": "stub",
+    "phase": "01",
+    "file": "frontend/src/api/generated/client/client.gen.ts",
+    "line": 214,
+    "description": "Generated fetch client leaves a TODO about returning errors; behavior is the upstream generator default.",
+    "status": "open",
+    "reason": "",
+    "recorded_at": "2026-10-02T00:39:14.749Z",
+    "resolved_at": null,
     "milestone": "v1.0"
   }
 ]

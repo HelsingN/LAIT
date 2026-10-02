@@ -106,7 +106,7 @@
 - [ ] **PLAT-06**: Learner can continue interacting with the UI while normal analysis or exercise generation runs, with no frozen page or unexplained indefinite spinner.
 - [ ] **PLAT-07**: Learner can receive a complete exercise set within five minutes for a documented normal-size lesson under the reference provider and environment.
 - [ ] **PLAT-08**: Product validation can demonstrate that at least 80% of generated exercises are usable after learning-unit review on the agreed evaluation sample.
-- [ ] **PLAT-09**: Maintainer can generate a type-safe TypeScript API client from the FastAPI OpenAPI 3.1 contract and detect an unreviewed contract/client mismatch in CI.
+- [x] **PLAT-09**: Maintainer can generate a type-safe TypeScript API client from the FastAPI OpenAPI 3.1 contract and detect an unreviewed contract/client mismatch in CI.
 - [ ] **PLAT-10**: Maintainer can test core services, persistence adapters, and each module independently.
 - [ ] **PLAT-11**: Maintainer can verify the primary workflow on Chromium plus targeted WebKit and mobile-emulation projects.
 - [ ] **PLAT-12**: Maintainer can verify a fresh-volume startup, application restart, interrupted AI job, concurrent session/job writes, database migration, and data persistence without manual database edits.
@@ -242,7 +242,7 @@ Deferred beyond the initial release and not mapped to the v1 roadmap.
 | PLAT-06 | Phase 2 | Pending |
 | PLAT-07 | Phase 9 | Pending |
 | PLAT-08 | Phase 5 | Pending |
-| PLAT-09 | Phase 1 | Pending |
+| PLAT-09 | Phase 1 | Complete |
 | PLAT-10 | Phase 1 | Pending |
 | PLAT-11 | Phase 9 | Pending |
 | PLAT-12 | Phase 9 | Pending |
