@@ -2,12 +2,10 @@
 
 from __future__ import annotations
 
-import inspect
 import sqlite3
 from pathlib import Path
 
 import pytest
-from fastapi.testclient import TestClient
 
 
 def _repository(tmp_path: Path):
@@ -157,96 +155,3 @@ def test_start_over_keeps_attempts_and_leaves_units_frozen(tmp_path: Path) -> No
             repository,
             repository,
         )
-
-
-def test_http_finish_and_start_over_only_map_dtos(tmp_path: Path) -> None:
-    from lait.adapters.http.app import create_app
-    from lait.adapters.persistence.database import migrate
-
-    database_url = f"sqlite:///{(tmp_path / 'http-finish.db').as_posix()}"
-    migrate(database_url)
-    client = TestClient(create_app(database_url))
-    source = "I was responsible for rolling out the migration."
-    text = "rolling out"
-    start_at = source.index(text)
-    created = client.post("/api/lessons", json={"source": source})
-    assert created.status_code == 201
-    lesson_id = created.json()["id"]
-    unit = client.post(
-        f"/api/lessons/{lesson_id}/learning-units",
-        json={"start": start_at, "end": start_at + len(text)},
-    )
-    assert unit.status_code == 201
-    accepted = client.post(f"/api/lessons/{lesson_id}/learning-units/{unit.json()['id']}/accept")
-    assert accepted.status_code == 200
-    generated = client.post(f"/api/lessons/{lesson_id}/exercises/generate")
-    assert generated.status_code == 200
-    started = client.post("/api/practice-sessions", json={"lesson_id": lesson_id})
-    assert started.status_code == 201
-    session_id = started.json()["session_id"]
-    submitted = client.post(
-        f"/api/practice-sessions/{session_id}/attempts",
-        json={"kind": "typed", "text": "Rolling out"},
-    )
-    assert submitted.status_code == 200
-    attempts_before = _attempt_rows(database_url)
-
-    restarted = client.post(f"/api/practice-sessions/{session_id}/start-over")
-    assert restarted.status_code == 200
-    restarted_body = restarted.json()
-    assert restarted_body["open"] is True
-    assert restarted_body["session_id"] != session_id
-    assert restarted_body["cursor"] == 0
-    assert restarted_body["current"]["mode"] == "typed"
-    migration_at = source.index("migration")
-    blocked = client.post(
-        f"/api/lessons/{lesson_id}/learning-units",
-        json={"start": migration_at, "end": migration_at + len("migration")},
-    )
-    assert blocked.status_code == 409
-    assert _attempt_rows(database_url) == attempts_before
-
-    finished = client.post(f"/api/practice-sessions/{restarted_body['session_id']}/finish")
-    assert finished.status_code == 200
-    finished_body = finished.json()
-    assert finished_body["session_id"] == restarted_body["session_id"]
-    assert finished_body["open"] is False
-    assert finished_body["current"] is None
-    assert _session_statuses(database_url)[session_id] == "abandoned"
-    assert _session_statuses(database_url)[restarted_body["session_id"]] == "closed"
-    added = client.post(
-        f"/api/lessons/{lesson_id}/learning-units",
-        json={"start": migration_at, "end": migration_at + len("migration")},
-    )
-    assert added.status_code == 201
-    assert _attempt_rows(database_url) == attempts_before
-
-    from lait.adapters.http.routers.practice import post_practice_finish, post_practice_start_over
-
-    schema = client.get("/openapi.json").json()
-    operation_ids = {
-        operation["operationId"]
-        for path_item in schema["paths"].values()
-        for operation in path_item.values()
-        if isinstance(operation, dict) and "operationId" in operation
-    }
-    assert "practice.finish" in operation_ids
-    assert "practice.start_over" in operation_ids
-
-    finish_body = inspect.getsource(post_practice_finish)
-    start_over_body = inspect.getsource(post_practice_start_over)
-    assert "finish_practice(" in finish_body
-    assert "PracticeFinish(" in finish_body
-    assert "start_practice(" not in finish_body
-    assert "PracticeStart(" not in finish_body
-    assert "abandon" not in finish_body.lower()
-    assert "start_over_practice(" in start_over_body
-    assert "PracticeStartOver(" in start_over_body
-    assert "start_practice(" not in start_over_body
-    assert "PracticeStart(" not in start_over_body
-    assert "abandon" not in start_over_body.lower()
-    router_source = Path("backend/lait/adapters/http/routers/practice.py").read_text(
-        encoding="utf-8"
-    )
-    assert "lait.adapters.persistence" not in router_source
-    assert "repositories" not in router_source

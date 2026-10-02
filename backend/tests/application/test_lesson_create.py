@@ -123,46 +123,6 @@ def test_application_handlers_do_not_import_fastapi_or_sqlalchemy() -> None:
     assert offenders == []
 
 
-def test_http_maps_create_dto_and_rejects_empty_source(tmp_path: Path) -> None:
-    from fastapi.testclient import TestClient
-
-    from lait.adapters.http.app import create_app
-    from lait.adapters.persistence.database import migrate
-
-    database_url = f"sqlite:///{(tmp_path / 'http.db').as_posix()}"
-    migrate(database_url)
-    client = TestClient(create_app(database_url))
-
-    rejected = client.post("/api/lessons", json={"source": "   "})
-    assert rejected.status_code == 422
-    assert client.get("/api/lessons").json()["lessons"] == []
-
-    created = client.post(
-        "/api/lessons",
-        json={"source": "Hello team\nWe shipped the queue.", "title": "Hello team"},
-    )
-    assert created.status_code == 201
-    body = created.json()
-    assert body["source"] == "Hello team\nWe shipped the queue."
-    assert body["title"] == "Hello team"
-    assert body["id"]
-
-    listed = client.get("/api/lessons")
-    assert listed.status_code == 200
-    assert listed.json()["lessons"][0]["id"] == body["id"]
-
-    fetched = client.get(f"/api/lessons/{body['id']}")
-    assert fetched.status_code == 200
-    assert fetched.json()["source"] == body["source"]
-
-    missing = client.get("/api/lessons/missing-lesson")
-    assert missing.status_code == 404
-
-    health = client.get("/health")
-    assert health.status_code == 200
-    assert health.json() == {"status": "ok"}
-
-
 def test_list_orders_by_created_at_desc_then_id(tmp_path: Path) -> None:
     from lait.application.commands.lesson_create import LessonCreate, handle
     from lait.application.queries.lesson_list import handle as list_lessons

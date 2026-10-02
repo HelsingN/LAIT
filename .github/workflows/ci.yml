@@ -22,6 +22,10 @@ jobs:
         run: uv sync --locked
       - name: Install frontend dependencies
         run: npm ci --prefix frontend
+      - name: pytest domain persistence modules
+        run: uv run pytest backend/tests/domain backend/tests/adapters/persistence backend/tests/modules -q
+      - name: pytest application
+        run: uv run pytest backend/tests/application -q
       - name: pytest
         run: uv run pytest -q
       - name: vitest

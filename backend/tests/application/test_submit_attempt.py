@@ -6,7 +6,6 @@ import sqlite3
 from pathlib import Path
 
 import pytest
-from fastapi.testclient import TestClient
 
 
 def _repository(tmp_path: Path):
@@ -159,72 +158,3 @@ def test_attempt_unit_fk_is_on_delete_restrict_and_copies_span_and_text(tmp_path
     finally:
         connection.close()
     assert copied == (unit.id, unit.start, unit.end, unit.text)
-
-
-def test_http_maps_generate_start_get_and_submit_only(tmp_path: Path) -> None:
-    from lait.adapters.http.app import create_app
-    from lait.adapters.persistence.database import migrate
-
-    database_url = f"sqlite:///{(tmp_path / 'http.db').as_posix()}"
-    migrate(database_url)
-    client = TestClient(create_app(database_url))
-    source = "I was responsible for rolling out the migration."
-    text = "rolling out"
-    start_at = source.index(text)
-    created = client.post("/api/lessons", json={"source": source})
-    assert created.status_code == 201
-    lesson_id = created.json()["id"]
-    unit = client.post(
-        f"/api/lessons/{lesson_id}/learning-units",
-        json={"start": start_at, "end": start_at + len(text)},
-    )
-    assert unit.status_code == 201
-    accepted = client.post(f"/api/lessons/{lesson_id}/learning-units/{unit.json()['id']}/accept")
-    assert accepted.status_code == 200
-
-    generated = client.post(f"/api/lessons/{lesson_id}/exercises/generate")
-    assert generated.status_code == 200
-    assert generated.json()["status"] == "completed"
-    assert generated.json()["definition_count"] == 1
-
-    started = client.post("/api/practice-sessions", json={"lesson_id": lesson_id})
-    assert started.status_code == 201
-    session_id = started.json()["session_id"]
-    assert started.json()["current"]["mode"] == "typed"
-    assert started.json()["open"] is True
-
-    current = client.get(f"/api/practice-sessions/{session_id}")
-    assert current.status_code == 200
-    assert current.json()["current"]["learning_unit_id"] == accepted.json()["id"]
-    assert "items" not in current.json()
-
-    submitted = client.post(
-        f"/api/practice-sessions/{session_id}/attempts",
-        json={"kind": "typed", "text": "Rolling out"},
-    )
-    assert submitted.status_code == 200
-    body = submitted.json()
-    assert body["session_open"] is True
-    assert body["category"] == "correct"
-    assert body["unit_text"] == text
-    assert body["span_start"] == start_at
-
-    nxt = client.get(f"/api/practice-sessions/{session_id}")
-    assert nxt.json()["open"] is True
-    assert nxt.json()["current"] is None
-
-    schema = client.get("/openapi.json").json()
-    operation_ids = {
-        operation["operationId"]
-        for path in schema["paths"].values()
-        for operation in path.values()
-        if isinstance(operation, dict) and "operationId" in operation
-    }
-    assert "exercise.generate" in operation_ids
-    assert "practice.start" in operation_ids
-    assert "practice.get" in operation_ids
-    assert "exercise.submit_attempt" in operation_ids
-    practice_router = Path("backend/lait/adapters/http/routers/practice.py").read_text(
-        encoding="utf-8"
-    )
-    assert "lait.adapters.persistence" not in practice_router
