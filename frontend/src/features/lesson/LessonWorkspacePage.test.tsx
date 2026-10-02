@@ -409,6 +409,85 @@ describe("Lesson workspace shell", () => {
     expect(screen.queryByRole("button", { name: "Exit Practice" })).not.toBeInTheDocument();
   });
 
+  it("disables Start Practice until the first start request settles", async () => {
+    const user = userEvent.setup();
+    const start = deferred<Response>();
+    const calls = installFetch({
+      units: [acceptedUnit],
+      generateResult: jsonResponse({
+        id: "gen-1",
+        lesson_id: lessonId,
+        status: "completed",
+        accepted_unit_ids: ["unit-1"],
+        definition_count: 1,
+      }),
+      start,
+    });
+    renderWorkspace();
+
+    await screen.findByRole("heading", { name: "Rolling out" });
+    await user.click(screen.getByRole("button", { name: "Generate Exercises", expanded: false }));
+    await user.click(
+      within(screen.getByRole("region", { name: "Generate Exercises" })).getByRole("button", {
+        name: "Generate Exercises",
+      }),
+    );
+    const startButton = await screen.findByRole("button", { name: "Start Practice" });
+    expect(startButton).toBeEnabled();
+    await user.click(startButton);
+    expect(startButton).toBeDisabled();
+    await user.click(startButton);
+    expect(
+      calls.filter((call) => call.url === "/api/practice-sessions" && call.method === "POST"),
+    ).toHaveLength(1);
+
+    start.resolve(
+      jsonResponse({
+        session_id: "session-1",
+        lesson_id: lessonId,
+        open: true,
+        cursor: 0,
+        current: null,
+      }),
+    );
+    expect(await screen.findByRole("button", { name: "Exit Practice" })).toBeInTheDocument();
+    expect(screen.queryByTestId("stage-column")).not.toBeInTheDocument();
+  });
+
+  it("enables Start Practice again after the start request rejects", async () => {
+    const user = userEvent.setup();
+    const start = deferred<Response>();
+    const calls = installFetch({
+      units: [acceptedUnit],
+      generateResult: jsonResponse({
+        id: "gen-1",
+        lesson_id: lessonId,
+        status: "completed",
+        accepted_unit_ids: ["unit-1"],
+        definition_count: 1,
+      }),
+      start,
+    });
+    renderWorkspace();
+
+    await screen.findByRole("heading", { name: "Rolling out" });
+    await user.click(screen.getByRole("button", { name: "Generate Exercises", expanded: false }));
+    await user.click(
+      within(screen.getByRole("region", { name: "Generate Exercises" })).getByRole("button", {
+        name: "Generate Exercises",
+      }),
+    );
+    const startButton = await screen.findByRole("button", { name: "Start Practice" });
+    await user.click(startButton);
+    expect(startButton).toBeDisabled();
+    start.resolve(new Response("nope", { status: 500 }));
+    expect(await screen.findByRole("alert")).toHaveTextContent("Could not start practice. Try again.");
+    expect(screen.getByRole("button", { name: "Start Practice" })).toBeEnabled();
+    expect(
+      calls.filter((call) => call.url === "/api/practice-sessions" && call.method === "POST"),
+    ).toHaveLength(1);
+  });
+
   it("does not reference module_registry.describe in lesson feature source", () => {
     const root = testDirectory;
     const files = walk(root).filter((file) => /\.(ts|tsx)$/.test(file) && !file.endsWith(".test.tsx"));
@@ -435,6 +514,7 @@ function installFetch(options: {
   generate?: ReturnType<typeof deferred<Response>>;
   generateResult?: Response;
   practiceGet?: ReturnType<typeof deferred<Response>>;
+  start?: ReturnType<typeof deferred<Response>>;
 }): FetchCall[] {
   const calls: FetchCall[] = [];
   let units = options.units.map((unit) => ({ ...unit }));
@@ -489,6 +569,12 @@ function installFetch(options: {
           return options.generate.promise;
         }
         return options.generateResult ?? jsonResponse({ status: "failed" }, 500);
+      }
+      if (url === "/api/practice-sessions" && method === "POST") {
+        if (options.start) {
+          return options.start.promise;
+        }
+        return new Response("missing", { status: 404 });
       }
       if (/\/api\/practice-sessions\/[^/]+$/.test(url) && method === "GET") {
         if (options.practiceGet) {

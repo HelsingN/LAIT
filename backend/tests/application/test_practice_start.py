@@ -347,3 +347,102 @@ def test_open_session_snapshot_mismatch_stays_open_and_frozen(tmp_path: Path) ->
         )
     assert repository.has_open_practice_session(lesson.id) is True
     assert accepted.id != draft.id
+
+
+def test_second_open_row_for_one_lesson_is_rejected(tmp_path: Path) -> None:
+    from sqlalchemy import create_engine
+    from sqlalchemy.exc import IntegrityError
+    from sqlalchemy.orm import sessionmaker
+
+    from lait.adapters.persistence.models import PracticeSessionRow
+    from lait.application.commands.practice_start import PracticeStart, handle
+
+    source = "alpha beta"
+    repository, database_url = _database(tmp_path)
+    lesson = _lesson(repository, source)
+    _accept_unit(repository, lesson.id, _add(repository, lesson.id, source, "alpha").id)
+    _generate(repository, lesson.id)
+    first = handle(PracticeStart(lesson_id=lesson.id), repository, repository, _registry())
+    connection = sqlite3.connect(database_url.removeprefix("sqlite:///"))
+    try:
+        generation_id = connection.execute(
+            "select generation_id from practice_sessions where id = ?",
+            (first.session_id,),
+        ).fetchone()
+    finally:
+        connection.close()
+    assert generation_id is not None
+
+    engine = create_engine(database_url)
+    factory = sessionmaker(bind=engine)
+    with factory() as session:
+        session.add(
+            PracticeSessionRow(
+                id="second-open",
+                lesson_id=lesson.id,
+                generation_id=generation_id[0],
+                status="open",
+                cursor=0,
+                created_at="2026-10-02T00:00:00+00:00",
+            )
+        )
+        with pytest.raises(IntegrityError):
+            session.commit()
+    engine.dispose()
+
+    connection = sqlite3.connect(database_url.removeprefix("sqlite:///"))
+    try:
+        index_row = connection.execute(
+            "select sql from sqlite_master where type = 'index' and name = ?",
+            ("uq_practice_sessions_one_open_per_lesson",),
+        ).fetchone()
+    finally:
+        connection.close()
+    assert index_row is not None
+    assert "uq_practice_sessions_one_open_per_lesson" in index_row[0]
+    assert _open_session_ids(database_url) == [first.session_id]
+
+
+def test_unique_violation_returns_the_winning_open_session(tmp_path: Path) -> None:
+    from sqlalchemy import create_engine, event
+
+    from lait.adapters.persistence.models import PracticeSessionRow
+    from lait.application.commands.practice_start import PracticeStart, handle
+
+    source = "alpha beta"
+    repository, database_url = _database(tmp_path)
+    lesson = _lesson(repository, source)
+    _accept_unit(repository, lesson.id, _add(repository, lesson.id, source, "alpha").id)
+    _generate(repository, lesson.id)
+    winner_id = "winner-open"
+    fired = {"done": False}
+
+    def before_insert(_mapper, _connection, target) -> None:
+        if fired["done"] or target.id == winner_id:
+            return
+        fired["done"] = True
+        other = create_engine(database_url)
+        with other.begin() as connection:
+            connection.execute(
+                PracticeSessionRow.__table__.insert(),
+                {
+                    "id": winner_id,
+                    "lesson_id": target.lesson_id,
+                    "generation_id": target.generation_id,
+                    "status": "open",
+                    "cursor": 0,
+                    "created_at": target.created_at,
+                },
+            )
+        other.dispose()
+
+    event.listen(PracticeSessionRow, "before_insert", before_insert)
+    try:
+        view = handle(PracticeStart(lesson_id=lesson.id), repository, repository, _registry())
+    finally:
+        event.remove(PracticeSessionRow, "before_insert", before_insert)
+
+    assert fired["done"] is True
+    assert view.session_id == winner_id
+    assert view.open is True
+    assert _open_session_ids(database_url) == [winner_id]
