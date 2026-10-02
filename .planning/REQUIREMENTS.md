@@ -31,12 +31,12 @@
 ### Exercises and Sessions
 
 - [x] **EXER-01**: Learner can generate exercises only from accepted learning units and can see a recoverable status while generation runs.
-- [ ] **EXER-02**: Learner can start an exercise session for a lesson and receive one exercise at a time.
-- [ ] **EXER-03**: Learner can complete Gap Fill exercises supplied through the Exercise Registry.
+- [x] **EXER-02**: Learner can start an exercise session for a lesson and receive one exercise at a time.
+- [x] **EXER-03**: Learner can complete Gap Fill exercises supplied through the Exercise Registry.
 - [ ] **EXER-04**: Learner can complete Chunk Completion exercises supplied through the Exercise Registry.
 - [ ] **EXER-05**: Learner can complete Sentence Reconstruction exercises supplied through the Exercise Registry.
 - [ ] **EXER-06**: Learner can complete Keyword Recall exercises supplied through the Exercise Registry.
-- [ ] **EXER-07**: Learner can submit an answer, view feedback, and continue to the next exercise without leaving the session.
+- [x] **EXER-07**: Learner can submit an answer, view feedback, and continue to the next exercise without leaving the session.
 - [ ] **EXER-08**: Learner can retry an exercise after feedback, with each submission retained as a distinct attempt.
 - [ ] **EXER-09**: Learner can reveal the relevant source or reference, with that assistance recorded rather than counted as independent recall.
 - [ ] **EXER-10**: Learner can resume an interrupted session without losing already submitted attempts or its current progress.
@@ -44,11 +44,11 @@
 
 ### Evaluation and Feedback
 
-- [ ] **EVAL-01**: Learner receives deterministic evaluation for selected options, exact missing content, token ordering, and other closed answers whenever a reliable rule exists.
+- [x] **EVAL-01**: Learner receives deterministic evaluation for selected options, exact missing content, token ordering, and other closed answers whenever a reliable rule exists.
 - [ ] **EVAL-02**: Learner receives normalized deterministic comparison that applies English-module rules for whitespace, capitalization, punctuation, contractions, and configured accepted variants.
 - [ ] **EVAL-03**: Learner can submit an open answer for semantic evaluation without requiring exact reproduction of the source wording.
-- [ ] **EVAL-04**: Learner receives one explicit result category: correct, acceptable, partial, incorrect, or uncertain.
-- [ ] **EVAL-05**: Learner can see the submitted answer, reference answer or meaning, concise explanation, target chunks used or missed, and an optional natural alternative.
+- [x] **EVAL-04**: Learner receives one explicit result category: correct, acceptable, partial, incorrect, or uncertain.
+- [x] **EVAL-05**: Learner can see the submitted answer, reference answer or meaning, concise explanation, target chunks used or missed, and an optional natural alternative.
 - [ ] **EVAL-06**: Learner can inspect the relevant original source while reviewing feedback.
 - [ ] **EVAL-07**: Learner's submitted attempt is saved before an external semantic-evaluation request, so provider failure cannot lose the answer.
 - [ ] **EVAL-08**: Learner receives `uncertain` or an unable-to-evaluate state when the semantic evaluator cannot support a reliable judgment.
@@ -182,21 +182,21 @@ Deferred beyond the initial release and not mapped to the v1 roadmap.
 | ANLY-08 | Phase 1 | Complete |
 | ANLY-09 | Phase 7 | Pending |
 | EXER-01 | Phase 1 | Complete |
-| EXER-02 | Phase 1 | Pending |
-| EXER-03 | Phase 1 | Pending |
+| EXER-02 | Phase 1 | Complete |
+| EXER-03 | Phase 1 | Complete |
 | EXER-04 | Phase 3 | Pending |
 | EXER-05 | Phase 4 | Pending |
 | EXER-06 | Phase 5 | Pending |
-| EXER-07 | Phase 1 | Pending |
+| EXER-07 | Phase 1 | Complete |
 | EXER-08 | Phase 3 | Pending |
 | EXER-09 | Phase 3 | Pending |
 | EXER-10 | Phase 4 | Pending |
 | EXER-11 | Phase 5 | Pending |
-| EVAL-01 | Phase 1 | Pending |
+| EVAL-01 | Phase 1 | Complete |
 | EVAL-02 | Phase 3 | Pending |
 | EVAL-03 | Phase 5 | Pending |
-| EVAL-04 | Phase 1 | Pending |
-| EVAL-05 | Phase 1 | Pending |
+| EVAL-04 | Phase 1 | Complete |
+| EVAL-05 | Phase 1 | Complete |
 | EVAL-06 | Phase 3 | Pending |
 | EVAL-07 | Phase 5 | Pending |
 | EVAL-08 | Phase 5 | Pending |
