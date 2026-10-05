@@ -604,6 +604,10 @@ describe("Lesson workspace shell", () => {
     expect(
       within(screen.getByRole("region", { name: "Exercises" })).queryByText("completed"),
     ).not.toBeInTheDocument();
+    const feedbackToggle = screen.getByRole("button", { name: "Feedback", expanded: false });
+    await waitFor(() => expect(feedbackToggle).toBeEnabled());
+    expect(screen.queryByRole("region", { name: "Feedback" })).not.toBeInTheDocument();
+    await userEvent.setup().click(feedbackToggle);
     const feedback = await screen.findByRole("region", { name: "Feedback" });
     expect(screen.getByTestId("prep-slot").contains(feedback)).toBe(false);
     expect(feedback).toHaveTextContent("session-saved");
@@ -616,6 +620,37 @@ describe("Lesson workspace shell", () => {
     expect(calls.some((call) => call.method === "POST" && call.url.includes("/exercises/generate"))).toBe(
       false,
     );
+  });
+
+  it.each([false, true])("starts Feedback collapsed with saved expansion=%s, including after reopening", async (savedFeedback) => {
+    localStorage.setItem(`lait.lesson-stages.${lessonId}`, JSON.stringify({
+      source: false,
+      "learning-units": true,
+      feedback: savedFeedback,
+    }));
+    installFetch({
+      units: [acceptedUnit],
+      latest: { restorable: false },
+      attemptList: [historyAttempt("session-saved", "completed", "attempt-saved")],
+    });
+    const first = renderWorkspace();
+    const user = userEvent.setup();
+    const toggle = screen.getByRole("button", { name: "Feedback", expanded: false });
+    await waitFor(() => expect(toggle).toBeEnabled());
+    expect(screen.queryByRole("region", { name: "Feedback" })).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Source", expanded: false })).toBeInTheDocument();
+    await user.click(toggle);
+    expect(await screen.findByRole("region", { name: "Feedback" })).toHaveTextContent("session-saved");
+    await user.click(toggle);
+    expect(screen.queryByRole("region", { name: "Feedback" })).not.toBeInTheDocument();
+    await user.click(toggle);
+    first.unmount();
+    renderWorkspace();
+    const reopened = screen.getByRole("button", { name: "Feedback", expanded: false });
+    await waitFor(() => expect(reopened).toBeEnabled());
+    expect(screen.queryByRole("region", { name: "Feedback" })).not.toBeInTheDocument();
+    await user.click(reopened);
+    expect(await screen.findByRole("region", { name: "Feedback" })).toHaveTextContent("session-saved");
   });
 
   it("keeps Start Practice disabled when the accepted set is not restorable", async () => {
@@ -870,6 +905,9 @@ describe("Lesson workspace shell", () => {
     });
     renderWorkspace();
 
+    const feedbackToggle = screen.getByRole("button", { name: "Feedback", expanded: false });
+    await waitFor(() => expect(feedbackToggle).toBeEnabled());
+    await userEvent.setup().click(feedbackToggle);
     const feedback = await screen.findByRole("region", { name: "Feedback" });
     expect(screen.getByTestId("prep-slot").contains(feedback)).toBe(true);
     expect(feedback.className).toMatch(/feedbackCover/);

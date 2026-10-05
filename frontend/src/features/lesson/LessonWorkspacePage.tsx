@@ -92,7 +92,10 @@ function useShortFeedbackCover(): boolean {
 export function LessonWorkspacePage() {
   const { id = "" } = useParams();
   const queryClient = useQueryClient();
-  const [expansion, setExpansion] = useState<StageExpansion>(() => loadStageExpansion(id));
+  const [expansion, setExpansion] = useState<StageExpansion>(() => ({
+    ...loadStageExpansion(id),
+    feedback: false,
+  }));
   const [selection, setSelection] = useState<CodePointRange | null>(null);
   const [prepSlot, setPrepSlot] = useState<HTMLDivElement | null>(null);
   const shortWindow = useShortFeedbackCover();
@@ -224,11 +227,6 @@ export function LessonWorkspacePage() {
         }
         setAttempts(listed);
         setFeedbackUnlocked(true);
-        setExpansion((current) => {
-          const next = { ...current, feedback: true };
-          saveStageExpansion(lessonId, next);
-          return next;
-        });
       } catch {
         // History stays closed until a later successful list.
       }

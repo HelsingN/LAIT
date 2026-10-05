@@ -4,11 +4,11 @@ milestone: v1.0
 current_phase: 01
 current_phase_name: Mod-First Manual Learning Loop
 status: executing
-stopped_at: Plan 01-14 stays approved. UX-21 is built and waiting on its own checkpoint. Phase 1 is not complete.
-last_updated: "2026-10-02T02:37:13.330Z"
+stopped_at: Quick task 261005-wza complete; its human checkpoint approved by the user. Phase 1 UAT remains separate and Phase 1 is not complete.
+last_updated: "2026-10-05T20:48:16.988Z"
 last_activity: 2026-10-05
-last_activity_desc: UX-21 moves the empty-selection hint onto the inactive Add button. Its checkpoint is not approved. Phase 1 remains open. No commit.
-state_head: 2f5f082838e842b8ee13bb3b24e3b694868c9432
+last_activity_desc: Quick task 261005-wza completed; user confirmed the Feedback human checkpoint passed. Phase 1 remains open. No commit.
+state_head: 0c5122d8dacf1022fb6cc909c0b79904a072192d
 progress:
   total_phases: 9
   completed_phases: 0
@@ -34,7 +34,7 @@ Phase: 01 (Mod-First Manual Learning Loop) — EXECUTING
 Plan: 14 of 14 recorded. The 01-14 checkpoint is approved. Phase 1 is not complete.
 Status: Phase 1 is not complete
 Current discussion area: Complete
-Last activity: 2026-10-05 — Completed quick task 261005-u2f: ignored local GSD runtime artifacts and milestone lock (uncommitted)
+Last activity: 2026-10-05 — Completed quick task 261005-wza: Feedback collapsed on lesson entry; human checkpoint approved (uncommitted).
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -152,6 +152,7 @@ Recent decisions affecting current and future work:
 | 261002-lpe | Recreated local Phase 1 UX audit with six findings and screenshot evidence | 2026-10-02 | Uncommitted — per user instruction | [261002-lpe-recreate-local-phase-1-ux-audit-from-cur](./quick/261002-lpe-recreate-local-phase-1-ux-audit-from-cur/) |
 | 261005-sqr | UX-21: selection hint on the inactive Add button. Checkpoint not approved. | 2026-10-05 | Uncommitted — per user instruction | [261005-sqr-ux-21-show-the-empty-selection-hint-as-a](./quick/261005-sqr-ux-21-show-the-empty-selection-hint-as-a/) |
 | 261005-u2f | Ignore local GSD runtime artifacts and milestone lock; files retained locally | 2026-10-05 | Uncommitted — no commit requested | [261005-u2f-ignore-local-gsd-runtime-artifacts-and-m](./quick/261005-u2f-ignore-local-gsd-runtime-artifacts-and-m/) |
+| 261005-wza | Feedback collapsed on lesson entry; human checkpoint approved, task complete. | 2026-10-05 | Uncommitted — no commit requested | [261005-wza-collapse-feedback-by-default-when-openin](./quick/261005-wza-collapse-feedback-by-default-when-openin/) |
 
 ## Deferred Items
 
@@ -167,5 +168,5 @@ Items acknowledged and carried forward from previous milestone close:
 ## Session Continuity
 
 Last session: 2026-10-02T02:37:13.271Z
-Stopped at: Plan 01-14 stays approved. UX-21 is built and waiting on its own checkpoint. Phase 1 is not complete.
+Stopped at: Quick task 261005-wza complete; its human checkpoint approved by the user. Continue the separate Phase 1 UAT. Phase 1 is not complete.
 Resume file: None
