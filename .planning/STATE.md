@@ -34,7 +34,7 @@ Phase: 01 (Mod-First Manual Learning Loop) — EXECUTING
 Plan: 14 of 14 recorded. The 01-14 checkpoint is approved. Phase 1 is not complete.
 Status: Phase 1 is not complete
 Current discussion area: Complete
-Last activity: 2026-10-02 — Completed quick task 261002-lpe: recreated local Phase 1 UX audit (uncommitted)
+Last activity: 2026-10-05 — Completed quick task 261005-u2f: ignored local GSD runtime artifacts and milestone lock (uncommitted)
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -151,6 +151,7 @@ Recent decisions affecting current and future work:
 |---|-------------|------|--------|-----------|
 | 261002-lpe | Recreated local Phase 1 UX audit with six findings and screenshot evidence | 2026-10-02 | Uncommitted — per user instruction | [261002-lpe-recreate-local-phase-1-ux-audit-from-cur](./quick/261002-lpe-recreate-local-phase-1-ux-audit-from-cur/) |
 | 261005-sqr | UX-21: selection hint on the inactive Add button. Checkpoint not approved. | 2026-10-05 | Uncommitted — per user instruction | [261005-sqr-ux-21-show-the-empty-selection-hint-as-a](./quick/261005-sqr-ux-21-show-the-empty-selection-hint-as-a/) |
+| 261005-u2f | Ignore local GSD runtime artifacts and milestone lock; files retained locally | 2026-10-05 | Uncommitted — no commit requested | [261005-u2f-ignore-local-gsd-runtime-artifacts-and-m](./quick/261005-u2f-ignore-local-gsd-runtime-artifacts-and-m/) |
 
 ## Deferred Items
 

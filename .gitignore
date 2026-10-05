@@ -73,3 +73,5 @@ frontend/openapi.json
 .gsd/generated/
 .mcp/
 .codex/
+/.gsd/
+/.planning/milestone.lock
