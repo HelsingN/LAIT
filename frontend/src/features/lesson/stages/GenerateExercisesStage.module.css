@@ -2,20 +2,32 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+  min-height: 0;
+  overflow: hidden;
   gap: var(--space-md);
 }
 
 .types,
-.status {
+.status,
+.ready {
   margin: 0;
   overflow-wrap: anywhere;
 }
 
+.ready {
+  flex: 0 0 auto;
+  font-weight: 600;
+}
+
 .types {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
   padding-left: var(--space-lg);
 }
 
 .primary {
+  flex: 0 0 auto;
   min-height: 44px;
   padding: var(--space-sm) var(--space-md);
   border: 0;

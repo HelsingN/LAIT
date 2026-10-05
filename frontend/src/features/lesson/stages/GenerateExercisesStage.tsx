@@ -11,6 +11,7 @@ type GenerateExercisesStageProps = {
   pending: boolean;
   outcome: GenerationResult | null;
   acceptedCount: number;
+  ready: boolean;
   onGenerate: () => void;
 };
 
@@ -19,10 +20,12 @@ export function GenerateExercisesStage({
   pending,
   outcome,
   acceptedCount,
+  ready,
   onGenerate,
 }: GenerateExercisesStageProps) {
   const failureCopy =
     outcome?.status === "failed" ? (acceptedCount === 0 ? NO_ACCEPTED : GENERIC_FAILURE) : null;
+  const showGenerate = pending || !ready;
 
   return (
     <div className={styles.panel}>
@@ -33,10 +36,12 @@ export function GenerateExercisesStage({
           ))}
         </ul>
       ) : null}
-      <button type="button" className={styles.primary} disabled={pending} onClick={onGenerate}>
-        {pending ? "Generating…" : "Generate Exercises"}
-      </button>
-      {outcome?.status === "completed" ? <p className={styles.status}>completed</p> : null}
+      {showGenerate ? (
+        <button type="button" className={styles.primary} disabled={pending} onClick={onGenerate}>
+          {pending ? "Generating…" : "Generate Exercises"}
+        </button>
+      ) : null}
+      {ready ? <p className={styles.ready}>Exercises are ready.</p> : null}
       {failureCopy ? (
         <p className={styles.status} role="alert">
           {failureCopy}

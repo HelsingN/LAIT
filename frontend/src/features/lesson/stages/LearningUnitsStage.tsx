@@ -33,7 +33,10 @@ export function LearningUnitsStage({
 }: LearningUnitsStageProps) {
   const [overlapError, setOverlapError] = useState<string | null>(null);
   const [frozenByServer, setFrozenByServer] = useState(false);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [hintSuppressed, setHintSuppressed] = useState(false);
   const locked = practiceOpen || frozenByServer;
+  const needsSelection = !locked && !selection;
   const liveUnits = units.filter((unit) => unit.removed_at === null);
 
   async function addUnit() {
@@ -75,6 +78,7 @@ export function LearningUnitsStage({
     }
     try {
       await removeLearningUnit(lessonId, unitId);
+      setSelectedId((current) => (current === unitId ? null : current));
       await onChanged();
     } catch (error) {
       if (error instanceof LearningUnitRequestError && error.kind === "frozen") {
@@ -83,56 +87,87 @@ export function LearningUnitsStage({
     }
   }
 
+  function selectUnit(unit: LearningUnit) {
+    setSelectedId(unit.id);
+    onJump(unit);
+  }
+
   return (
-    <div>
+    <div className={styles.root}>
       {locked ? <p className={styles.frozen}>{FROZEN_HINT}</p> : null}
+      <div
+        className={hintSuppressed ? `${styles.addSlot} ${styles.addSlotSuppressed}` : styles.addSlot}
+        onMouseLeave={() => setHintSuppressed(false)}
+      >
+        <button
+          type="button"
+          className={styles.primary}
+          disabled={locked}
+          aria-disabled={needsSelection ? true : undefined}
+          aria-describedby={needsSelection ? "add-unit-hint" : undefined}
+          onClick={() => void addUnit()}
+          onKeyDown={(event) => {
+            if (event.key === "Escape" && needsSelection) {
+              setHintSuppressed(true);
+              event.currentTarget.blur();
+            }
+          }}
+        >
+          Add Learning Unit
+        </button>
+        {needsSelection ? (
+          <span id="add-unit-hint" role="tooltip" className={styles.addTooltip}>
+            {EMPTY_SELECTION_HINT}
+          </span>
+        ) : null}
+      </div>
+      {overlapError ? (
+        <p className={styles.error} role="alert">
+          {overlapError}
+        </p>
+      ) : null}
       {liveUnits.length === 0 ? (
-        <div className={styles.empty}>
-          <h3>No learning units</h3>
-          <p>Select a phrase in the source, then choose Add Learning Unit.</p>
+        <div className={styles.scroller}>
+          <div className={styles.empty}>
+            <h3>No learning units</h3>
+            <p>Select a phrase in the source, then choose Add Learning Unit.</p>
+          </div>
         </div>
       ) : (
-        <ul className={styles.list}>
-          {liveUnits.map((unit) => (
-            <li key={unit.id} className={styles.row}>
-              <p className={styles.unitText}>{unit.text}</p>
-              <span className={styles.badge}>{unit.status}</span>
-              <button type="button" className={styles.jump} onClick={() => onJump(unit)} disabled={locked}>
-                {unit.text}
-              </button>
-              <div className={styles.actions}>
+        <ul id="units" className={styles.list}>
+          {liveUnits.map((unit) => {
+            const selected = selectedId === unit.id;
+            return (
+              <li key={unit.id} className={selected ? `${styles.row} ${styles.rowSelected}` : styles.row}>
+                <button type="button" className={styles.phrase} onClick={() => selectUnit(unit)}>
+                  {unit.text}
+                </button>
                 {unit.status === "draft" ? (
                   <button
                     type="button"
-                    className={styles.primary}
+                    className={styles.accept}
                     disabled={locked}
                     onClick={() => void acceptUnit(unit.id)}
                   >
                     Accept
                   </button>
                 ) : null}
-                <button
-                  type="button"
-                  className={styles.destructive}
-                  disabled={locked}
-                  onClick={() => void deleteUnit(unit.id)}
-                >
-                  Delete
-                </button>
-              </div>
-            </li>
-          ))}
+                {selected ? (
+                  <button
+                    type="button"
+                    className={styles.remove}
+                    aria-label={`Remove ${unit.text}`}
+                    disabled={locked}
+                    onClick={() => void deleteUnit(unit.id)}
+                  >
+                    <span aria-hidden="true">×</span>
+                  </button>
+                ) : null}
+              </li>
+            );
+          })}
         </ul>
       )}
-      {overlapError ? (
-        <p className={styles.error} role="alert">
-          {overlapError}
-        </p>
-      ) : null}
-      {!locked && !selection ? <p className={styles.hint}>{EMPTY_SELECTION_HINT}</p> : null}
-      <button type="button" className={styles.primary} disabled={locked || !selection} onClick={() => void addUnit()}>
-        Add Learning Unit
-      </button>
     </div>
   );
 }

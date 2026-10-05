@@ -89,6 +89,7 @@ function renderWorkspace() {
 }
 
 function installFetch() {
+  let submitted = false;
   vi.stubGlobal(
     "fetch",
     vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
@@ -97,6 +98,13 @@ function installFetch() {
       if (url.includes("/api/exercise-registry")) {
         return jsonResponse({
           exercises: [{ exercise_type: "gap-fill", visibility: "learner", module_id: "official.exercise.gap-fill" }],
+        });
+      }
+      if (url.includes("/exercises/latest") && method === "GET") {
+        return jsonResponse({
+          restorable: false,
+          generation_id: null,
+          accepted_unit_ids: [],
         });
       }
       if (url.includes("/learning-units") && method === "GET") {
@@ -117,8 +125,31 @@ function installFetch() {
           201,
         );
       }
-      if (url.endsWith("/attempts") && method === "POST") {
+      if (url.includes("/practice-sessions/") && url.endsWith("/attempts") && method === "POST") {
+        submitted = true;
         return jsonResponse(attempt);
+      }
+      if (url.includes("/lessons/") && url.endsWith("/attempts") && method === "GET") {
+        return jsonResponse({
+          attempts: submitted
+            ? [
+                {
+                  attempt_id: attempt.attempt_id,
+                  session_id: "session-1",
+                  session_disposition: "exited",
+                  mode: "typed",
+                  category: attempt.category,
+                  submitted: attempt.submitted,
+                  expected: attempt.expected,
+                  explanation: attempt.explanation,
+                  unit_text: attempt.unit_text,
+                  span_start: attempt.span_start,
+                  span_end: attempt.span_end,
+                  created_at: "2026-10-01T00:00:00+00:00",
+                },
+              ]
+            : [],
+        });
       }
       if (url.endsWith("/finish") && method === "POST") {
         return jsonResponse({
@@ -148,9 +179,9 @@ function installFetch() {
 
 async function generateAndStart(user: ReturnType<typeof userEvent.setup>) {
   await screen.findByRole("heading", { name: "Rolling out" });
-  await user.click(screen.getByRole("button", { name: "Generate Exercises", expanded: false }));
+  await user.click(screen.getByRole("button", { name: "Exercises", expanded: false }));
   await user.click(
-    within(screen.getByRole("region", { name: "Generate Exercises" })).getByRole("button", {
+    within(screen.getByRole("region", { name: "Exercises" })).getByRole("button", {
       name: "Generate Exercises",
     }),
   );

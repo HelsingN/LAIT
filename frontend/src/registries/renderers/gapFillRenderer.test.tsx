@@ -131,9 +131,9 @@ it("wraps the blank inline and scrolls the chip bank", async () => {
   );
 
   await screen.findByRole("heading", { name: "Rolling out" });
-  await user.click(screen.getByRole("button", { name: "Generate Exercises", expanded: false }));
+  await user.click(screen.getByRole("button", { name: "Exercises", expanded: false }));
   await user.click(
-    within(screen.getByRole("region", { name: "Generate Exercises" })).getByRole("button", {
+    within(screen.getByRole("region", { name: "Exercises" })).getByRole("button", {
       name: "Generate Exercises",
     }),
   );

@@ -209,7 +209,10 @@ function installFetch(script: Script): FetchCall[] {
       if (url === "/api/practice-sessions" && method === "POST") {
         return jsonResponse(practiceView(script.startItem), 201);
       }
-      if (url.endsWith("/attempts") && method === "POST") {
+      if (url.includes(`/api/lessons/${lessonId}/attempts`) && method === "GET") {
+        return jsonResponse({ attempts: [] });
+      }
+      if (url.includes("/practice-sessions/") && url.endsWith("/attempts") && method === "POST") {
         return script.submit(body);
       }
       if (url.endsWith("/finish") && method === "POST") {
@@ -232,9 +235,9 @@ function installFetch(script: Script): FetchCall[] {
 
 async function generateAndStart(user: ReturnType<typeof userEvent.setup>) {
   await screen.findByRole("heading", { name: "Rolling out" });
-  await user.click(screen.getByRole("button", { name: "Generate Exercises", expanded: false }));
+  await user.click(screen.getByRole("button", { name: "Exercises", expanded: false }));
   await user.click(
-    within(screen.getByRole("region", { name: "Generate Exercises" })).getByRole("button", {
+    within(screen.getByRole("region", { name: "Exercises" })).getByRole("button", {
       name: "Generate Exercises",
     }),
   );
@@ -286,7 +289,9 @@ it("submits one typed answer then continues inside the session", async () => {
   expect(card).not.toHaveTextContent("natural");
   expect(screen.queryByRole("button", { name: "Submit Answer" })).not.toBeInTheDocument();
 
-  const submitCall = calls.find((call) => call.url.endsWith("/attempts"));
+  const submitCall = calls.find(
+    (call) => call.method === "POST" && call.url.includes("/practice-sessions/") && call.url.endsWith("/attempts"),
+  );
   expect(submitCall?.body).toMatchObject({ kind: "typed", text: "nope" });
   expect(submitCall?.body).not.toHaveProperty("category");
 
@@ -328,7 +333,9 @@ it("submits a drag chip by unit id and displays the server category", async () =
   const card = await screen.findByTestId("feedback-card");
   expect(card).toHaveTextContent("correct");
   expect(card).not.toHaveTextContent("incorrect");
-  const submitCall = calls.find((call) => call.url.endsWith("/attempts"));
+  const submitCall = calls.find(
+    (call) => call.method === "POST" && call.url.includes("/practice-sessions/") && call.url.endsWith("/attempts"),
+  );
   expect(submitCall?.body).toMatchObject({
     kind: "drag",
     text: "the migration",

@@ -11,7 +11,7 @@ export type StageId = (typeof STAGE_IDS)[number];
 export type StageExpansion = Record<StageId, boolean>;
 
 const DEFAULT_EXPANSION: StageExpansion = {
-  source: false,
+  source: true,
   "learning-units": true,
   "generate-exercises": false,
   practice: false,
