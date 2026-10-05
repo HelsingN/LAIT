@@ -1,4 +1,4 @@
-"""Map practice DTOs onto start, get, submit, finish, and start over."""
+"""Map practice DTOs onto start, get, submit, finish, start over, and attempt list."""
 
 from __future__ import annotations
 
@@ -13,6 +13,7 @@ from lait.application.commands.practice_start import PracticeStart
 from lait.application.commands.practice_start import handle as start_practice
 from lait.application.commands.practice_start_over import PracticeStartOver
 from lait.application.commands.practice_start_over import handle as start_over_practice
+from lait.application.queries.attempt_list_for_lesson import handle as list_attempts
 from lait.application.queries.lesson_get import LessonNotFoundError
 from lait.application.queries.practice_get import handle as get_practice
 from lait.domain.practice_session import (
@@ -67,6 +68,25 @@ class SubmitBody(BaseModel):
     target_learning_unit_id: str | None = None
 
 
+class AttemptListItemResponse(BaseModel):
+    attempt_id: str
+    session_id: str
+    session_disposition: str
+    mode: str
+    category: str
+    submitted: str
+    expected: str
+    explanation: str
+    unit_text: str
+    span_start: int
+    span_end: int
+    created_at: str
+
+
+class AttemptListResponse(BaseModel):
+    attempts: list[AttemptListItemResponse]
+
+
 class SubmitResponse(BaseModel):
     attempt_id: str
     session_open: bool
@@ -116,6 +136,36 @@ def _practice_response(view: PracticeView) -> PracticeResponse:
         open=view.open,
         cursor=view.cursor,
         current=None if view.current is None else _current_response(view.current),
+    )
+
+
+@router.get(
+    "/api/lessons/{lesson_id}/attempts",
+    operation_id="attempt.list_for_lesson",
+)
+def get_lesson_attempts(lesson_id: str, request: Request) -> AttemptListResponse:
+    try:
+        outcome = list_attempts(lesson_id, _repository(request))
+    except LessonNotFoundError as exc:
+        raise HTTPException(status_code=404, detail="Lesson not found") from exc
+    return AttemptListResponse(
+        attempts=[
+            AttemptListItemResponse(
+                attempt_id=row.attempt_id,
+                session_id=row.session_id,
+                session_disposition=row.session_disposition,
+                mode=row.mode,
+                category=row.category,
+                submitted=row.submitted,
+                expected=row.expected,
+                explanation=row.explanation,
+                unit_text=row.unit_text,
+                span_start=row.span_start,
+                span_end=row.span_end,
+                created_at=row.created_at.isoformat(),
+            )
+            for row in outcome.attempts
+        ]
     )
 
 

@@ -1,5 +1,7 @@
 import {
+  attemptListForLesson,
   exerciseGenerate,
+  exerciseLatestCompleted,
   exerciseRegistryListVisibleFor,
   exerciseSubmitAttempt,
   learningUnitAccept,
@@ -13,10 +15,12 @@ import {
   practiceGet,
   practiceStart,
   practiceStartOver,
+  type AttemptListItemResponse,
   type CurrentItemResponse,
   type ExerciseRegistryItem,
   type ExerciseRegistryResponse,
   type GenerationResponse,
+  type LatestCompletedResponse,
   type LearningUnitResponse,
   type LessonResponse,
   type PracticeResponse,
@@ -62,9 +66,20 @@ type SdkPayload<T> = {
 async function readData<T>(pending: Promise<SdkPayload<T>>): Promise<T> {
   const result = await pending;
   if (result.data === undefined) {
-    throw new Error(`Request failed with status ${result.response?.status ?? 0}`);
+    const status = result.response?.status ?? 0;
+    const error = new Error(`Request failed with status ${status}`) as Error & { status: number };
+    error.status = status;
+    throw error;
   }
   return result.data;
+}
+
+export function requestStatus(error: unknown): number | null {
+  if (typeof error === "object" && error !== null && "status" in error) {
+    const status = (error as { status?: unknown }).status;
+    return typeof status === "number" ? status : null;
+  }
+  return null;
 }
 
 function asUnit(unit: LearningUnitResponse): LearningUnit {
@@ -166,6 +181,26 @@ export function generateExercises(lessonId: string): Promise<GenerationResult> {
       path: { lesson_id: lessonId },
     }),
   );
+}
+
+export type LatestCompleted = LatestCompletedResponse;
+
+export type LessonAttempt = AttemptListItemResponse;
+
+export function latestCompletedExercises(lessonId: string): Promise<LatestCompleted> {
+  return readData(
+    exerciseLatestCompleted({
+      path: { lesson_id: lessonId },
+    }),
+  );
+}
+
+export function listLessonAttempts(lessonId: string): Promise<LessonAttempt[]> {
+  return readData(
+    attemptListForLesson({
+      path: { lesson_id: lessonId },
+    }),
+  ).then((body) => body.attempts);
 }
 
 export type PracticeSegment = SegmentResponse;

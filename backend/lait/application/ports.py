@@ -7,7 +7,7 @@ from typing import Protocol
 
 from lait.domain.learning_unit import LearningUnit
 from lait.domain.lesson import Lesson
-from lait.domain.practice_session import PracticeSession
+from lait.domain.practice_session import AttemptRecord, ExerciseGeneration, PracticeSession
 
 
 class LessonRepository(Protocol):
@@ -32,3 +32,7 @@ class LearningUnitRepository(Protocol):
     def insert_open_practice_session(
         self, practice: PracticeSession, created_at: datetime
     ) -> PracticeSession: ...
+
+    def latest_completed_generation(self, lesson_id: str) -> ExerciseGeneration | None: ...
+
+    def list_attempt_records_for_lesson(self, lesson_id: str) -> list[AttemptRecord]: ...

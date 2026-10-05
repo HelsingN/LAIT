@@ -35,6 +35,8 @@ packages = ["backend/lait"]
 [tool.pytest.ini_options]
 testpaths = ["backend/tests"]
 pythonpath = ["backend"]
+# Same basename in application/ and adapters/persistence/ (lesson reopen reads).
+addopts = "--import-mode=importlib"
 
 [tool.ruff]
 line-length = 100

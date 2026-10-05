@@ -5,6 +5,70 @@ export type ClientOptions = {
 };
 
 /**
+ * AttemptListItemResponse
+ */
+export type AttemptListItemResponse = {
+    /**
+     * Attempt Id
+     */
+    attempt_id: string;
+    /**
+     * Session Id
+     */
+    session_id: string;
+    /**
+     * Session Disposition
+     */
+    session_disposition: string;
+    /**
+     * Mode
+     */
+    mode: string;
+    /**
+     * Category
+     */
+    category: string;
+    /**
+     * Submitted
+     */
+    submitted: string;
+    /**
+     * Expected
+     */
+    expected: string;
+    /**
+     * Explanation
+     */
+    explanation: string;
+    /**
+     * Unit Text
+     */
+    unit_text: string;
+    /**
+     * Span Start
+     */
+    span_start: number;
+    /**
+     * Span End
+     */
+    span_end: number;
+    /**
+     * Created At
+     */
+    created_at: string;
+};
+
+/**
+ * AttemptListResponse
+ */
+export type AttemptListResponse = {
+    /**
+     * Attempts
+     */
+    attempts: Array<AttemptListItemResponse>;
+};
+
+/**
  * CurrentItemResponse
  */
 export type CurrentItemResponse = {
@@ -112,6 +176,24 @@ export type HttpValidationError = {
      * Detail
      */
     detail?: Array<ValidationError>;
+};
+
+/**
+ * LatestCompletedResponse
+ */
+export type LatestCompletedResponse = {
+    /**
+     * Restorable
+     */
+    restorable: boolean;
+    /**
+     * Generation Id
+     */
+    generation_id: string | null;
+    /**
+     * Accepted Unit Ids
+     */
+    accepted_unit_ids: Array<string>;
 };
 
 /**
@@ -673,6 +755,66 @@ export type ExerciseGenerateResponses = {
 };
 
 export type ExerciseGenerateResponse = ExerciseGenerateResponses[keyof ExerciseGenerateResponses];
+
+export type ExerciseLatestCompletedData = {
+    body?: never;
+    path: {
+        /**
+         * Lesson Id
+         */
+        lesson_id: string;
+    };
+    query?: never;
+    url: '/api/lessons/{lesson_id}/exercises/latest';
+};
+
+export type ExerciseLatestCompletedErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type ExerciseLatestCompletedError = ExerciseLatestCompletedErrors[keyof ExerciseLatestCompletedErrors];
+
+export type ExerciseLatestCompletedResponses = {
+    /**
+     * Successful Response
+     */
+    200: LatestCompletedResponse;
+};
+
+export type ExerciseLatestCompletedResponse = ExerciseLatestCompletedResponses[keyof ExerciseLatestCompletedResponses];
+
+export type AttemptListForLessonData = {
+    body?: never;
+    path: {
+        /**
+         * Lesson Id
+         */
+        lesson_id: string;
+    };
+    query?: never;
+    url: '/api/lessons/{lesson_id}/attempts';
+};
+
+export type AttemptListForLessonErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type AttemptListForLessonError = AttemptListForLessonErrors[keyof AttemptListForLessonErrors];
+
+export type AttemptListForLessonResponses = {
+    /**
+     * Successful Response
+     */
+    200: AttemptListResponse;
+};
+
+export type AttemptListForLessonResponse = AttemptListForLessonResponses[keyof AttemptListForLessonResponses];
 
 export type PracticeStartData = {
     body: PracticeStartBody;

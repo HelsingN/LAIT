@@ -125,3 +125,23 @@ class Attempt:
     chunks_missed: tuple[str, ...]
     natural_alternative: str | None
     created_at: datetime
+
+
+@dataclass(frozen=True, slots=True)
+class AttemptRecord:
+    """One saved attempt joined to its session, before disposition is classified."""
+
+    attempt_id: str
+    session_id: str
+    session_status: str
+    cursor: int
+    pass_item_count: int
+    mode: str
+    category: str
+    submitted: str
+    expected: str
+    explanation: str
+    unit_text: str
+    span_start: int
+    span_end: int
+    created_at: datetime

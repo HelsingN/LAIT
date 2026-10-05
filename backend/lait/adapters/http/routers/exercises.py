@@ -1,4 +1,4 @@
-"""Map exercise DTOs onto exercise.generate. No repository queries here."""
+"""Map exercise DTOs onto exercise.generate and exercise.latest_completed."""
 
 from __future__ import annotations
 
@@ -7,6 +7,7 @@ from pydantic import BaseModel
 
 from lait.application.commands.exercise_generate import ExerciseGenerate
 from lait.application.commands.exercise_generate import handle as generate_exercises
+from lait.application.queries.exercise_latest_completed import handle as latest_completed
 from lait.application.queries.lesson_get import LessonNotFoundError
 
 router = APIRouter()
@@ -18,6 +19,12 @@ class GenerationResponse(BaseModel):
     status: str
     accepted_unit_ids: list[str]
     definition_count: int
+
+
+class LatestCompletedResponse(BaseModel):
+    restorable: bool
+    generation_id: str | None
+    accepted_unit_ids: list[str]
 
 
 def _repository(request: Request):
@@ -48,4 +55,20 @@ def post_generate_exercises(lesson_id: str, request: Request) -> GenerationRespo
         status=outcome.status,
         accepted_unit_ids=list(outcome.accepted_unit_ids),
         definition_count=outcome.definition_count,
+    )
+
+
+@router.get(
+    "/api/lessons/{lesson_id}/exercises/latest",
+    operation_id="exercise.latest_completed",
+)
+def get_latest_completed_exercises(lesson_id: str, request: Request) -> LatestCompletedResponse:
+    try:
+        outcome = latest_completed(lesson_id, _repository(request))
+    except LessonNotFoundError as exc:
+        raise HTTPException(status_code=404, detail="Lesson not found") from exc
+    return LatestCompletedResponse(
+        restorable=outcome.restorable,
+        generation_id=outcome.generation_id,
+        accepted_unit_ids=list(outcome.accepted_unit_ids),
     )

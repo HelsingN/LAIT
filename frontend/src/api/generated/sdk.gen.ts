@@ -2,7 +2,7 @@
 
 import type { Client, ClientMeta, Options as Options2, RequestResult, TDataShape } from './client';
 import { client } from './client.gen';
-import type { ExerciseGenerateData, ExerciseGenerateErrors, ExerciseGenerateResponses, ExerciseRegistryListVisibleForData, ExerciseRegistryListVisibleForErrors, ExerciseRegistryListVisibleForResponses, ExerciseSubmitAttemptData, ExerciseSubmitAttemptErrors, ExerciseSubmitAttemptResponses, HealthData, HealthResponses, LearningUnitAcceptData, LearningUnitAcceptErrors, LearningUnitAcceptResponses, LearningUnitAddData, LearningUnitAddErrors, LearningUnitAddResponses, LearningUnitListData, LearningUnitListErrors, LearningUnitListResponses, LearningUnitRemoveData, LearningUnitRemoveErrors, LearningUnitRemoveResponses, LessonCreateData, LessonCreateErrors, LessonCreateResponses, LessonGetData, LessonGetErrors, LessonGetResponses, LessonListData, LessonListResponses, ModuleRegistryDescribeData, ModuleRegistryDescribeResponses, PracticeFinishData, PracticeFinishErrors, PracticeFinishResponses, PracticeGetData, PracticeGetErrors, PracticeGetResponses, PracticeStartData, PracticeStartErrors, PracticeStartOverData, PracticeStartOverErrors, PracticeStartOverResponses, PracticeStartResponses } from './types.gen';
+import type { AttemptListForLessonData, AttemptListForLessonErrors, AttemptListForLessonResponses, ExerciseGenerateData, ExerciseGenerateErrors, ExerciseGenerateResponses, ExerciseLatestCompletedData, ExerciseLatestCompletedErrors, ExerciseLatestCompletedResponses, ExerciseRegistryListVisibleForData, ExerciseRegistryListVisibleForErrors, ExerciseRegistryListVisibleForResponses, ExerciseSubmitAttemptData, ExerciseSubmitAttemptErrors, ExerciseSubmitAttemptResponses, HealthData, HealthResponses, LearningUnitAcceptData, LearningUnitAcceptErrors, LearningUnitAcceptResponses, LearningUnitAddData, LearningUnitAddErrors, LearningUnitAddResponses, LearningUnitListData, LearningUnitListErrors, LearningUnitListResponses, LearningUnitRemoveData, LearningUnitRemoveErrors, LearningUnitRemoveResponses, LessonCreateData, LessonCreateErrors, LessonCreateResponses, LessonGetData, LessonGetErrors, LessonGetResponses, LessonListData, LessonListResponses, ModuleRegistryDescribeData, ModuleRegistryDescribeResponses, PracticeFinishData, PracticeFinishErrors, PracticeFinishResponses, PracticeGetData, PracticeGetErrors, PracticeGetResponses, PracticeStartData, PracticeStartErrors, PracticeStartOverData, PracticeStartOverErrors, PracticeStartOverResponses, PracticeStartResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -76,6 +76,16 @@ export const learningUnitRemove = <ThrowOnError extends boolean = false>(options
  * Post Generate Exercises
  */
 export const exerciseGenerate = <ThrowOnError extends boolean = false>(options: Options<ExerciseGenerateData, ThrowOnError>): RequestResult<ExerciseGenerateResponses, ExerciseGenerateErrors, ThrowOnError> => (options.client ?? client).post<ExerciseGenerateResponses, ExerciseGenerateErrors, ThrowOnError>({ url: '/api/lessons/{lesson_id}/exercises/generate', ...options });
+
+/**
+ * Get Latest Completed Exercises
+ */
+export const exerciseLatestCompleted = <ThrowOnError extends boolean = false>(options: Options<ExerciseLatestCompletedData, ThrowOnError>): RequestResult<ExerciseLatestCompletedResponses, ExerciseLatestCompletedErrors, ThrowOnError> => (options.client ?? client).get<ExerciseLatestCompletedResponses, ExerciseLatestCompletedErrors, ThrowOnError>({ url: '/api/lessons/{lesson_id}/exercises/latest', ...options });
+
+/**
+ * Get Lesson Attempts
+ */
+export const attemptListForLesson = <ThrowOnError extends boolean = false>(options: Options<AttemptListForLessonData, ThrowOnError>): RequestResult<AttemptListForLessonResponses, AttemptListForLessonErrors, ThrowOnError> => (options.client ?? client).get<AttemptListForLessonResponses, AttemptListForLessonErrors, ThrowOnError>({ url: '/api/lessons/{lesson_id}/attempts', ...options });
 
 /**
  * Post Practice Session

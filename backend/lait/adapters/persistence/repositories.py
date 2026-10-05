@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 from datetime import datetime
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session, sessionmaker
 
@@ -25,6 +25,7 @@ from lait.domain.practice_session import (
     COMPLETED,
     OPEN,
     Attempt,
+    AttemptRecord,
     ExerciseDefinition,
     ExerciseGeneration,
     PassItem,
@@ -321,6 +322,48 @@ class SqlAlchemyPracticeRepository:
             stored.cursor = cursor
             session.commit()
 
+    def list_attempt_records_for_lesson(self, lesson_id: str) -> list[AttemptRecord]:
+        with self._session_factory() as session:
+            pairs = session.execute(
+                select(AttemptRow, PracticeSessionRow)
+                .join(PracticeSessionRow, AttemptRow.session_id == PracticeSessionRow.id)
+                .where(PracticeSessionRow.lesson_id == lesson_id)
+                .order_by(
+                    PracticeSessionRow.created_at.asc(),
+                    AttemptRow.created_at.asc(),
+                    PracticeSessionRow.id.asc(),
+                    AttemptRow.id.asc(),
+                )
+            ).all()
+            session_ids = {practice.id for _attempt, practice in pairs}
+            counts: dict[str, int] = {}
+            if session_ids:
+                counted = session.execute(
+                    select(PracticePassItemRow.session_id, func.count())
+                    .where(PracticePassItemRow.session_id.in_(session_ids))
+                    .group_by(PracticePassItemRow.session_id)
+                ).all()
+                counts = {session_id: int(count) for session_id, count in counted}
+            return [
+                AttemptRecord(
+                    attempt_id=attempt.id,
+                    session_id=practice.id,
+                    session_status=practice.status,
+                    cursor=practice.cursor,
+                    pass_item_count=counts.get(practice.id, 0),
+                    mode=attempt.mode,
+                    category=attempt.category,
+                    submitted=attempt.submitted,
+                    expected=attempt.expected,
+                    explanation=attempt.explanation,
+                    unit_text=attempt.unit_text,
+                    span_start=attempt.span_start,
+                    span_end=attempt.span_end,
+                    created_at=datetime.fromisoformat(attempt.created_at),
+                )
+                for attempt, practice in pairs
+            ]
+
     def _generation_in_session(
         self, session: Session, row: ExerciseGenerationRow
     ) -> ExerciseGeneration:
@@ -399,6 +442,16 @@ class SqlAlchemyLearningUnitRepository:
             lesson_id
         )
 
+    def latest_completed_generation(self, lesson_id: str) -> ExerciseGeneration | None:
+        return SqlAlchemyPracticeRepository(self._session_factory).latest_completed_generation(
+            lesson_id
+        )
+
+    def list_attempt_records_for_lesson(self, lesson_id: str) -> list[AttemptRecord]:
+        return SqlAlchemyPracticeRepository(self._session_factory).list_attempt_records_for_lesson(
+            lesson_id
+        )
+
 
 class RepositoryBundle:
     """Lesson, learning-unit, and practice ports over one session factory.
@@ -464,3 +517,6 @@ class RepositoryBundle:
 
     def add_attempt(self, attempt: Attempt, cursor: int) -> None:
         self._practice.add_attempt(attempt, cursor)
+
+    def list_attempt_records_for_lesson(self, lesson_id: str) -> list[AttemptRecord]:
+        return self._practice.list_attempt_records_for_lesson(lesson_id)

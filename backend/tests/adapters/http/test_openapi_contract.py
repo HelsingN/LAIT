@@ -15,6 +15,8 @@ D23_OPERATION_IDS = frozenset(
         "learning_unit.remove",
         "learning_unit.list",
         "exercise.generate",
+        "exercise.latest_completed",
+        "attempt.list_for_lesson",
         "practice.start",
         "practice.get",
         "practice.finish",
