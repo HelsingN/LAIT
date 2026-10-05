@@ -151,6 +151,10 @@ Suggested branch forms:
 - `architecture/<topic>`
 - `planning/<topic>`
 
+## Execution policy
+
+Learner-visible plan and phase-close checks are defined in `docs/governance/MANUAL_UI_VERIFICATION.md`. That policy does not change the specification version.
+
 ## Current baseline
 
 The first explicitly versioned baseline is `0.2.0`.

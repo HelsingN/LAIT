@@ -4,16 +4,16 @@ milestone: v1.0
 current_phase: 01
 current_phase_name: Mod-First Manual Learning Loop
 status: executing
-stopped_at: Completed 01-12-PLAN.md
+stopped_at: Plan 01-14 stays approved. UX-21 is built and waiting on its own checkpoint. Phase 1 is not complete.
 last_updated: "2026-10-02T02:37:13.330Z"
-last_activity: 2026-10-02
-last_activity_desc: Phase 01 execution started
+last_activity: 2026-10-05
+last_activity_desc: UX-21 moves the empty-selection hint onto the inactive Add button. Its checkpoint is not approved. Phase 1 remains open. No commit.
 state_head: 2f5f082838e842b8ee13bb3b24e3b694868c9432
 progress:
   total_phases: 9
   completed_phases: 0
-  total_plans: 12
-  completed_plans: 12
+  total_plans: 14
+  completed_plans: 14
 milestone_name: milestone
 spec_version: 0.2.0
 ---
@@ -31,10 +31,10 @@ Current planning/specification baseline: `.planning/VERSION.md` (`0.2.0`)
 ## Current Position
 
 Phase: 01 (Mod-First Manual Learning Loop) — EXECUTING
-Plan: 12 of 12
-Status: Ready to execute
+Plan: 14 of 14 recorded. The 01-14 checkpoint is approved. Phase 1 is not complete.
+Status: Phase 1 is not complete
 Current discussion area: Complete
-Last activity: 2026-10-02 — Phase 01 execution started
+Last activity: 2026-10-02 — Completed quick task 261002-lpe: recreated local Phase 1 UX audit (uncommitted)
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -130,6 +130,8 @@ Recent decisions affecting current and future work:
 - [Phase 01]: Application tests do not import the FastAPI app; HTTP DTO tests live under adapters/http
 - [Phase 01]: CI runs domain, persistence, and modules separately from the application suite, and still runs the full pytest gate
 - [Phase 01]: practice.start returns the open session only when that session generation snapshot matches the current accepted set
+- [Governance]: Learner-visible plans end on a blocking-human Docker check; backend-only plans do not. Observations are classified before they become blockers. See `docs/governance/MANUAL_UI_VERIFICATION.md`.
+- [Phase 01]: UX-16/17 diagnosis is `01-13-DIAGNOSIS.md`. Follow-up plan `01-13-PLAN.md` is not executed. Slices 2–4 stay out of that plan.
 
 ### Pending Todos
 
@@ -143,6 +145,13 @@ Recent decisions affecting current and future work:
 - Execution must preserve the Learning Unit, Gap Fill, proof-module, visibility, session, and application command/query decisions recorded in `01-CONTEXT.md`.
 - Future MCP schemas and DeepSeek Harness packaging remain deferred and must not expand Phase 1 scope.
 
+### Quick Tasks Completed
+
+| # | Description | Date | Commit | Directory |
+|---|-------------|------|--------|-----------|
+| 261002-lpe | Recreated local Phase 1 UX audit with six findings and screenshot evidence | 2026-10-02 | Uncommitted — per user instruction | [261002-lpe-recreate-local-phase-1-ux-audit-from-cur](./quick/261002-lpe-recreate-local-phase-1-ux-audit-from-cur/) |
+| 261005-sqr | UX-21: selection hint on the inactive Add button. Checkpoint not approved. | 2026-10-05 | Uncommitted — per user instruction | [261005-sqr-ux-21-show-the-empty-selection-hint-as-a](./quick/261005-sqr-ux-21-show-the-empty-selection-hint-as-a/) |
+
 ## Deferred Items
 
 Items acknowledged and carried forward from previous milestone close:
@@ -152,9 +161,10 @@ Items acknowledged and carried forward from previous milestone close:
 | Integration | Production MCP adapter | Deferred beyond v1; architecture-ready only | Spec 0.2.0 |
 | Integration | DeepSeek Harness plugin/package | Future reference integration candidate | Spec 0.2.0 |
 | Domain | Decide whether `PracticeSession` becomes a first-class core entity | Deferred until concrete orchestration/practice requirements exist | Spec 0.2.0 |
+| UX | Feedback still reads as a technical log (UUID, mode names, raw categories). A later slice needs a learner-facing summary: pass title, completed versus left early, choice versus recall, hard phrases, next step. Not a 01-13 blocker and not in 01-14. | Deferred to the Feedback slice | 2026-10-02 |
 
 ## Session Continuity
 
 Last session: 2026-10-02T02:37:13.271Z
-Stopped at: Completed 01-12-PLAN.md
+Stopped at: Plan 01-14 stays approved. UX-21 is built and waiting on its own checkpoint. Phase 1 is not complete.
 Resume file: None

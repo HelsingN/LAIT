@@ -35,7 +35,7 @@ This roadmap grows the product through vertical MVP slices that keep the learnin
   4. Maintainer can inspect active modules and capabilities, invoke the workflow through documented commands and queries, add a proof exercise contribution through the public registry and renderer seams without changing core domain services, and see startup reject invalid or incompatible module catalogs.
   5. Maintainer can generate the TypeScript client from OpenAPI, have CI detect an unreviewed contract/client mismatch, and test the core, persistence adapter, and bundled modules independently.
 
-**Plans:** 12/12 plans executed
+**Plans:** 14/14 plans executed
 
 Plans:
 - [x] 01-01-PLAN.md
@@ -50,6 +50,8 @@ Plans:
 - [x] 01-10-PLAN.md
 - [x] 01-11-PLAN.md
 - [x] 01-12-PLAN.md — Return the same-generation open session and resume it after reload
+- [x] 01-13-PLAN.md — Restore a matching generation and attempts after reload, and end the pass on the last Continue
+- [x] 01-14-PLAN.md — Widen the workspace and make preparation actions obvious
 
 **UI hint:** yes
 

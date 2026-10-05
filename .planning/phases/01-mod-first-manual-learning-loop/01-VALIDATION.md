@@ -98,10 +98,14 @@ Progressive gates. Do not run a later wave's command before the plan that create
 
 ## Manual-Only Verifications
 
+Already-executed Phase 1 plans are not rewritten to insert checkpoints. The rule in `docs/governance/MANUAL_UI_VERIFICATION.md` still gates phase close, and it applies to every later plan.
+
+Follow-up `01-13-PLAN.md` (not executed): automated reads are `uv run pytest backend/tests/application/test_lesson_reopen_reads.py backend/tests/adapters/persistence/test_lesson_reopen_reads.py backend/tests/application/test_handler_isolation.py -q` and `npx --prefix frontend vitest run src/features/lesson/LessonWorkspacePage.test.tsx src/features/lesson/stages/FeedbackStage.test.tsx`. The blocking-human Docker check is the last task of that plan. Those commands do not replace it.
+
 | Behavior | Requirement | Why Manual | Test Instructions |
 |----------|-------------|------------|-------------------|
 | Viewport wrap/truncate backstops from UI-SPEC | UI-SPEC long-text rows | `verification: backstop` — abstain without human/viewport evidence | Spot-check Lesson List title truncate, create-title wrap, Gap Fill wrap at 320px after plan 01-07 |
-| None other for the Phase 1 contract | — | Browser projects are PLAT-11, later | Remaining phase behaviors above have automated verification |
+| Phase-close learner-flow smoke | LESS-01, LESS-02, ANLY-08, EXER-01, EXER-02, EXER-07, EVAL-01, EVAL-04, EVAL-05 | Vitest and pytest do not show Compose reopen | On `http://127.0.0.1:5173`, paste a lesson, add and accept a unit, finish one Gap Fill item, reload, open the same lesson from `/`, then `docker compose restart` without deleting the volume and open it again. Source and units must still be there. |
 
 ---
 

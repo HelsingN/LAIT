@@ -6,7 +6,7 @@
     {
       "number": "1",
       "name": "Mod-First Manual Learning Loop",
-      "status": "planned"
+      "status": "in_progress"
     },
     {
       "number": "2",
@@ -50,9 +50,9 @@
     }
   ],
   "next": {
-    "command": "/gsd-execute-phase 1",
-    "label": "Execute phase 01",
-    "reason": "Phase 01 of 9 — plans verified, not started"
+    "command": "/gsd-progress --next",
+    "label": "Advance to the next step",
+    "reason": "Phase 01 of 9 · executing"
   },
-  "updated_at": "2026-10-01T03:20:44.852Z"
+  "updated_at": "2026-10-02T02:37:10.222Z"
 }

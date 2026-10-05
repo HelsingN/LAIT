@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>01-14 workspace sketch</title>
+  <style>
+    :root {
+      --color-dominant: #f7f6f2;
+      --color-secondary: #e4e9ef;
+      --color-accent: #0f6e56;
+      --color-destructive: #b42318;
+      --color-text: #1c1b19;
+      --font-ui: "Segoe UI", sans-serif;
+      --font-source: Palatino, "Palatino Linotype", serif;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      background: var(--color-dominant);
+      color: var(--color-text);
+      font-family: var(--font-ui);
+    }
+    .page {
+      height: 100dvh;
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 12px 16px 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      overflow: auto;
+    }
+    header { flex: 0 0 auto; }
+    header a { color: inherit; font-weight: 600; font-size: 14px; }
+    h1 { font-size: 22px; line-height: 1.25; margin: 4px 0 0; }
+    .prep {
+      flex: 1 1 auto;
+      min-height: 8rem;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 12px;
+      min-width: 0;
+    }
+    .pane {
+      background: var(--color-secondary);
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      min-width: 0;
+    }
+    .pane h2 { margin: 0 0 8px; font-size: 16px; flex: 0 0 auto; }
+    .source {
+      margin: 0;
+      overflow: auto;
+      min-height: 0;
+      font-family: var(--font-source);
+      white-space: pre-wrap;
+    }
+    .add {
+      flex: 0 0 auto;
+      margin-bottom: 8px;
+      background: var(--color-accent);
+      color: white;
+      border: 0;
+      padding: 8px 12px;
+      font-weight: 600;
+    }
+    .units {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      overflow: auto;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .unit {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 4px 4px 4px 8px;
+      background: white;
+    }
+    .unit.selected { outline: 2px solid var(--color-accent); }
+    .phrase { min-width: 0; }
+    .remove {
+      flex: 0 0 auto;
+      width: 28px;
+      height: 28px;
+      border: 0;
+      background: transparent;
+      color: var(--color-destructive);
+      font-size: 20px;
+      line-height: 1;
+      padding: 0;
+    }
+    .accept {
+      flex: 0 0 auto;
+      border: 1px solid var(--color-accent);
+      background: transparent;
+      color: var(--color-accent);
+      font-weight: 600;
+      padding: 4px 8px;
+    }
+    .actions {
+      flex: 0 0 auto;
+      position: sticky;
+      bottom: 0;
+      background: var(--color-dominant);
+    }
+    .stage { border-top: 1px solid #c9c3b8; }
+    .stage > button.header {
+      width: 100%;
+      text-align: left;
+      background: transparent;
+      border: 0;
+      padding: 8px 0;
+      font-size: 18px;
+      font-weight: 600;
+    }
+    .chev { display: inline-block; width: 1.2em; }
+    .ready { margin: 0 0 8px; font-weight: 600; }
+    .primary {
+      background: var(--color-accent);
+      color: white;
+      border: 0;
+      padding: 8px 12px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    @media (min-width: 960px) {
+      .page { padding-inline: 24px; }
+      .prep {
+        grid-template-columns: minmax(0, 1fr) 320px;
+        grid-template-rows: minmax(0, 1fr);
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header>
+      <a href="#list">Lessons</a>
+      <h1>Tell me about a difficult technical problem you solved.</h1>
+    </header>
+    <section class="prep" aria-label="Preparation">
+      <div class="pane">
+        <h2><span class="chev" aria-hidden="true">▾</span> Source</h2>
+        <p class="source">During the Nord Stream 2 project, I was responsible for upgrading and preparing the vessel's IT infrastructure. Everything worked perfectly during testing in port.
+
+The alarms indicated that one of the sensor controllers repeatedly disconnecting from the network.
+
+I was responsible for upgrading. The controller was connected using a shielded Ethernet cable. The cable was in good condition.
+
+The rest of the source stays in this pane. The page does not grow with it. Exercises and Start Practice stay in the window because this column takes only the height left after the header and the action cluster.</p>
+      </div>
+      <div class="pane">
+        <h2><span class="chev" aria-hidden="true">▾</span> Learning Units</h2>
+        <button class="add" type="button">Add Learning Unit</button>
+        <ul class="units" id="units">
+          <li class="unit selected">
+            <span class="phrase">I was responsible for upgrading</span>
+            <button class="remove" type="button" aria-label="Remove I was responsible for upgrading"><span aria-hidden="true">×</span></button>
+          </li>
+          <li class="unit">
+            <span class="phrase">indicated that</span>
+            <button class="accept" type="button">Accept</button>
+          </li>
+          <li class="unit"><span class="phrase">using a shielded Ethernet cable</span></li>
+          <li class="unit"><span class="phrase">was in good condition</span></li>
+          <li class="unit"><span class="phrase">repeatedly disconnecting from the network</span></li>
+          <li class="unit"><span class="phrase">worked perfectly during testing</span></li>
+          <li class="unit"><span class="phrase">preparing the vessel's IT infrastructure</span></li>
+          <li class="unit"><span class="phrase">one of the sensor controllers</span></li>
+          <li class="unit"><span class="phrase">everything worked perfectly</span></li>
+          <li class="unit"><span class="phrase">the cable was in good condition</span></li>
+          <li class="unit"><span class="phrase">during testing in port</span></li>
+          <li class="unit"><span class="phrase">the alarms indicated that</span></li>
+        </ul>
+      </div>
+    </section>
+    <div class="actions">
+      <section class="stage">
+        <button class="header" type="button" aria-expanded="true"><span class="chev" aria-hidden="true">▾</span> Exercises</button>
+        <p class="ready">Exercises are ready.</p>
+      </section>
+      <section class="stage">
+        <button class="header" type="button" aria-expanded="true"><span class="chev" aria-hidden="true">▾</span> Practice</button>
+        <button class="primary" type="button">Start Practice</button>
+      </section>
+      <section class="stage">
+        <button class="header" type="button" aria-expanded="false"><span class="chev" aria-hidden="true">▸</span> Feedback</button>
+      </section>
+    </div>
+  </main>
+</body>
+</html>
