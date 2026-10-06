@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import "@testing-library/jest-dom/vitest";
-import { cleanup, render, screen, within } from "@testing-library/react";
+import { cleanup, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { afterEach, expect, it, vi } from "vitest";
@@ -265,7 +265,7 @@ it("submits one typed answer then continues inside the session", async () => {
 
   expect(screen.queryByTestId("stage-column")).not.toBeInTheDocument();
   expect(screen.queryByTestId("proof-renderer")).not.toBeInTheDocument();
-  expect(screen.getByText("______")).toBeInTheDocument();
+  expect(screen.getByTestId("gap-fill-blank").textContent ?? "").not.toMatch(/_/);
   expect(screen.getByText("I was responsible for")).toBeInTheDocument();
   expect(screen.queryByTestId("chip-bank")).not.toBeInTheDocument();
   expect(
@@ -425,6 +425,33 @@ it("start over confirms then calls start_over only", async () => {
   expect(calls.filter((call) => call.url === "/api/practice-sessions" && call.method === "POST")).toHaveLength(1);
   expect(calls.filter((call) => call.url === "/api/practice-sessions/session-1/start-over")).toHaveLength(1);
   expect(calls.some((call) => call.url.endsWith("/finish"))).toBe(false);
+});
+
+it("clears a selected chip when start over repeats the first item", async () => {
+  const user = userEvent.setup();
+  installFetch({
+    units: [rollingOut, migration],
+    exerciseType: "gap-fill",
+    startItem: dragItem(),
+    continueItem: null,
+    startOverItem: dragItem(),
+    submit: () => jsonResponse(feedbackBody()),
+  });
+  renderWorkspace();
+  await generateAndStart(user);
+
+  await user.click(screen.getByRole("button", { name: "the migration" }));
+  expect(screen.getByRole("button", { name: "the migration" })).toHaveAttribute("aria-pressed", "true");
+  expect(screen.getByRole("button", { name: "Submit Answer" })).toBeEnabled();
+
+  await user.click(screen.getByRole("button", { name: "Start Over" }));
+  await user.click(within(screen.getByRole("alertdialog")).getByRole("button", { name: "Start Over" }));
+
+  await waitFor(() => {
+    expect(screen.getByRole("button", { name: "the migration" })).toHaveAttribute("aria-pressed", "false");
+  });
+  expect(screen.getByRole("button", { name: "rolling out" })).toHaveAttribute("aria-pressed", "false");
+  expect(screen.getByRole("button", { name: "Submit Answer" })).toBeDisabled();
 });
 
 it("renders server feedback as text and omits a null natural alternative", async () => {

@@ -18,7 +18,9 @@
 }
 
 .blank {
-  display: inline;
+  display: inline-block;
+  min-width: 4.5rem;
+  vertical-align: baseline;
   border-bottom: 2px solid var(--color-accent);
 }
 
@@ -54,8 +56,15 @@
   max-width: 100%;
   min-height: 44px;
   padding: var(--space-sm) var(--space-md);
-  border: 0;
+  border: 1px solid var(--color-text);
   background: var(--color-dominant);
+  font-family: var(--font-ui);
+  font-size: 16px;
+}
+
+.answerLabel,
+.instruction {
+  margin: 0;
   font-family: var(--font-ui);
   font-size: 16px;
 }

@@ -610,8 +610,11 @@ describe("Lesson workspace shell", () => {
     await userEvent.setup().click(feedbackToggle);
     const feedback = await screen.findByRole("region", { name: "Feedback" });
     expect(screen.getByTestId("prep-slot").contains(feedback)).toBe(false);
-    expect(feedback).toHaveTextContent("session-saved");
-    expect(feedback).toHaveTextContent("correct");
+    expect(within(feedback).getByRole("heading", { name: "Current pass" })).toBeInTheDocument();
+    expect(feedback).toHaveTextContent("1/1");
+    expect(feedback).toHaveTextContent("completed");
+    expect(feedback).toHaveTextContent("Correct");
+    expect(feedback).not.toHaveTextContent("session-saved");
     await waitFor(() => {
       expect(calls.some((call) => call.url.includes("/exercises/latest") && call.method === "GET")).toBe(
         true,
@@ -640,7 +643,7 @@ describe("Lesson workspace shell", () => {
     expect(screen.queryByRole("region", { name: "Feedback" })).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Source", expanded: false })).toBeInTheDocument();
     await user.click(toggle);
-    expect(await screen.findByRole("region", { name: "Feedback" })).toHaveTextContent("session-saved");
+    expect(await screen.findByRole("region", { name: "Feedback" })).toHaveTextContent("Current pass");
     await user.click(toggle);
     expect(screen.queryByRole("region", { name: "Feedback" })).not.toBeInTheDocument();
     await user.click(toggle);
@@ -650,7 +653,7 @@ describe("Lesson workspace shell", () => {
     await waitFor(() => expect(reopened).toBeEnabled());
     expect(screen.queryByRole("region", { name: "Feedback" })).not.toBeInTheDocument();
     await user.click(reopened);
-    expect(await screen.findByRole("region", { name: "Feedback" })).toHaveTextContent("session-saved");
+    expect(await screen.findByRole("region", { name: "Feedback" })).toHaveTextContent("1/1");
   });
 
   it("keeps Start Practice disabled when the accepted set is not restorable", async () => {
@@ -701,7 +704,7 @@ describe("Lesson workspace shell", () => {
         current: null,
       }),
       attemptList: [
-        historyAttempt("session-old", "completed", "attempt-old"),
+        historyAttempt("session-old", "completed", "attempt-old", "kept earlier"),
         historyAttempt("session-now", "completed", "attempt-now"),
       ],
     });
@@ -714,10 +717,13 @@ describe("Lesson workspace shell", () => {
 
     const feedback = await screen.findByRole("region", { name: "Feedback" });
     const current = within(feedback).getByRole("region", { name: "Current pass" });
-    expect(current).toHaveTextContent("session-now");
-    expect(current).not.toHaveTextContent("session-old");
+    expect(within(current).getByRole("heading", { name: "Current pass" })).toBeInTheDocument();
+    expect(current).toHaveTextContent("1/1");
+    expect(current).toHaveTextContent("completed");
+    expect(current).not.toHaveTextContent("session-now");
+    expect(current).not.toHaveTextContent("kept earlier");
     expect(within(feedback).getByRole("region", { name: "Earlier passes" })).toHaveTextContent(
-      "session-old",
+      "kept earlier",
     );
     expect(screen.queryByRole("button", { name: "Exit Practice" })).not.toBeInTheDocument();
     expect(calls.some((call) => call.method === "POST" && call.url.includes("/finish"))).toBe(true);
@@ -743,7 +749,7 @@ describe("Lesson workspace shell", () => {
         current: typedItem,
       }),
       attemptList: [
-        historyAttempt("session-old", "completed", "attempt-old"),
+        historyAttempt("session-old", "completed", "attempt-old", "kept earlier"),
         historyAttempt("session-now", "exited", "attempt-now"),
       ],
     });
@@ -754,11 +760,13 @@ describe("Lesson workspace shell", () => {
 
     const feedback = await screen.findByRole("region", { name: "Feedback" });
     const current = within(feedback).getByRole("region", { name: "Current pass" });
+    expect(within(current).getByRole("heading", { name: "Current pass" })).toBeInTheDocument();
+    expect(current).toHaveTextContent("1/1");
     expect(current).toHaveTextContent("left early");
-    expect(current).toHaveTextContent("session-now");
+    expect(current).not.toHaveTextContent("session-now");
     expect(current).not.toHaveTextContent("completed");
     expect(within(feedback).getByRole("region", { name: "Earlier passes" })).toHaveTextContent(
-      "session-old",
+      "kept earlier",
     );
   });
 
@@ -780,7 +788,10 @@ describe("Lesson workspace shell", () => {
 
     const feedback = await screen.findByRole("region", { name: "Feedback" });
     const current = within(feedback).getByRole("region", { name: "Current pass" });
-    expect(current).toHaveTextContent(sessionId);
+    expect(within(current).getByRole("heading", { name: "Current pass" })).toBeInTheDocument();
+    expect(current).toHaveTextContent("1/1");
+    expect(current).toHaveTextContent("completed");
+    expect(current).not.toHaveTextContent(sessionId);
     expect(screen.queryByRole("button", { name: "Exit Practice" })).not.toBeInTheDocument();
     expect(localStorage.getItem(`lait.practice-session.${lessonId}`)).toBeNull();
     expect(calls.some((call) => call.method === "POST" && call.url.includes("/finish"))).toBe(true);
@@ -810,7 +821,11 @@ describe("Lesson workspace shell", () => {
     renderWorkspace();
 
     const feedback = await screen.findByRole("region", { name: "Feedback" });
-    expect(within(feedback).getByRole("region", { name: "Current pass" })).toHaveTextContent(sessionId);
+    const current = within(feedback).getByRole("region", { name: "Current pass" });
+    expect(within(current).getByRole("heading", { name: "Current pass" })).toBeInTheDocument();
+    expect(current).toHaveTextContent("1/1");
+    expect(current).toHaveTextContent("completed");
+    expect(current).not.toHaveTextContent(sessionId);
     await waitFor(() => {
       expect(localStorage.getItem(`lait.practice-session.${lessonId}`)).toBeNull();
     });
@@ -887,7 +902,11 @@ describe("Lesson workspace shell", () => {
     expect(calls.filter((call) => call.method === "POST" && call.url.includes("/finish"))).toHaveLength(1);
 
     await userEvent.setup().click(screen.getByRole("button", { name: "Try again" }));
-    expect(await screen.findByRole("region", { name: "Current pass" })).toHaveTextContent(sessionId);
+    const current = await screen.findByRole("region", { name: "Current pass" });
+    expect(within(current).getByRole("heading", { name: "Current pass" })).toBeInTheDocument();
+    expect(current).toHaveTextContent("1/1");
+    expect(current).toHaveTextContent("completed");
+    expect(current).not.toHaveTextContent(sessionId);
     expect(calls.filter((call) => call.method === "POST" && call.url.includes("/finish"))).toHaveLength(1);
   });
 
@@ -955,7 +974,7 @@ function walk(directory: string): string[] {
   });
 }
 
-function historyAttempt(sessionId: string, disposition: string, attemptId: string) {
+function historyAttempt(sessionId: string, disposition: string, attemptId: string, unitText = "rolling out") {
   return {
     attempt_id: attemptId,
     session_id: sessionId,
@@ -965,7 +984,7 @@ function historyAttempt(sessionId: string, disposition: string, attemptId: strin
     submitted: "rolling out",
     expected: "rolling out",
     explanation: "matched",
-    unit_text: "rolling out",
+    unit_text: unitText,
     span_start: 23,
     span_end: 34,
     created_at: "2026-10-02T00:00:00+00:00",

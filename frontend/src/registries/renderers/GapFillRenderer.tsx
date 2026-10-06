@@ -1,6 +1,7 @@
 import { useState } from "react";
 
 import styles from "./GapFillRenderer.module.css";
+import { stripEmphasis } from "./stripEmphasis.ts";
 import type { RendererProps, UnitLabel } from "./types.ts";
 
 export function GapFillRenderer({
@@ -15,6 +16,7 @@ export function GapFillRenderer({
   const [draft, setDraft] = useState("");
   const [selectedUnitId, setSelectedUnitId] = useState<string | null>(null);
   const drag = item.mode === "drag";
+  const graded = feedback !== null;
   const selected = units.find((unit) => unit.id === selectedUnitId) ?? null;
   const canSubmit = drag ? selected !== null : draft.trim() !== "";
 
@@ -34,11 +36,9 @@ export function GapFillRenderer({
       <p className={styles.sentence} data-testid="gap-fill-sentence">
         {item.segments.map((segment, index) =>
           segment.kind === "blank" ? (
-            <span key={index} className={styles.blank} data-testid="gap-fill-blank">
-              {segment.text}
-            </span>
+            <span key={index} className={styles.blank} data-testid="gap-fill-blank" />
           ) : (
-            <span key={index}>{segment.text}</span>
+            <span key={index}>{stripEmphasis(segment.text)}</span>
           ),
         )}
       </p>
@@ -49,17 +49,28 @@ export function GapFillRenderer({
               key={unitId}
               unit={units.find((candidate) => candidate.id === unitId) ?? { id: unitId, text: unitId }}
               pressed={selectedUnitId === unitId}
+              disabled={graded}
               onSelect={setSelectedUnitId}
             />
           ))}
         </div>
       ) : (
-        <input
-          className={styles.answer}
-          aria-label="Answer"
-          value={draft}
-          onChange={(event) => setDraft(event.target.value)}
-        />
+        <>
+          <label className={styles.answerLabel} htmlFor="gap-fill-answer">
+            Answer
+          </label>
+          <p id="gap-fill-instruction" className={styles.instruction}>
+            Type the missing words.
+          </p>
+          <input
+            id="gap-fill-answer"
+            className={styles.answer}
+            aria-describedby="gap-fill-instruction"
+            value={draft}
+            disabled={graded}
+            onChange={(event) => setDraft(event.target.value)}
+          />
+        </>
       )}
       {submitError ? (
         <p className={styles.error} role="alert">
@@ -83,10 +94,12 @@ export function GapFillRenderer({
 function ChipButton({
   unit,
   pressed,
+  disabled,
   onSelect,
 }: {
   unit: UnitLabel;
   pressed: boolean;
+  disabled: boolean;
   onSelect: (unitId: string) => void;
 }) {
   return (
@@ -94,7 +107,13 @@ function ChipButton({
       type="button"
       className={styles.chip}
       aria-pressed={pressed}
-      onClick={() => onSelect(unit.id)}
+      disabled={disabled}
+      onClick={() => {
+        if (disabled) {
+          return;
+        }
+        onSelect(unit.id);
+      }}
     >
       {unit.text}
     </button>

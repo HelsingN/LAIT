@@ -18,6 +18,31 @@ type FeedbackStageProps = {
   onJump: (attempt: FeedbackAttempt) => void;
 };
 
+function modeLabel(mode: string): string {
+  if (mode === "drag") {
+    return "Choice";
+  }
+  if (mode === "typed") {
+    return "Typed";
+  }
+  return mode;
+}
+
+function categoryLabel(category: string): string {
+  if (category === "correct") {
+    return "Correct";
+  }
+  if (category === "incorrect") {
+    return "Incorrect";
+  }
+  return category;
+}
+
+function scoreLabel(attempts: FeedbackAttempt[]): string {
+  const correct = attempts.filter((attempt) => attempt.category === "correct").length;
+  return `${correct}/${attempts.length}`;
+}
+
 function passLabel(disposition: string): string {
   if (disposition === "exited") {
     return "left early";
@@ -56,8 +81,9 @@ export function FeedbackStage({ attempts, currentSessionId, onJump }: FeedbackSt
   return (
     <div>
       <section aria-label="Current pass">
+        <h3>Current pass</h3>
+        <p>{scoreLabel(currentAttempts)}</p>
         <p>{passLabel(currentAttempts[0]?.session_disposition ?? "")}</p>
-        <p>{current}</p>
         <AttemptRows attempts={currentAttempts} onJump={onJump} />
       </section>
       {earlierIds.length > 0 ? (
@@ -68,7 +94,6 @@ export function FeedbackStage({ attempts, currentSessionId, onJump }: FeedbackSt
             return (
               <div key={sessionId}>
                 <p>{passLabel(rows[0]?.session_disposition ?? "")}</p>
-                <p>{sessionId}</p>
                 <AttemptRows attempts={rows} onJump={onJump} />
               </div>
             );
@@ -90,8 +115,8 @@ function AttemptRows({
     <ul className={styles.list}>
       {attempts.map((attempt) => (
         <li key={attempt.attempt_id} className={styles.row}>
-          <p className={styles.category}>{attempt.mode}</p>
-          <p className={styles.category}>{attempt.category}</p>
+          <p className={styles.category}>{modeLabel(attempt.mode)}</p>
+          <p className={styles.category}>{categoryLabel(attempt.category)}</p>
           <p className={styles.explanation}>{attempt.explanation}</p>
           <button type="button" className={styles.jump} onClick={() => onJump(attempt)}>
             {attempt.unit_text}

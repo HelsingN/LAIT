@@ -1,37 +1,60 @@
 ---
-status: testing
+status: diagnosed
 phase: 01-mod-first-manual-learning-loop
 source: [01-VERIFICATION.md]
 started: 2026-10-02T03:02:00Z
-updated: 2026-10-02T03:02:00Z
+updated: 2026-10-06T00:35:00Z
 ---
 
 ## Current Test
 
-number: 1
-name: Compose health
-expected: |
-  Healthy only after migrations. Lesson appears on / and opens at /lessons/:id.
-awaiting: user response
+[testing complete]
 
 ## Tests
 
 ### 1. Compose health
 
 expected: Healthy only after migrations. Lesson appears on / and opens at /lessons/:id.
-result: [pending]
-
-**Test:** `docker compose up -d --wait` on a fresh volume, then paste a lesson and reopen it from `/`.
-
-**Why human:** No probe runs Compose. This pass did not start containers.
+result: issue
+reported: "Браузерная проверка завершена. Работают: правильные/ошибочные ответы, Continue, Start Over, восстановление после reload, полный проход и досрочный Exit. История сохраняется, проходы разделены, Feedback при входе свёрнут. Проверенные раскладки тоже работают; ошибок в консоли нет. Остались UX-проблемы: варианты не перемешиваются; пустое поле ввода почти незаметно; после проверки ответ можно изменить, но отправить повторно нельзя — интерфейс вводит в заблуждение; Feedback показывает технический лог вместо понятного учебного итога; в предложениях видны буквальные * из Source; двойное подчёркивание тоже осталось. Добавлено 11 тестовых попыток в трёх сессиях. Source, юниты и генерацию не менял. Код и статус UAT не трогал. Полный отчёт: C:/Users/97255/.codex/visualizations/2026/10/02/01a0fc72-fc87-7723-8dcf-da8bc00ec3f7/LAIT_BROWSER_VERIFICATION_2026-10-06.md. Это не human approval и не закрытие Phase 1."
+severity: major
 
 ## Summary
 
 total: 1
 passed: 0
-issues: 0
-pending: 1
+issues: 1
+pending: 0
 skipped: 0
 blocked: 0
 
 ## Gaps
+
+- gap_id: G-01-1
+  truth: "Healthy only after migrations. Lesson appears on / and opens at /lessons/:id."
+  status: resolved
+  resolution: "Plan 01-15. The user approved the Docker checkpoint on 2026-10-06 after the Start Over selection fix. A real browser-process restart was not part of that check. This approval does not close Phase 1."
+  reason: "User reported: browser verification on the running lesson completed without console errors. Answer grading, Continue, Start Over, reload restore, full pass, early Exit, saved history, separated passes, collapsed Feedback on entry, and the checked layouts work. Remaining UX: options are not shuffled; the empty Answer field is nearly invisible; after grading the answer stays editable but cannot be resubmitted; Feedback is a technical log instead of a learner summary; literal Source asterisks and the double underscore remain in sentences. 11 attempts were added across 3 sessions. Source, units, and generation were not edited. Not phase approval."
+  severity: major
+  test: 1
+  root_cause: "Five unimplemented behaviors, not a failed lesson open and not a 01-14 layout regression. generate() stores span order as chip_unit_ids and GapFillRenderer paints that order with no shuffle. The typed control is an unlabeled input with border 0 under the sentence. After feedback is set, submit() returns and Submit becomes Continue while the chip and input stay enabled. FeedbackStage prints the session id, mode, category, and explanation; Current pass is only an aria-label and no score is computed. _item_for copies the source window into segments with no markdown strip, and the blank is still the text ______ plus a 2px underline."
+  artifacts:
+    - path: backend/lait/modules/exercise_gap_fill/generate.py
+      issue: "span order stored as chip_unit_ids; raw source slices and blank ______"
+    - path: backend/lait/application/queries/practice_get.py
+      issue: "view_for copies generation.chip_unit_ids onto every current item"
+    - path: backend/lait/application/commands/practice_start_over.py
+      issue: "start_over reuses the same completed generation"
+    - path: frontend/src/registries/renderers/GapFillRenderer.tsx
+      issue: "no shuffle, unlabeled input, submit bails after grade, controls stay enabled"
+    - path: frontend/src/registries/renderers/GapFillRenderer.module.css
+      issue: "answer border 0; blank adds a second underline"
+    - path: frontend/src/features/lesson/stages/FeedbackStage.tsx
+      issue: "technical log; no visible Current pass heading and no score"
+  missing:
+    - "Shuffle or an explicit per-item permutation of chip_unit_ids"
+    - "Visible label, border, and instruction for the typed answer"
+    - "After a grade, disable the chip and the input or say the grade is final"
+    - "Visible current-pass heading, short score, and plain labels instead of the session UUID"
+    - "Strip emphasis markers from sentence segments and use one green blank line"
+  debug_session: .planning/debug/practice-ux-unimplemented.md

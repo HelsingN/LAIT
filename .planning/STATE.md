@@ -4,16 +4,16 @@ milestone: v1.0
 current_phase: 01
 current_phase_name: Mod-First Manual Learning Loop
 status: executing
-stopped_at: Quick task 261005-wza complete; its human checkpoint approved by the user. Phase 1 UAT remains separate and Phase 1 is not complete.
-last_updated: "2026-10-05T20:48:16.988Z"
-last_activity: 2026-10-05
-last_activity_desc: Quick task 261005-wza completed; user confirmed the Feedback human checkpoint passed. Phase 1 remains open. No commit.
-state_head: 0c5122d8dacf1022fb6cc909c0b79904a072192d
+stopped_at: Plan 01-15 human checkpoint approved by the user. Phase 1 is not complete.
+last_updated: "2026-10-06T00:35:00.000Z"
+last_activity: 2026-10-06
+last_activity_desc: Plan 01-15 human checkpoint approved. Phase 1 remains open.
+state_head: 8b57705a3aec0ee5d77e92ea73ecdc7e5cdc1f49
 progress:
   total_phases: 9
   completed_phases: 0
-  total_plans: 14
-  completed_plans: 14
+  total_plans: 15
+  completed_plans: 15
 milestone_name: milestone
 spec_version: 0.2.0
 ---
@@ -31,10 +31,10 @@ Current planning/specification baseline: `.planning/VERSION.md` (`0.2.0`)
 ## Current Position
 
 Phase: 01 (Mod-First Manual Learning Loop) — EXECUTING
-Plan: 14 of 14 recorded. The 01-14 checkpoint is approved. Phase 1 is not complete.
+Plan: 15 of 15 recorded. The 01-15 checkpoint is approved. Phase 1 is not complete.
 Status: Phase 1 is not complete
 Current discussion area: Complete
-Last activity: 2026-10-05 — Completed quick task 261005-wza: Feedback collapsed on lesson entry; human checkpoint approved (uncommitted).
+Last activity: 2026-10-06 — Plan 01-15 human checkpoint approved. Phase 1 remains open.
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -163,10 +163,10 @@ Items acknowledged and carried forward from previous milestone close:
 | Integration | Production MCP adapter | Deferred beyond v1; architecture-ready only | Spec 0.2.0 |
 | Integration | DeepSeek Harness plugin/package | Future reference integration candidate | Spec 0.2.0 |
 | Domain | Decide whether `PracticeSession` becomes a first-class core entity | Deferred until concrete orchestration/practice requirements exist | Spec 0.2.0 |
-| UX | Feedback still reads as a technical log (UUID, mode names, raw categories). A later slice needs a learner-facing summary: pass title, completed versus left early, choice versus recall, hard phrases, next step. Not a 01-13 blocker and not in 01-14. | Deferred to the Feedback slice | 2026-10-02 |
+| UX | Feedback current pass shows a heading, score, and plain labels. Hard phrases and a next-step panel were not in 01-15. | Landed in 01-15 | 2026-10-06 |
 
 ## Session Continuity
 
-Last session: 2026-10-02T02:37:13.271Z
-Stopped at: Quick task 261005-wza complete; its human checkpoint approved by the user. Continue the separate Phase 1 UAT. Phase 1 is not complete.
+Last session: 2026-10-06T00:35:00.000Z
+Stopped at: Plan 01-15 human checkpoint approved by the user. Phase 1 is not complete.
 Resume file: None

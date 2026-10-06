@@ -9,6 +9,7 @@ const START_OVER_CONFIRMATION =
   "Start over: Abandon this practice run and start a new session on the same units? Submitted answers stay saved.";
 
 type FocusPracticeModeProps = {
+  sessionId: string;
   item: PracticeItemView | null;
   units: UnitLabel[];
   learnerExerciseTypes: string[];
@@ -22,6 +23,7 @@ type FocusPracticeModeProps = {
 };
 
 export function FocusPracticeMode({
+  sessionId,
   item,
   units,
   learnerExerciseTypes,
@@ -41,7 +43,7 @@ export function FocusPracticeMode({
       <p className={styles.hint}>{FROZEN_HINT}</p>
       {Renderer && item ? (
         <Renderer
-          key={`${item.exercise_type}:${item.position}:${item.mode}:${item.learning_unit_id}`}
+          key={`${sessionId}:${item.exercise_type}:${item.position}:${item.mode}:${item.learning_unit_id}`}
           item={item}
           units={units}
           pending={pending}

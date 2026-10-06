@@ -220,7 +220,7 @@ it("lists category explanation and an excerpt jump", async () => {
   await user.click(screen.getByRole("button", { name: "Exit Practice" }));
 
   const feedback = await screen.findByRole("region", { name: "Feedback" });
-  expect(feedback).toHaveTextContent("incorrect");
+  expect(feedback).toHaveTextContent("Incorrect");
   expect(feedback).toHaveTextContent('Your answer: "nope". Expected: "rolling out".');
   await user.click(within(feedback).getByRole("button", { name: "rolling out" }));
 
@@ -244,7 +244,7 @@ it("keeps listed attempts after start over", async () => {
   await user.click(screen.getByRole("button", { name: "Exit Practice" }));
 
   const feedback = await screen.findByRole("region", { name: "Feedback" });
-  expect(feedback).toHaveTextContent("incorrect");
+  expect(feedback).toHaveTextContent("Incorrect");
   expect(feedback).toHaveTextContent('Your answer: "nope". Expected: "rolling out".');
   expect(feedback).not.toHaveTextContent("No attempts yet. Start Practice to begin.");
 });

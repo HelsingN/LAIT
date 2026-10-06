@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from lait.application.ports import LearningUnitRepository
+from lait.application.queries.chip_order import permute_chip_ids
 from lait.domain.practice_session import (
     CurrentItem,
     ExerciseGeneration,
@@ -42,7 +43,11 @@ def view_for(practice: PracticeSession, generation: ExerciseGeneration) -> Pract
             target_text=definition.target_text,
             sentence=definition.sentence,
             segments=definition.segments,
-            chip_unit_ids=generation.chip_unit_ids,
+            chip_unit_ids=permute_chip_ids(
+                generation.chip_unit_ids,
+                session_id=practice.id,
+                item_id=item.learning_unit_id,
+            ),
         )
     return PracticeView(
         session_id=practice.id,

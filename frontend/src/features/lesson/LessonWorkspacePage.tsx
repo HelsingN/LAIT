@@ -434,6 +434,7 @@ export function LessonWorkspacePage() {
           </>
         ) : null}
         <FocusPracticeMode
+          sessionId={session.session_id}
           item={focusItem}
           units={units.map((unit) => ({ id: unit.id, text: unit.text }))}
           learnerExerciseTypes={learnerExerciseTypes}

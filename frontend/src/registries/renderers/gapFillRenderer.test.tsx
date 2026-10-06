@@ -10,6 +10,7 @@ import { afterEach, expect, it, vi } from "vitest";
 import { MemoryRouter, Route, Routes } from "react-router";
 
 import { LessonWorkspacePage } from "../../features/lesson/LessonWorkspacePage.tsx";
+import { GapFillRenderer } from "./GapFillRenderer.tsx";
 
 const lessonId = "lesson-1";
 const testDirectory = dirname(fileURLToPath(import.meta.url));
@@ -140,7 +141,7 @@ it("wraps the blank inline and scrolls the chip bank", async () => {
   await user.click(await screen.findByRole("button", { name: "Start Practice" }));
 
   const blank = await screen.findByTestId("gap-fill-blank");
-  expect(blank).toHaveTextContent("______");
+  expect(blank.textContent ?? "").not.toMatch(/_/);
   expect(getComputedStyle(blank).display).not.toBe("block");
   const sentence = screen.getByTestId("gap-fill-sentence");
   expect(sentence).toHaveTextContent("I was responsible for");
@@ -151,7 +152,10 @@ it("wraps the blank inline and scrolls the chip bank", async () => {
   const css = readFileSync(join(testDirectory, "GapFillRenderer.module.css"), "utf8");
   expect(css).toMatch(/\.sentence\s*\{[^}]*overflow-wrap:\s*anywhere/s);
   expect(css).toMatch(/\.sentence\s*\{[^}]*font-family:\s*var\(--font-source\)/s);
-  expect(css).toMatch(/\.blank\s*\{[^}]*display:\s*inline/s);
+  expect(css).toMatch(/\.blank\s*\{[^}]*display:\s*inline-block/s);
+  expect(css).toMatch(/\.blank\s*\{[^}]*min-width:\s*4\.5rem/s);
+  expect(css).toMatch(/\.blank\s*\{[^}]*border-bottom:\s*2px solid var\(--color-accent\)/s);
+  expect(css).not.toMatch(/\.blank\s*\{[^}]*text-decoration/s);
   expect(css).toMatch(/\.chipBank\s*\{[^}]*flex-wrap:\s*wrap/s);
   expect(css).toMatch(/\.chipBank\s*\{[^}]*max-height:\s*40vh/s);
   expect(css).toMatch(/\.chipBank\s*\{[^}]*overflow-y:\s*auto/s);
@@ -163,4 +167,130 @@ it("wraps the blank inline and scrolls the chip bank", async () => {
     "utf8",
   );
   expect(focusCss).toMatch(/overflow-x:\s*hidden/);
+});
+
+it("renders chips in chip_unit_ids order", () => {
+  const reversed = {
+    ...dragItem,
+    chip_unit_ids: ["unit-2", "unit-1"],
+  };
+  render(
+    <GapFillRenderer
+      item={reversed}
+      units={[
+        { id: "unit-1", text: "rolling out" },
+        { id: "unit-2", text: "the migration" },
+      ]}
+      pending={false}
+      submitError={null}
+      feedback={null}
+      onSubmit={() => undefined}
+      onContinue={() => undefined}
+    />,
+  );
+
+  const buttons = within(screen.getByTestId("chip-bank")).getAllByRole("button");
+  expect(buttons.map((button) => button.textContent)).toEqual(["the migration", "rolling out"]);
+});
+
+it("strips emphasis markers and leaves identifier underscores", () => {
+  render(
+    <GapFillRenderer
+      item={{
+        ...dragItem,
+        segments: [
+          { kind: "text", text: "*responsible* **rolling** _out_ file_name " },
+          { kind: "blank", text: "______" },
+        ],
+      }}
+      units={[]}
+      pending={false}
+      submitError={null}
+      feedback={null}
+      onSubmit={() => undefined}
+      onContinue={() => undefined}
+    />,
+  );
+
+  const sentence = screen.getByTestId("gap-fill-sentence");
+  expect(sentence).toHaveTextContent("responsible rolling out file_name");
+  expect(sentence).not.toHaveTextContent("*");
+  expect(screen.getByTestId("gap-fill-blank").textContent ?? "").not.toMatch(/_/);
+});
+
+it("shows a labeled typed answer and locks it after a grade", () => {
+  const { rerender } = render(
+    <GapFillRenderer
+      item={{ ...dragItem, mode: "typed" }}
+      units={[]}
+      pending={false}
+      submitError={null}
+      feedback={null}
+      onSubmit={() => undefined}
+      onContinue={() => undefined}
+    />,
+  );
+
+  const answer = screen.getByRole("textbox", { name: "Answer" });
+  expect(screen.getByText("Type the missing words.")).toBeVisible();
+  expect(answer).toHaveAccessibleDescription("Type the missing words.");
+  const css = readFileSync(join(testDirectory, "GapFillRenderer.module.css"), "utf8");
+  expect(css).toMatch(/\.answer\s*\{[^}]*border:\s*1px solid var\(--color-text\)/s);
+
+  rerender(
+    <GapFillRenderer
+      item={{ ...dragItem, mode: "typed" }}
+      units={[]}
+      pending={false}
+      submitError={null}
+      feedback={{
+        category: "incorrect",
+        submitted: "nope",
+        expected: "rolling out",
+        explanation: "miss",
+        chunks_used: [],
+        chunks_missed: [],
+        natural_alternative: null,
+      }}
+      onSubmit={() => undefined}
+      onContinue={() => undefined}
+    />,
+  );
+
+  expect(screen.getByRole("textbox", { name: "Answer" })).toBeDisabled();
+  expect(screen.getByRole("button", { name: "Continue" })).toBeEnabled();
+  expect(screen.queryByRole("button", { name: "Retry" })).not.toBeInTheDocument();
+});
+
+it("ignores chip clicks after a grade", async () => {
+  const user = userEvent.setup();
+  render(
+    <GapFillRenderer
+      item={dragItem}
+      units={[
+        { id: "unit-1", text: "rolling out" },
+        { id: "unit-2", text: "the migration" },
+      ]}
+      pending={false}
+      submitError={null}
+      feedback={{
+        category: "correct",
+        submitted: "rolling out",
+        expected: "rolling out",
+        explanation: "matched",
+        chunks_used: [],
+        chunks_missed: [],
+        natural_alternative: null,
+      }}
+      onSubmit={() => undefined}
+      onContinue={() => undefined}
+    />,
+  );
+
+  const chips = within(screen.getByTestId("chip-bank")).getAllByRole("button");
+  expect(chips.every((chip) => chip.hasAttribute("disabled"))).toBe(true);
+  await user.click(chips[0]!);
+  expect(chips.every((chip) => chip.getAttribute("aria-pressed") !== "true")).toBe(true);
+  expect(screen.getByRole("button", { name: "Continue" })).toBeEnabled();
+  expect(screen.queryByRole("button", { name: "Retry" })).not.toBeInTheDocument();
 });
