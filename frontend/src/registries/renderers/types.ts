@@ -42,6 +42,9 @@ export type RendererProps = {
   pending: boolean;
   submitError: string | null;
   feedback: RendererFeedback | null;
+  revealed?: boolean;
   onSubmit: (answer: RendererAnswer) => void;
   onContinue: () => void;
+  onTryAgain?: () => void;
+  onShowAnswer?: () => void;
 };

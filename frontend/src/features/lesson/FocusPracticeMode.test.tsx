@@ -215,6 +215,9 @@ function installFetch(script: Script): FetchCall[] {
       if (url.includes("/practice-sessions/") && url.endsWith("/attempts") && method === "POST") {
         return script.submit(body);
       }
+      if (url.endsWith("/advance") && method === "POST") {
+        return jsonResponse(practiceView(script.continueItem, "session-1"));
+      }
       if (url.endsWith("/finish") && method === "POST") {
         return jsonResponse({ ...practiceView(null), open: false });
       }
@@ -281,12 +284,13 @@ it("submits one typed answer then continues inside the session", async () => {
   pendingSubmit.resolve(jsonResponse(feedbackBody()));
 
   const card = await screen.findByTestId("feedback-card");
-  expect(card).toHaveTextContent("incorrect");
+  expect(card).toHaveTextContent("Incorrect");
   expect(card).toHaveTextContent("nope");
-  expect(card).toHaveTextContent("rolling out");
-  expect(card).toHaveTextContent('Your answer: "nope". Expected: "rolling out".');
-  expect(card).toHaveTextContent("missed");
-  expect(card).not.toHaveTextContent("natural");
+  expect(card).not.toHaveTextContent("rolling out");
+  expect(card).not.toHaveTextContent("missed");
+  expect(card).not.toHaveTextContent("used");
+  expect(screen.getByRole("button", { name: "Try again" })).toBeEnabled();
+  expect(screen.getByRole("button", { name: "Show answer" })).toBeEnabled();
   expect(screen.queryByRole("button", { name: "Submit Answer" })).not.toBeInTheDocument();
 
   const submitCall = calls.find(
@@ -303,6 +307,7 @@ it("submits one typed answer then continues inside the session", async () => {
   expect(calls.some((call) => call.method === "GET" && /\/api\/practice-sessions\/session-1$/.test(call.url))).toBe(
     true,
   );
+  expect(calls.some((call) => call.url.endsWith("/advance") && call.method === "POST")).toBe(true);
 });
 
 it("submits a drag chip by unit id and displays the server category", async () => {
@@ -331,8 +336,9 @@ it("submits a drag chip by unit id and displays the server category", async () =
   await user.click(screen.getByRole("button", { name: "Submit Answer" }));
 
   const card = await screen.findByTestId("feedback-card");
-  expect(card).toHaveTextContent("correct");
-  expect(card).not.toHaveTextContent("incorrect");
+  expect(card).toHaveTextContent("Correct");
+  expect(card).not.toHaveTextContent("Incorrect");
+  expect(screen.queryByRole("button", { name: "Try again" })).not.toBeInTheDocument();
   const submitCall = calls.find(
     (call) => call.method === "POST" && call.url.includes("/practice-sessions/") && call.url.endsWith("/attempts"),
   );
@@ -480,8 +486,9 @@ it("renders server feedback as text and omits a null natural alternative", async
 
   const card = await screen.findByTestId("feedback-card");
   expect(card.querySelector("script")).toBeNull();
-  expect(card).toHaveTextContent('<script>alert(1)</script>');
-  expect(card).toHaveTextContent("used");
+  expect(card).toHaveTextContent("Correct");
+  expect(card).not.toHaveTextContent("<script>");
+  expect(card).not.toHaveTextContent("used");
   expect(card).not.toHaveTextContent("null");
   expect(screen.getAllByTestId("feedback-card")).toHaveLength(1);
 });

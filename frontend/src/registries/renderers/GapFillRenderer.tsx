@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import styles from "./GapFillRenderer.module.css";
 import { stripEmphasis } from "./stripEmphasis.ts";
@@ -10,13 +10,25 @@ export function GapFillRenderer({
   pending,
   submitError,
   feedback,
+  revealed = false,
   onSubmit,
   onContinue,
+  onTryAgain,
+  onShowAnswer,
 }: RendererProps) {
   const [draft, setDraft] = useState("");
   const [selectedUnitId, setSelectedUnitId] = useState<string | null>(null);
   const drag = item.mode === "drag";
   const graded = feedback !== null;
+  const missed = feedback?.category === "incorrect" && !revealed;
+
+  useEffect(() => {
+    if (feedback !== null) {
+      return;
+    }
+    setDraft("");
+    setSelectedUnitId(null);
+  }, [feedback]);
   const selected = units.find((unit) => unit.id === selectedUnitId) ?? null;
   const canSubmit = drag ? selected !== null : draft.trim() !== "";
 
@@ -77,11 +89,23 @@ export function GapFillRenderer({
           {submitError}
         </p>
       ) : null}
-      {feedback ? <FeedbackCard feedback={feedback} /> : null}
+      {feedback ? <FeedbackCard feedback={feedback} revealed={revealed} /> : null}
       {feedback ? (
-        <button type="button" className={styles.primary} onClick={onContinue}>
-          Continue
-        </button>
+        <>
+          {missed ? (
+            <>
+              <button type="button" className={styles.primary} onClick={onTryAgain}>
+                Try again
+              </button>
+              <button type="button" className={styles.primary} onClick={onShowAnswer}>
+                Show answer
+              </button>
+            </>
+          ) : null}
+          <button type="button" className={styles.primary} onClick={onContinue}>
+            Continue
+          </button>
+        </>
       ) : (
         <button type="button" className={styles.primary} disabled={pending || !canSubmit} onClick={submit}>
           {pending ? "Checking…" : "Submit Answer"}
@@ -120,20 +144,36 @@ function ChipButton({
   );
 }
 
-function FeedbackCard({ feedback }: { feedback: RendererProps["feedback"] }) {
+function resultWord(category: string): string {
+  if (category === "correct") {
+    return "Correct";
+  }
+  if (category === "incorrect") {
+    return "Incorrect";
+  }
+  if (category === "corrected") {
+    return "Corrected";
+  }
+  return category;
+}
+
+function FeedbackCard({
+  feedback,
+  revealed,
+}: {
+  feedback: RendererProps["feedback"];
+  revealed: boolean;
+}) {
   if (!feedback) {
     return null;
   }
   const tone = feedback.category === "incorrect" ? styles.incorrect : styles.correct;
+  const showSubmitted = feedback.category === "incorrect" || feedback.category === "corrected";
   return (
     <article className={styles.card} data-testid="feedback-card">
-      <p className={tone}>{feedback.category}</p>
-      <p>{feedback.submitted}</p>
-      <p>{feedback.expected}</p>
-      <p>{feedback.explanation}</p>
-      {feedback.chunks_used.length > 0 ? <p>used {feedback.chunks_used.join(", ")}</p> : null}
-      {feedback.chunks_missed.length > 0 ? <p>missed {feedback.chunks_missed.join(", ")}</p> : null}
-      {feedback.natural_alternative != null ? <p>{feedback.natural_alternative}</p> : null}
+      <p className={tone}>{resultWord(feedback.category)}</p>
+      {showSubmitted ? <p>{feedback.submitted}</p> : null}
+      {revealed ? <p>{feedback.expected}</p> : null}
     </article>
   );
 }

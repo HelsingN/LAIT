@@ -31,6 +31,7 @@ class ListedAttempt:
     unit_text: str
     span_start: int
     span_end: int
+    pass_item_count: int
     created_at: datetime
 
 
@@ -55,7 +56,7 @@ def handle(lesson_id: str, repository: AttemptListRepository) -> AttemptList:
                 attempt_id=row.attempt_id,
                 session_id=row.session_id,
                 session_disposition=session_disposition(
-                    row.session_status, row.cursor, row.pass_item_count
+                    row.session_status, row.cursor, row.session_item_count
                 ),
                 mode=row.mode,
                 category=row.category,
@@ -65,6 +66,7 @@ def handle(lesson_id: str, repository: AttemptListRepository) -> AttemptList:
                 unit_text=row.unit_text,
                 span_start=row.span_start,
                 span_end=row.span_end,
+                pass_item_count=row.pass_item_count,
                 created_at=row.created_at,
             )
             for row in rows

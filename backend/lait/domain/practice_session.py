@@ -136,6 +136,7 @@ class AttemptRecord:
     session_status: str
     cursor: int
     pass_item_count: int
+    session_item_count: int
     mode: str
     category: str
     submitted: str

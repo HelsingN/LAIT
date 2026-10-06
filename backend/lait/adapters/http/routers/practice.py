@@ -7,6 +7,8 @@ from pydantic import BaseModel, ConfigDict
 
 from lait.application.commands.exercise_submit_attempt import SubmitAttempt
 from lait.application.commands.exercise_submit_attempt import handle as submit_attempt
+from lait.application.commands.practice_advance import PracticeAdvance
+from lait.application.commands.practice_advance import handle as advance_practice
 from lait.application.commands.practice_finish import PracticeFinish
 from lait.application.commands.practice_finish import handle as finish_practice
 from lait.application.commands.practice_start import PracticeStart
@@ -59,6 +61,12 @@ class PracticeStartBody(BaseModel):
     lesson_id: str
 
 
+class AdvanceBody(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    position: int
+
+
 class SubmitBody(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
@@ -80,6 +88,7 @@ class AttemptListItemResponse(BaseModel):
     unit_text: str
     span_start: int
     span_end: int
+    pass_item_count: int
     created_at: str
 
 
@@ -162,6 +171,7 @@ def get_lesson_attempts(lesson_id: str, request: Request) -> AttemptListResponse
                 unit_text=row.unit_text,
                 span_start=row.span_start,
                 span_end=row.span_end,
+                pass_item_count=row.pass_item_count,
                 created_at=row.created_at.isoformat(),
             )
             for row in outcome.attempts
@@ -235,6 +245,23 @@ def post_attempt(session_id: str, body: SubmitBody, request: Request) -> SubmitR
         span_end=result.span_end,
         unit_text=result.unit_text,
     )
+
+
+@router.post(
+    "/api/practice-sessions/{session_id}/advance",
+    operation_id="practice.advance",
+)
+def post_practice_advance(session_id: str, body: AdvanceBody, request: Request) -> PracticeResponse:
+    try:
+        view = advance_practice(
+            PracticeAdvance(session_id=session_id, position=body.position),
+            _repository(request),
+        )
+    except PracticeSessionNotFoundError as exc:
+        raise HTTPException(status_code=404, detail="Practice session not found") from exc
+    except NoCurrentItemError as exc:
+        raise HTTPException(status_code=409, detail="No current exercise item") from exc
+    return _practice_response(view)
 
 
 @router.post(

@@ -46,12 +46,13 @@ def test_incorrect_explanation_matches_d18_and_records_missed() -> None:
     submitted = "  ship it  "
     unit = "rolling out"
     assert explanation(category="incorrect", submitted=submitted, unit=unit) == (
-        'Your answer: "  ship it  ". Expected: "rolling out".'
+        'Your answer: "  ship it  ".'
     )
 
     result = evaluate(_item(), TypedAnswer(submitted))
     assert result.category == "incorrect"
-    assert result.explanation == 'Your answer: "  ship it  ". Expected: "rolling out".'
+    assert result.explanation == 'Your answer: "  ship it  ".'
+    assert "Expected" not in result.explanation
     assert result.natural_alternative is None
     assert result.chunks_used == ()
     assert result.chunks_missed == ("rolling out",)

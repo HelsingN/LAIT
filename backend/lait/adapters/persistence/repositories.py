@@ -28,10 +28,30 @@ from lait.domain.practice_session import (
     AttemptRecord,
     ExerciseDefinition,
     ExerciseGeneration,
+    NoCurrentItemError,
     PassItem,
     PracticeSession,
     PracticeSessionNotFoundError,
 )
+
+
+def _opening_pass_size(definition_count: int) -> int:
+    if definition_count > 1:
+        return definition_count * 2
+    return definition_count
+
+
+def _listed_pass_size(definition_count: int, item_count: int) -> int:
+    opening = _opening_pass_size(definition_count)
+    if opening > 0:
+        return opening
+    return item_count
+
+
+def _still_uncorrected(categories: list[str]) -> bool:
+    if "incorrect" not in categories:
+        return False
+    return "correct" not in categories and "corrected" not in categories
 
 
 def _to_unit(row: LearningUnitRow) -> LearningUnit:
@@ -296,6 +316,88 @@ class SqlAlchemyPracticeRepository:
         )
         return _to_session(row, items)
 
+    def list_attempt_keys_for_session(self, session_id: str) -> list[tuple[str, str, str, str]]:
+        with self._session_factory() as session:
+            rows = session.scalars(
+                select(AttemptRow)
+                .where(AttemptRow.session_id == session_id)
+                .order_by(AttemptRow.created_at.asc(), AttemptRow.id.asc())
+            ).all()
+            return [(row.id, row.learning_unit_id, row.mode, row.category) for row in rows]
+
+    def advance_current_item(self, session_id: str, position: int) -> int:
+        with self._session_factory() as session:
+            row = session.get(PracticeSessionRow, session_id)
+            if row is None or row.status != OPEN:
+                raise PracticeSessionNotFoundError(session_id)
+            if row.cursor > position:
+                return row.cursor
+            if row.cursor != position:
+                raise NoCurrentItemError(session_id)
+            items = list(
+                session.scalars(
+                    select(PracticePassItemRow)
+                    .where(PracticePassItemRow.session_id == session_id)
+                    .order_by(PracticePassItemRow.position.asc())
+                ).all()
+            )
+            item = next((candidate for candidate in items if candidate.position == position), None)
+            if item is None:
+                raise NoCurrentItemError(session_id)
+            attempt = session.scalars(
+                select(AttemptRow).where(
+                    AttemptRow.session_id == session_id,
+                    AttemptRow.learning_unit_id == item.learning_unit_id,
+                    AttemptRow.mode == item.mode,
+                )
+            ).first()
+            if attempt is None:
+                raise NoCurrentItemError(session_id)
+            if position + 1 < len(items):
+                row.cursor = position + 1
+                session.commit()
+                return row.cursor
+            definition_count = session.scalar(
+                select(func.count())
+                .select_from(ExerciseDefinitionRow)
+                .where(ExerciseDefinitionRow.generation_id == row.generation_id)
+            )
+            opening_size = _opening_pass_size(int(definition_count or 0))
+            attempts = session.scalars(
+                select(AttemptRow)
+                .where(AttemptRow.session_id == session_id)
+                .order_by(AttemptRow.created_at.asc(), AttemptRow.id.asc())
+            ).all()
+            categories: dict[tuple[str, str], list[str]] = {}
+            for stored in attempts:
+                key = (stored.learning_unit_id, stored.mode)
+                categories.setdefault(key, []).append(stored.category)
+            queue = [
+                opening
+                for opening in items
+                if opening.position < opening_size
+                and _still_uncorrected(categories.get((opening.learning_unit_id, opening.mode), []))
+            ]
+            if not queue:
+                row.cursor = position + 1
+                session.commit()
+                return row.cursor
+            start = len(items)
+            for offset, opening in enumerate(queue):
+                session.add(
+                    PracticePassItemRow(
+                        id=f"{session_id}:{start + offset}",
+                        session_id=session_id,
+                        position=start + offset,
+                        mode=opening.mode,
+                        learning_unit_id=opening.learning_unit_id,
+                        definition_id=opening.definition_id,
+                    )
+                )
+            row.cursor = start
+            session.commit()
+            return row.cursor
+
     def add_attempt(self, attempt: Attempt, cursor: int) -> None:
         row = AttemptRow(
             id=attempt.id,
@@ -336,21 +438,36 @@ class SqlAlchemyPracticeRepository:
                 )
             ).all()
             session_ids = {practice.id for _attempt, practice in pairs}
-            counts: dict[str, int] = {}
+            generation_ids = {practice.generation_id for _attempt, practice in pairs}
+            item_counts: dict[str, int] = {}
+            definition_counts: dict[str, int] = {}
             if session_ids:
                 counted = session.execute(
                     select(PracticePassItemRow.session_id, func.count())
                     .where(PracticePassItemRow.session_id.in_(session_ids))
                     .group_by(PracticePassItemRow.session_id)
                 ).all()
-                counts = {session_id: int(count) for session_id, count in counted}
+                item_counts = {session_id: int(count) for session_id, count in counted}
+            if generation_ids:
+                counted_definitions = session.execute(
+                    select(ExerciseDefinitionRow.generation_id, func.count())
+                    .where(ExerciseDefinitionRow.generation_id.in_(generation_ids))
+                    .group_by(ExerciseDefinitionRow.generation_id)
+                ).all()
+                definition_counts = {
+                    generation_id: int(count) for generation_id, count in counted_definitions
+                }
             return [
                 AttemptRecord(
                     attempt_id=attempt.id,
                     session_id=practice.id,
                     session_status=practice.status,
                     cursor=practice.cursor,
-                    pass_item_count=counts.get(practice.id, 0),
+                    pass_item_count=_listed_pass_size(
+                        definition_counts.get(practice.generation_id, 0),
+                        item_counts.get(practice.id, 0),
+                    ),
+                    session_item_count=item_counts.get(practice.id, 0),
                     mode=attempt.mode,
                     category=attempt.category,
                     submitted=attempt.submitted,
@@ -514,6 +631,12 @@ class RepositoryBundle:
 
     def set_practice_session_status(self, session_id: str, status: str) -> None:
         self._practice.set_practice_session_status(session_id, status)
+
+    def list_attempt_keys_for_session(self, session_id: str) -> list[tuple[str, str, str, str]]:
+        return self._practice.list_attempt_keys_for_session(session_id)
+
+    def advance_current_item(self, session_id: str, position: int) -> int:
+        return self._practice.advance_current_item(session_id, position)
 
     def add_attempt(self, attempt: Attempt, cursor: int) -> None:
         self._practice.add_attempt(attempt, cursor)

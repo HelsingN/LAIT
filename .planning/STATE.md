@@ -4,16 +4,16 @@ milestone: v1.0
 current_phase: 01
 current_phase_name: Mod-First Manual Learning Loop
 status: executing
-stopped_at: Plan 01-15 human checkpoint approved by the user. Phase 1 is not complete.
-last_updated: "2026-10-06T00:35:00.000Z"
+stopped_at: Plan 01-16 is approved. Phase 1 is not complete.
+last_updated: "2026-10-06T03:13:00.000Z"
 last_activity: 2026-10-06
-last_activity_desc: Plan 01-15 human checkpoint approved. Phase 1 remains open.
+last_activity_desc: The user approved the 01-16 Docker checkpoint. Phase 1 remains open.
 state_head: 8b57705a3aec0ee5d77e92ea73ecdc7e5cdc1f49
 progress:
   total_phases: 9
   completed_phases: 0
-  total_plans: 15
-  completed_plans: 15
+  total_plans: 16
+  completed_plans: 16
 milestone_name: milestone
 spec_version: 0.2.0
 ---
@@ -31,10 +31,10 @@ Current planning/specification baseline: `.planning/VERSION.md` (`0.2.0`)
 ## Current Position
 
 Phase: 01 (Mod-First Manual Learning Loop) — EXECUTING
-Plan: 15 of 15 recorded. The 01-15 checkpoint is approved. Phase 1 is not complete.
+Plan: 16 of 16 recorded. The 01-16 checkpoint is approved. Phase 1 is not complete.
 Status: Phase 1 is not complete
 Current discussion area: Complete
-Last activity: 2026-10-06 — Plan 01-15 human checkpoint approved. Phase 1 remains open.
+Last activity: 2026-10-06 — The user approved plan 01-16. Phase 1 remains open.
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -132,6 +132,7 @@ Recent decisions affecting current and future work:
 - [Phase 01]: practice.start returns the open session only when that session generation snapshot matches the current accepted set
 - [Governance]: Learner-visible plans end on a blocking-human Docker check; backend-only plans do not. Observations are classified before they become blockers. See `docs/governance/MANUAL_UI_VERIFICATION.md`.
 - [Phase 01]: UX-16/17 diagnosis is `01-13-DIAGNOSIS.md`. Follow-up plan `01-13-PLAN.md` is not executed. Slices 2–4 stay out of that plan.
+- [Phase 01]: A repeat round stays in the same session. Queue identity is learning-unit id plus mode. The opening pass size is the score denominator. A named target resolves the copy at the cursor.
 
 ### Pending Todos
 
@@ -164,9 +165,10 @@ Items acknowledged and carried forward from previous milestone close:
 | Integration | DeepSeek Harness plugin/package | Future reference integration candidate | Spec 0.2.0 |
 | Domain | Decide whether `PracticeSession` becomes a first-class core entity | Deferred until concrete orchestration/practice requirements exist | Spec 0.2.0 |
 | UX | Feedback current pass shows a heading, score, and plain labels. Hard phrases and a next-step panel were not in 01-15. | Landed in 01-15 | 2026-10-06 |
+| UX | History rows still show the expected phrase in the stored explanation and again as the unit jump. The focus card does not. | Deferred. Not a 01-16 blocker. | 2026-10-06 |
 
 ## Session Continuity
 
-Last session: 2026-10-06T00:35:00.000Z
-Stopped at: Plan 01-15 human checkpoint approved by the user. Phase 1 is not complete.
+Last session: 2026-10-06T03:13:00.000Z
+Stopped at: Plan 01-16 is approved. Phase 1 is not complete.
 Resume file: None

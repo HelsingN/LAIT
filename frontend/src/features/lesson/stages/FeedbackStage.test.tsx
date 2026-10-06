@@ -81,3 +81,47 @@ it("uses the newest session as the current pass on a plain reload", () => {
   expect(current).not.toHaveTextContent("kept earlier");
   expect(screen.getByRole("region", { name: "Earlier passes" })).toHaveTextContent("kept earlier");
 });
+
+it("scores first-try corrects against the pass size and offers missed practice", () => {
+  const rows: FeedbackAttempt[] = [
+    ...[0, 1, 2, 3, 4, 5].map((index) => ({
+      ...attempt(finished, `correct-${index}`, "completed", "typed"),
+      span_start: index,
+      span_end: index + 1,
+      pass_item_count: 8,
+    })),
+    {
+      ...attempt(finished, "miss", "completed", "drag"),
+      category: "incorrect",
+      span_start: 20,
+      span_end: 21,
+      pass_item_count: 8,
+    },
+    {
+      ...attempt(finished, "fix", "completed", "drag"),
+      category: "corrected",
+      span_start: 20,
+      span_end: 21,
+      pass_item_count: 8,
+    },
+    {
+      ...attempt(finished, "miss-2", "completed", "typed", "other"),
+      category: "incorrect",
+      span_start: 30,
+      span_end: 31,
+      pass_item_count: 8,
+    },
+  ];
+  render(
+    <FeedbackStage
+      currentSessionId={finished}
+      attempts={rows}
+      onJump={() => undefined}
+    />,
+  );
+
+  const current = screen.getByRole("region", { name: "Current pass" });
+  expect(current).toHaveTextContent("6/8");
+  expect(current).toHaveTextContent("Corrected");
+  expect(screen.queryByRole("button", { name: "Practice missed phrases" })).not.toBeInTheDocument();
+});

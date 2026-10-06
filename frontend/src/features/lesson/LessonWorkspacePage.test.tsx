@@ -803,6 +803,198 @@ describe("Lesson workspace shell", () => {
     );
   });
 
+  it("keeps the first miss after remount", async () => {
+    const sessionId = "session-miss";
+    localStorage.setItem(`lait.practice-session.${lessonId}`, sessionId);
+    localStorage.setItem(`lait.practice-attempt.${sessionId}.0`, "attempt-miss");
+    const openView = {
+      session_id: sessionId,
+      lesson_id: lessonId,
+      open: true,
+      cursor: 0,
+      current: typedItem,
+    };
+    installFetch({
+      units: [acceptedUnit],
+      latest: {
+        restorable: true,
+        generation_id: "gen-1",
+        accepted_unit_ids: ["unit-1"],
+      },
+      practiceView: jsonResponse(openView),
+      attemptList: [
+        {
+          ...historyAttempt(sessionId, "open", "attempt-miss"),
+          category: "incorrect",
+          submitted: "nope",
+          expected: "rolling out",
+          explanation: 'Your answer: "nope".',
+        },
+      ],
+    });
+    const first = renderWorkspace();
+    expect(await screen.findByRole("button", { name: "Try again" })).toBeEnabled();
+    expect(screen.getByTestId("feedback-card")).toHaveTextContent("Incorrect");
+    expect(screen.getByTestId("feedback-card")).not.toHaveTextContent("rolling out");
+
+    first.unmount();
+    localStorage.setItem(`lait.practice-reveal.${sessionId}.0`, "1");
+    renderWorkspace();
+    const card = await screen.findByTestId("feedback-card");
+    expect(card).toHaveTextContent("rolling out");
+    expect(screen.queryByRole("button", { name: "Try again" })).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Continue" })).toBeEnabled();
+  });
+
+  it("continues into the next round and keeps the opening score on exit", async () => {
+    const user = userEvent.setup();
+    const sessionId = "session-round";
+    localStorage.setItem(`lait.practice-session.${lessonId}`, sessionId);
+    localStorage.setItem(`lait.practice-attempt.${sessionId}.0`, "attempt-miss");
+    const openView = {
+      session_id: sessionId,
+      lesson_id: lessonId,
+      open: true,
+      cursor: 0,
+      current: typedItem,
+    };
+    const copy = { ...typedItem, position: 4 };
+    installFetch({
+      units: [acceptedUnit],
+      practiceView: jsonResponse(openView),
+      nextPracticeView: jsonResponse({ ...openView, cursor: 4, current: copy }),
+      attemptList: [
+        {
+          ...historyAttempt(sessionId, "exited", "attempt-ok", "I was"),
+          category: "correct",
+          pass_item_count: 4,
+          span_start: 0,
+          span_end: 5,
+        },
+        {
+          ...historyAttempt(sessionId, "exited", "attempt-ok-2", "responsible"),
+          category: "correct",
+          pass_item_count: 4,
+          span_start: 6,
+          span_end: 17,
+        },
+        {
+          ...historyAttempt(sessionId, "exited", "attempt-miss"),
+          category: "incorrect",
+          submitted: "nope",
+          expected: "rolling out",
+          explanation: 'Your answer: "nope".',
+          pass_item_count: 4,
+        },
+      ],
+    });
+    renderWorkspace();
+    expect(await screen.findByRole("button", { name: "Try again" })).toBeEnabled();
+    await user.click(screen.getByRole("button", { name: "Continue" }));
+    expect(await screen.findByRole("button", { name: "Submit Answer" })).toBeDisabled();
+    expect(screen.queryByTestId("feedback-card")).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Try again" })).not.toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Exit Practice" }));
+    const feedback = await screen.findByRole("region", { name: "Feedback" });
+    expect(within(feedback).getByRole("region", { name: "Current pass" })).toHaveTextContent("2/4");
+    expect(screen.queryByRole("button", { name: "Practice missed phrases" })).not.toBeInTheDocument();
+  });
+
+  it("keeps 2/4 after remount when repeat rows are in the list", async () => {
+    const user = userEvent.setup();
+    installFetch({
+      units: [acceptedUnit],
+      latest: {
+        restorable: true,
+        generation_id: "gen-1",
+        accepted_unit_ids: ["unit-1"],
+      },
+      attemptList: [
+        {
+          ...historyAttempt("session-kept", "exited", "attempt-1", "I was"),
+          category: "correct",
+          pass_item_count: 4,
+          span_start: 0,
+          span_end: 5,
+          mode: "drag",
+        },
+        {
+          ...historyAttempt("session-kept", "exited", "attempt-2", "rolling out"),
+          category: "incorrect",
+          pass_item_count: 4,
+          span_start: 23,
+          span_end: 34,
+          mode: "drag",
+        },
+        {
+          ...historyAttempt("session-kept", "exited", "attempt-3", "rolling out"),
+          category: "incorrect",
+          pass_item_count: 4,
+          span_start: 23,
+          span_end: 34,
+          mode: "typed",
+        },
+        {
+          ...historyAttempt("session-kept", "exited", "attempt-4", "the migration"),
+          category: "correct",
+          pass_item_count: 4,
+          span_start: 35,
+          span_end: 48,
+          mode: "typed",
+        },
+        {
+          ...historyAttempt("session-kept", "exited", "attempt-5", "rolling out"),
+          category: "corrected",
+          pass_item_count: 4,
+          span_start: 23,
+          span_end: 34,
+          mode: "drag",
+        },
+      ],
+    });
+    renderWorkspace();
+    const feedbackToggle = await screen.findByRole("button", { name: "Feedback", expanded: false });
+    await waitFor(() => expect(feedbackToggle).toBeEnabled());
+    await user.click(feedbackToggle);
+    const current = within(await screen.findByRole("region", { name: "Feedback" })).getByRole(
+      "region",
+      { name: "Current pass" },
+    );
+    expect(current).toHaveTextContent("2/4");
+    expect(current).toHaveTextContent("Incorrect");
+    expect(current).toHaveTextContent("Corrected");
+    expect(current).not.toHaveTextContent("session-kept");
+    expect(screen.queryByRole("button", { name: "Practice missed phrases" })).not.toBeInTheDocument();
+  });
+
+  it("does not paint an earlier miss onto a new position", async () => {
+    const sessionId = "session-copy";
+    localStorage.setItem(`lait.practice-session.${lessonId}`, sessionId);
+    installFetch({
+      units: [acceptedUnit],
+      practiceView: jsonResponse({
+        session_id: sessionId,
+        lesson_id: lessonId,
+        open: true,
+        cursor: 4,
+        current: { ...typedItem, position: 4 },
+      }),
+      attemptList: [
+        {
+          ...historyAttempt(sessionId, "open", "attempt-miss"),
+          category: "incorrect",
+          submitted: "nope",
+          expected: "rolling out",
+          explanation: 'Your answer: "nope".',
+        },
+      ],
+    });
+    renderWorkspace();
+    expect(await screen.findByRole("button", { name: "Submit Answer" })).toBeDisabled();
+    expect(screen.queryByRole("button", { name: "Try again" })).not.toBeInTheDocument();
+    expect(screen.queryByTestId("feedback-card")).not.toBeInTheDocument();
+  });
+
   it("clears a stored id when finish returns 404 and still shows the listed pass", async () => {
     const sessionId = "session-closed-already";
     localStorage.setItem(`lait.practice-session.${lessonId}`, sessionId);
@@ -1032,6 +1224,7 @@ function installFetch(options: {
   generateResult?: Response;
   practiceGet?: ReturnType<typeof deferred<Response>>;
   practiceView?: Response;
+  nextPracticeView?: Response;
   start?: ReturnType<typeof deferred<Response>>;
   startResult?: Response;
   latest?: unknown;
@@ -1044,6 +1237,7 @@ function installFetch(options: {
   let units = options.units.map((unit) => ({ ...unit }));
   let attemptListFailuresLeft = options.attemptListFailures ?? 0;
   let finishStatusIndex = 0;
+  let practiceReads = 0;
   const lessonBody = { ...lesson, source: options.source ?? lesson.source };
   vi.stubGlobal(
     "fetch",
@@ -1126,6 +1320,15 @@ function installFetch(options: {
       if (url.includes("/practice-sessions/") && url.endsWith("/attempts") && method === "POST") {
         return jsonResponse(submittedAttempt);
       }
+      if (url.endsWith("/advance") && method === "POST") {
+        return jsonResponse({
+          session_id: "session-advanced",
+          lesson_id: lessonId,
+          open: true,
+          cursor: 0,
+          current: typedItem,
+        });
+      }
       if (url.includes("/finish") && method === "POST") {
         const queued = options.finishStatuses?.[finishStatusIndex];
         if (options.finishStatuses) {
@@ -1147,7 +1350,11 @@ function installFetch(options: {
         if (options.practiceGet) {
           return options.practiceGet.promise;
         }
-        return options.practiceView ?? new Response("missing", { status: 404 });
+        practiceReads += 1;
+        if (practiceReads > 1 && options.nextPracticeView) {
+          return options.nextPracticeView.clone();
+        }
+        return options.practiceView?.clone() ?? new Response("missing", { status: 404 });
       }
       if (url.includes(`/api/lessons/${lessonId}`) && method === "GET") {
         return jsonResponse(lessonBody);

@@ -69,6 +69,7 @@ def _record(
         session_status=status,
         cursor=cursor,
         pass_item_count=pass_item_count,
+        session_item_count=pass_item_count,
         mode=mode,
         category="correct",
         submitted="alpha",

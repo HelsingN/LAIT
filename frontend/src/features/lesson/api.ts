@@ -2,6 +2,7 @@ export {
   acceptLearningUnit,
   addLearningUnit,
   createLesson,
+  advancePractice,
   finishPractice,
   generateExercises,
   getLesson,

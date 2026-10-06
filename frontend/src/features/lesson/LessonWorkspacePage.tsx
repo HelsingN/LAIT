@@ -5,6 +5,7 @@ import { Link, useParams } from "react-router";
 
 import { FocusPracticeMode } from "./FocusPracticeMode.tsx";
 import {
+  advancePractice,
   finishPractice,
   generateExercises,
   getLesson,
@@ -17,7 +18,6 @@ import {
   startOverPractice,
   startPractice,
   submitAttempt,
-  type AttemptResult,
   type GenerationResult,
   type LearningUnit,
   type LessonAttempt,
@@ -26,15 +26,18 @@ import {
 import styles from "./LessonWorkspacePage.module.css";
 import { type CodePointRange } from "./selectionOffsets.ts";
 import { FeedbackStage } from "./stages/FeedbackStage.tsx";
+import type { RendererFeedback } from "../../registries/renderers/types.ts";
 import { GenerateExercisesStage } from "./stages/GenerateExercisesStage.tsx";
 import { LearningUnitsStage } from "./stages/LearningUnitsStage.tsx";
 import { PracticeStage } from "./stages/PracticeStage.tsx";
 import { SourceStage } from "./stages/SourceStage.tsx";
 import {
+  attemptStorageKey,
   clearOpenPracticeSessionId,
   isPracticeOpen,
   loadOpenPracticeSessionId,
   loadStageExpansion,
+  revealStorageKey,
   saveOpenPracticeSessionId,
   saveStageExpansion,
   type StageExpansion,
@@ -104,7 +107,8 @@ export function LessonWorkspacePage() {
   const [practiceUnlocked, setPracticeUnlocked] = useState(false);
   const [focused, setFocused] = useState(false);
   const [session, setSession] = useState<PracticeView | null>(null);
-  const [feedback, setFeedback] = useState<AttemptResult | null>(null);
+  const [feedback, setFeedback] = useState<RendererFeedback | null>(null);
+  const [revealed, setRevealed] = useState(false);
   const [attempts, setAttempts] = useState<LessonAttempt[]>([]);
   const [feedbackUnlocked, setFeedbackUnlocked] = useState(false);
   const [currentPassSessionId, setCurrentPassSessionId] = useState<string | null>(null);
@@ -160,7 +164,7 @@ export function LessonWorkspacePage() {
     let cancelled = false;
     setPendingStoredSession(true);
     void getPractice(sessionId)
-      .then((view) => {
+      .then(async (view) => {
         if (cancelled) {
           return;
         }
@@ -169,9 +173,36 @@ export function LessonWorkspacePage() {
           return;
         }
         setPendingStoredSession(false);
-        if (view.open) {
+        if (view.open && view.current) {
           setSession(view);
           setFocused(true);
+          const listed = await listLessonAttempts(id);
+          if (cancelled) {
+            return;
+          }
+          const current = view.current;
+          const marked = localStorage.getItem(attemptStorageKey(view.session_id, current.position));
+          const rows = listed.filter(
+            (row) =>
+              row.session_id === view.session_id &&
+              row.mode === current.mode &&
+              row.span_start === current.start &&
+              row.span_end === current.end,
+          );
+          const latest = rows[rows.length - 1];
+          if (marked && latest?.attempt_id === marked && latest.category === "incorrect") {
+            const shown = localStorage.getItem(revealStorageKey(view.session_id, current.position)) === "1";
+            setRevealed(shown);
+            setFeedback({
+              category: latest.category,
+              submitted: latest.submitted,
+              expected: latest.expected,
+              explanation: latest.explanation,
+              chunks_used: [],
+              chunks_missed: [],
+              natural_alternative: null,
+            });
+          }
           return;
         }
         clearOpenPracticeSessionId(id);
@@ -267,6 +298,7 @@ export function LessonWorkspacePage() {
       saveOpenPracticeSessionId(id, view.session_id);
       setSession(view);
       setFeedback(null);
+      setRevealed(false);
       setSubmitError(null);
       setFocused(true);
     } catch {
@@ -290,6 +322,11 @@ export function LessonWorkspacePage() {
         submittedUnitId: answer.submittedUnitId,
         targetLearningUnitId: session.current.learning_unit_id,
       });
+      localStorage.setItem(
+        attemptStorageKey(session.session_id, session.current.position),
+        result.attempt_id,
+      );
+      setRevealed(false);
       setFeedback(result);
     } catch {
       setSubmitError("Could not submit. Try again.");
@@ -369,18 +406,43 @@ export function LessonWorkspacePage() {
     await revealPass(historyRetryId);
   }
 
+  async function handleTryAgain() {
+    setFeedback(null);
+    setRevealed(false);
+    setSubmitError(null);
+  }
+
+  function handleShowAnswer() {
+    if (!session?.current || !feedback) {
+      return;
+    }
+    localStorage.setItem(revealStorageKey(session.session_id, session.current.position), "1");
+    setRevealed(true);
+  }
+
   async function handleContinue() {
     if (!session) {
       return;
     }
-    const view = await getPractice(session.session_id);
-    if (view.open && view.current === null) {
-      await closeSession(view.session_id, true);
-      return;
+    const position = session.current?.position;
+    const skip =
+      position !== undefined && (feedback?.category === "incorrect" || revealed);
+    try {
+      if (skip) {
+        await advancePractice(session.session_id, position);
+      }
+      const view = await getPractice(session.session_id);
+      if (view.open && view.current === null) {
+        await closeSession(view.session_id, true);
+        return;
+      }
+      setSession(view);
+      setFeedback(null);
+      setRevealed(false);
+      setSubmitError(null);
+    } catch {
+      setSubmitError("Could not continue. Try again.");
     }
-    setSession(view);
-    setFeedback(null);
-    setSubmitError(null);
   }
 
   async function handleExit() {
@@ -398,6 +460,7 @@ export function LessonWorkspacePage() {
     saveOpenPracticeSessionId(id, view.session_id);
     setSession(view);
     setFeedback(null);
+    setRevealed(false);
     setSubmitError(null);
   }
 
@@ -441,8 +504,11 @@ export function LessonWorkspacePage() {
           pending={submitPending}
           submitError={submitError}
           feedback={feedback}
+          revealed={revealed}
           onSubmit={(answer) => void handleSubmit(answer)}
           onContinue={() => void handleContinue()}
+          onTryAgain={handleTryAgain}
+          onShowAnswer={handleShowAnswer}
           onExit={() => void handleExit()}
           onStartOver={() => void handleStartOver()}
         />

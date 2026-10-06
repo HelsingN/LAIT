@@ -35,7 +35,7 @@ This roadmap grows the product through vertical MVP slices that keep the learnin
   4. Maintainer can inspect active modules and capabilities, invoke the workflow through documented commands and queries, add a proof exercise contribution through the public registry and renderer seams without changing core domain services, and see startup reject invalid or incompatible module catalogs.
   5. Maintainer can generate the TypeScript client from OpenAPI, have CI detect an unreviewed contract/client mismatch, and test the core, persistence adapter, and bundled modules independently.
 
-**Plans:** 15/15 plans executed
+**Plans:** 16 plans
 
 Plans:
 - [x] 01-01-PLAN.md
@@ -53,6 +53,7 @@ Plans:
 - [x] 01-13-PLAN.md — Restore a matching generation and attempts after reload, and end the pass on the last Continue
 - [x] 01-14-PLAN.md — Widen the workspace and make preparation actions obvious
 - [x] 01-15-PLAN.md — Close the five practice and feedback UX gaps from UAT G-01-1
+- [x] 01-16-PLAN.md — Retry a miss in the same pass, then continue into still-uncorrected items
 
 **UI hint:** yes
 

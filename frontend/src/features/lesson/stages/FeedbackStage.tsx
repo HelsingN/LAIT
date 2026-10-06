@@ -10,6 +10,7 @@ export type FeedbackAttempt = {
   session_id: string;
   session_disposition: string;
   mode: string;
+  pass_item_count?: number;
 };
 
 type FeedbackStageProps = {
@@ -35,12 +36,28 @@ function categoryLabel(category: string): string {
   if (category === "incorrect") {
     return "Incorrect";
   }
+  if (category === "corrected") {
+    return "Corrected";
+  }
   return category;
 }
 
+function itemKey(attempt: FeedbackAttempt): string {
+  return `${attempt.mode}:${attempt.span_start}:${attempt.span_end}`;
+}
+
 function scoreLabel(attempts: FeedbackAttempt[]): string {
-  const correct = attempts.filter((attempt) => attempt.category === "correct").length;
-  return `${correct}/${attempts.length}`;
+  const first = new Map<string, string>();
+  for (const attempt of attempts) {
+    const key = itemKey(attempt);
+    if (!first.has(key)) {
+      first.set(key, attempt.category);
+    }
+  }
+  const correct = [...first.values()].filter((category) => category === "correct").length;
+  const declared = attempts.find((attempt) => attempt.pass_item_count !== undefined)?.pass_item_count;
+  const denominator = declared !== undefined && declared > 0 ? declared : first.size;
+  return `${correct}/${denominator}`;
 }
 
 function passLabel(disposition: string): string {

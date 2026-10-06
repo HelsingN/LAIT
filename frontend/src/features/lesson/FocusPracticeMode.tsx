@@ -16,8 +16,11 @@ type FocusPracticeModeProps = {
   pending: boolean;
   submitError: string | null;
   feedback: RendererFeedback | null;
+  revealed?: boolean;
   onSubmit: RendererProps["onSubmit"];
   onContinue: () => void;
+  onTryAgain?: () => void;
+  onShowAnswer?: () => void;
   onExit: () => void;
   onStartOver: () => void;
 };
@@ -30,8 +33,11 @@ export function FocusPracticeMode({
   pending,
   submitError,
   feedback,
+  revealed = false,
   onSubmit,
   onContinue,
+  onTryAgain,
+  onShowAnswer,
   onExit,
   onStartOver,
 }: FocusPracticeModeProps) {
@@ -49,8 +55,11 @@ export function FocusPracticeMode({
           pending={pending}
           submitError={submitError}
           feedback={feedback}
+          revealed={revealed}
           onSubmit={onSubmit}
           onContinue={onContinue}
+          onTryAgain={onTryAgain}
+          onShowAnswer={onShowAnswer}
         />
       ) : null}
       <div className={styles.nav}>

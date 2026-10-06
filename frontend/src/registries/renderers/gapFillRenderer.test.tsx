@@ -259,7 +259,44 @@ it("shows a labeled typed answer and locks it after a grade", () => {
 
   expect(screen.getByRole("textbox", { name: "Answer" })).toBeDisabled();
   expect(screen.getByRole("button", { name: "Continue" })).toBeEnabled();
+  expect(screen.getByRole("button", { name: "Try again" })).toBeEnabled();
+  expect(screen.getByRole("button", { name: "Show answer" })).toBeEnabled();
   expect(screen.queryByRole("button", { name: "Retry" })).not.toBeInTheDocument();
+  expect(screen.getByTestId("feedback-card")).toHaveTextContent("Incorrect");
+  expect(screen.getByTestId("feedback-card")).toHaveTextContent("nope");
+  expect(screen.getByTestId("feedback-card")).not.toHaveTextContent("rolling out");
+});
+
+it("clears a typed draft when the grade is cleared for another try", async () => {
+  const user = userEvent.setup();
+  const item = { ...dragItem, mode: "typed" };
+  const props = {
+    item,
+    units: [],
+    pending: false,
+    submitError: null,
+    onSubmit: () => undefined,
+    onContinue: () => undefined,
+  };
+  const { rerender } = render(<GapFillRenderer {...props} feedback={null} />);
+  await user.type(screen.getByRole("textbox", { name: "Answer" }), "nope");
+  rerender(
+    <GapFillRenderer
+      {...props}
+      feedback={{
+        category: "incorrect",
+        submitted: "nope",
+        expected: "rolling out",
+        explanation: "miss",
+        chunks_used: [],
+        chunks_missed: [],
+        natural_alternative: null,
+      }}
+    />,
+  );
+  rerender(<GapFillRenderer {...props} feedback={null} />);
+  expect(screen.getByRole("textbox", { name: "Answer" })).toHaveValue("");
+  expect(screen.getByRole("button", { name: "Submit Answer" })).toBeDisabled();
 });
 
 it("ignores chip clicks after a grade", async () => {

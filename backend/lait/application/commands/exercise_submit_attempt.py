@@ -86,7 +86,15 @@ def handle(
     evaluation = load_evaluate(definition.module_package)(definition_to_item(definition), answer)
     clock = now or (lambda: datetime.now(UTC))
     mint = new_id or (lambda: str(uuid4()))
-    cursor = practice.cursor + 1 if advance else practice.cursor
+    prior = units.list_attempt_keys_for_session(practice.id)  # type: ignore[attr-defined]
+    prior_incorrect = any(
+        unit_id == item.learning_unit_id and mode == item.mode and category == "incorrect"
+        for _attempt_id, unit_id, mode, category in prior
+    )
+    category = evaluation.category
+    if category == "correct" and prior_incorrect:
+        category = "corrected"
+    cursor = practice.cursor
     attempt = Attempt(
         id=mint(),
         session_id=practice.id,
@@ -96,7 +104,7 @@ def handle(
         unit_text=unit.text,
         mode=item.mode,
         submitted=evaluation.submitted,
-        category=evaluation.category,
+        category=category,
         expected=evaluation.expected,
         explanation=evaluation.explanation,
         chunks_used=evaluation.chunks_used,
@@ -105,6 +113,8 @@ def handle(
         created_at=clock(),
     )
     units.add_attempt(attempt, cursor)  # type: ignore[attr-defined]
+    if advance and category in {"correct", "corrected"}:
+        cursor = units.advance_current_item(practice.id, practice.cursor)  # type: ignore[attr-defined]
     return SubmitResult(
         attempt_id=attempt.id,
         session_open=True,
@@ -140,15 +150,20 @@ def _resolve_item(practice: PracticeSession, command: SubmitAttempt) -> tuple[Pa
         if practice.cursor >= len(practice.items):
             raise NoCurrentItemError(practice.id)
         return practice.items[practice.cursor], True
-    matches = [
+    if practice.cursor < len(practice.items):
+        current = practice.items[practice.cursor]
+        if (
+            current.learning_unit_id == command.target_learning_unit_id
+            and current.mode == command.kind
+        ):
+            return current, True
+    past = [
         item
         for item in practice.items
-        if item.learning_unit_id == command.target_learning_unit_id and item.mode == command.kind
+        if item.learning_unit_id == command.target_learning_unit_id
+        and item.mode == command.kind
+        and item.position < practice.cursor
     ]
-    if not matches:
+    if not past:
         raise NoCurrentItemError(practice.id)
-    item = matches[0]
-    if item.position > practice.cursor:
-        raise NoCurrentItemError(practice.id)
-    advance = item.position == practice.cursor and practice.cursor < len(practice.items)
-    return item, advance
+    return past[0], False

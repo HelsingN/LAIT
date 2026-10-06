@@ -39,6 +39,14 @@ export function saveStageExpansion(lessonId: string, expansion: StageExpansion):
   localStorage.setItem(stageStorageKey(lessonId), JSON.stringify(expansion));
 }
 
+export function revealStorageKey(sessionId: string, position: number): string {
+  return `lait.practice-reveal.${sessionId}.${position}`;
+}
+
+export function attemptStorageKey(sessionId: string, position: number): string {
+  return `lait.practice-attempt.${sessionId}.${position}`;
+}
+
 export function practiceSessionStorageKey(lessonId: string): string {
   return `lait.practice-session.${lessonId}`;
 }
