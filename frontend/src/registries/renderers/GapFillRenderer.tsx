@@ -18,6 +18,7 @@ export function GapFillRenderer({
 }: RendererProps) {
   const [draft, setDraft] = useState("");
   const [selectedUnitId, setSelectedUnitId] = useState<string | null>(null);
+  const [answerEditable, setAnswerEditable] = useState(false);
   const drag = item.mode === "drag";
   const graded = feedback !== null;
   const missed = feedback?.category === "incorrect" && !revealed;
@@ -78,8 +79,19 @@ export function GapFillRenderer({
             id="gap-fill-answer"
             className={styles.answer}
             aria-describedby="gap-fill-instruction"
+            autoComplete="off"
+            autoCorrect="off"
+            autoCapitalize="none"
+            data-1p-ignore="true"
+            data-lpignore="true"
+            data-form-type="other"
+            readOnly={!answerEditable}
             value={draft}
             disabled={graded}
+            onFocus={(event) => {
+              event.currentTarget.readOnly = false;
+              setAnswerEditable(true);
+            }}
             onChange={(event) => setDraft(event.target.value)}
           />
         </>

@@ -232,6 +232,8 @@ it("shows a labeled typed answer and locks it after a grade", () => {
   );
 
   const answer = screen.getByRole("textbox", { name: "Answer" });
+  expect(answer).toHaveAttribute("autocomplete", "off");
+  expect(answer).toHaveAttribute("readonly");
   expect(screen.getByText("Type the missing words.")).toBeVisible();
   expect(answer).toHaveAccessibleDescription("Type the missing words.");
   const css = readFileSync(join(testDirectory, "GapFillRenderer.module.css"), "utf8");
