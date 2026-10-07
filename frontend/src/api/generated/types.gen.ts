@@ -5,6 +5,16 @@ export type ClientOptions = {
 };
 
 /**
+ * AdvanceBody
+ */
+export type AdvanceBody = {
+    /**
+     * Position
+     */
+    position: number;
+};
+
+/**
  * AttemptListItemResponse
  */
 export type AttemptListItemResponse = {
@@ -41,6 +51,22 @@ export type AttemptListItemResponse = {
      */
     explanation: string;
     /**
+     * Chunks Used
+     */
+    chunks_used: Array<string>;
+    /**
+     * Chunks Missed
+     */
+    chunks_missed: Array<string>;
+    /**
+     * Natural Alternative
+     */
+    natural_alternative: string | null;
+    /**
+     * Learning Unit Id
+     */
+    learning_unit_id: string;
+    /**
      * Unit Text
      */
     unit_text: string;
@@ -52,6 +78,10 @@ export type AttemptListItemResponse = {
      * Span End
      */
     span_end: number;
+    /**
+     * Pass Item Count
+     */
+    pass_item_count: number;
     /**
      * Created At
      */
@@ -900,6 +930,36 @@ export type ExerciseSubmitAttemptResponses = {
 };
 
 export type ExerciseSubmitAttemptResponse = ExerciseSubmitAttemptResponses[keyof ExerciseSubmitAttemptResponses];
+
+export type PracticeAdvanceData = {
+    body: AdvanceBody;
+    path: {
+        /**
+         * Session Id
+         */
+        session_id: string;
+    };
+    query?: never;
+    url: '/api/practice-sessions/{session_id}/advance';
+};
+
+export type PracticeAdvanceErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type PracticeAdvanceError = PracticeAdvanceErrors[keyof PracticeAdvanceErrors];
+
+export type PracticeAdvanceResponses = {
+    /**
+     * Successful Response
+     */
+    200: PracticeResponse;
+};
+
+export type PracticeAdvanceResponse = PracticeAdvanceResponses[keyof PracticeAdvanceResponses];
 
 export type PracticeFinishData = {
     body?: never;

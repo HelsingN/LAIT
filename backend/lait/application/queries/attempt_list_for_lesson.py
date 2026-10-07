@@ -28,6 +28,10 @@ class ListedAttempt:
     submitted: str
     expected: str
     explanation: str
+    chunks_used: tuple[str, ...]
+    chunks_missed: tuple[str, ...]
+    natural_alternative: str | None
+    learning_unit_id: str
     unit_text: str
     span_start: int
     span_end: int
@@ -63,6 +67,10 @@ def handle(lesson_id: str, repository: AttemptListRepository) -> AttemptList:
                 submitted=row.submitted,
                 expected=row.expected,
                 explanation=row.explanation,
+                chunks_used=row.chunks_used,
+                chunks_missed=row.chunks_missed,
+                natural_alternative=row.natural_alternative,
+                learning_unit_id=row.learning_unit_id,
                 unit_text=row.unit_text,
                 span_start=row.span_start,
                 span_end=row.span_end,

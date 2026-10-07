@@ -85,19 +85,16 @@
   opacity: 0.7;
 }
 
-.card {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-sm);
-  width: 100%;
+.answered {
   max-width: 100%;
-  padding: var(--space-md);
   overflow-wrap: anywhere;
-  background: var(--color-dominant);
+  white-space: pre-wrap;
+  border-color: currentColor;
 }
 
-.card p {
-  margin: 0;
+.accepted {
+  color: var(--color-accent);
+  font-weight: 600;
 }
 
 .correct {

@@ -17,6 +17,7 @@ export type PracticeItemView = {
 };
 
 export type RendererFeedback = {
+  attempt_id?: string;
   category: string;
   submitted: string;
   expected: string;

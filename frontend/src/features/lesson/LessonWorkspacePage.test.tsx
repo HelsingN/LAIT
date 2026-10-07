@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import "@testing-library/jest-dom/vitest";
-import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { readFileSync, readdirSync } from "node:fs";
@@ -10,6 +10,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { MemoryRouter, Route, Routes } from "react-router";
 
 import { LessonWorkspacePage } from "./LessonWorkspacePage.tsx";
+import * as focusModule from "./FocusPracticeMode.tsx";
 
 const lessonId = "lesson-1";
 const sourceText = "I was responsible for rolling out the migration.";
@@ -85,6 +86,7 @@ afterEach(() => {
   cleanup();
   localStorage.clear();
   vi.unstubAllGlobals();
+  vi.restoreAllMocks();
 });
 
 describe("Lesson workspace shell", () => {
@@ -838,11 +840,12 @@ describe("Lesson workspace shell", () => {
     expect(screen.getByTestId("feedback-card")).not.toHaveTextContent("rolling out");
 
     first.unmount();
-    localStorage.setItem(`lait.practice-reveal.${sessionId}.0`, "1");
+    localStorage.setItem(`lait.practice-reveal.${sessionId}.0`, JSON.stringify({ version: 1, session_id: sessionId, attempt_id: "attempt-miss", item: typedItem }));
     renderWorkspace();
     const card = await screen.findByTestId("feedback-card");
     expect(card).toHaveTextContent("rolling out");
-    expect(screen.queryByRole("button", { name: "Try again" })).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Try again" })).toBeEnabled();
+    expect(screen.getByTestId("gap-fill-blank")).toHaveTextContent("rolling out");
     expect(screen.getByRole("button", { name: "Continue" })).toBeEnabled();
   });
 
@@ -1158,6 +1161,343 @@ describe("Lesson workspace shell", () => {
 
 const testDirectory = dirname(fileURLToPath(import.meta.url));
 
+describe("Exact saved feedback presentation", () => {
+  function store(sessionId: string, item = typedItem, category = "incorrect") {
+    localStorage.setItem(`lait.practice-session.${lessonId}`, sessionId);
+    localStorage.setItem(`lait.practice-attempt.${sessionId}.${item.position}`, "attempt-exact");
+    localStorage.setItem(`lait.practice-feedback.${lessonId}.${sessionId}`, JSON.stringify({
+      version: 1, session_id: sessionId, attempt_id: "attempt-exact", item,
+      response_cursor: item.position + (category === "incorrect" ? 0 : 1),
+    }));
+  }
+
+  it("restores actual rich payload from the exact row, not the newest repeat row; reveal survives remount without mutations", async () => {
+    const focusSpy = vi.spyOn(focusModule, "FocusPracticeMode");
+    const sessionId = "session-exact";
+    const item = { ...typedItem, position: 4 };
+    store(sessionId, item);
+    const calls = installFetch({ units: [acceptedUnit], practiceView: jsonResponse({ session_id: sessionId, lesson_id: lessonId, open: true, cursor: 4, current: item }),
+      attemptList: [
+        { ...historyAttempt(sessionId, "open", "attempt-exact"), category: "incorrect", submitted: "nope", explanation: "Original teaching for this saved attempt." },
+        { ...historyAttempt(sessionId, "open", "newest-other-copy"), category: "incorrect", submitted: "other copy" },
+      ] });
+    const first = renderWorkspace();
+    let card = await screen.findByTestId("feedback-card");
+    expect(card).toHaveTextContent("nope");
+    expect(card).not.toHaveTextContent("other copy");
+    expect(screen.getByTestId("gap-fill-blank")).toHaveTextContent("nope");
+    expect(within(card).queryByText("Details")).not.toBeInTheDocument();
+    expect(card.innerHTML).not.toContain("Original teaching");
+    expect(card.innerHTML).not.toContain("follow through");
+    await userEvent.setup().click(screen.getByRole("button", { name: "Show answer" }));
+    expect(screen.getByTestId("gap-fill-blank")).toHaveTextContent("rolling out");
+    expect(card).not.toHaveTextContent("Original teaching for this saved attempt.");
+    expect(card).not.toHaveTextContent("follow through");
+    expect(card).not.toHaveTextContent("deploying the change");
+    first.unmount();
+    renderWorkspace();
+    card = await screen.findByTestId("feedback-card");
+    expect(card).toHaveTextContent("rolling out");
+    expect(screen.queryByRole("textbox", { name: "Answer" })).not.toBeInTheDocument();
+    expect(focusSpy.mock.lastCall?.[0].feedback).toEqual({
+      attempt_id: "attempt-exact", category: "incorrect", submitted: "nope", expected: "rolling out",
+      explanation: "Original teaching for this saved attempt.", chunks_used: ["follow through"],
+      chunks_missed: ["rolling out"], natural_alternative: "deploying the change",
+    });
+    expect(calls.filter(call => call.method === "POST")).toHaveLength(0);
+  });
+
+  it.each(["1", "{bad", JSON.stringify({ version: 1, session_id: "session-stale", attempt_id: "older", item: typedItem })])("fails closed for a legacy/corrupt/stale reveal %s", async (raw) => {
+    const sessionId = "session-stale";
+    store(sessionId);
+    localStorage.setItem(`lait.practice-reveal.${sessionId}.0`, raw);
+    installFetch({ units: [acceptedUnit], practiceView: jsonResponse({ session_id: sessionId, lesson_id: lessonId, open: true, cursor: 0, current: typedItem }),
+      attemptList: [{ ...historyAttempt(sessionId, "open", "attempt-exact"), category: "incorrect", submitted: "nope" }] });
+    renderWorkspace();
+    const card = await screen.findByTestId("feedback-card");
+    expect(card.innerHTML).not.toContain("rolling out");
+    expect(card.innerHTML).not.toContain("deploying the change");
+    expect(screen.getByRole("button", { name: "Show answer" })).toBeEnabled();
+  });
+
+  it.each(["correct", "corrected"])("restores final %s before Continue without finishing the exhausted cursor", async (category) => {
+    const sessionId = "session-final";
+    store(sessionId, typedItem, category);
+    const calls = installFetch({ units: [acceptedUnit], practiceView: jsonResponse({ session_id: sessionId, lesson_id: lessonId, open: true, cursor: 1, current: null }),
+      attemptList: [{ ...historyAttempt(sessionId, "open", "attempt-exact"), category }] });
+    renderWorkspace();
+    const card = await screen.findByTestId("feedback-card");
+    expect(within(card).getByTestId("gap-fill-blank")).toHaveTextContent("rolling out");
+    expect(within(card).getByTestId("gap-fill-blank").className).toMatch(/accepted/);
+    expect(screen.queryByRole("textbox", { name: "Answer" })).not.toBeInTheDocument();
+    expect(within(card).queryByTestId("submitted-answer")).not.toBeInTheDocument();
+    expect(within(card).queryByTestId("reference-answer")).not.toBeInTheDocument();
+    expect(screen.getByTestId("gap-fill-sentence")).toHaveTextContent("I was responsible for");
+    expect(calls.filter(call => call.method === "POST")).toHaveLength(0);
+    await userEvent.setup().click(screen.getByRole("button", { name: "Continue" }));
+    await screen.findByRole("region", { name: "Current pass" });
+    expect(calls.filter(call => call.url.endsWith("/finish"))).toHaveLength(1);
+  });
+
+  it("keeps the open session and pending pointer on history failure and retries the read without finish", async () => {
+    const sessionId = "session-read-error";
+    store(sessionId);
+    const calls = installFetch({ units: [acceptedUnit], attemptListFailures: 2,
+      practiceView: jsonResponse({ session_id: sessionId, lesson_id: lessonId, open: true, cursor: 0, current: typedItem }),
+      attemptList: [{ ...historyAttempt(sessionId, "open", "attempt-exact"), category: "incorrect", submitted: "nope" }] });
+    renderWorkspace();
+    expect(await screen.findByRole("alert")).toHaveTextContent("Could not load practice history.");
+    expect(localStorage.getItem(`lait.practice-session.${lessonId}`)).toBe(sessionId);
+    expect(localStorage.getItem(`lait.practice-feedback.${lessonId}.${sessionId}`)).not.toBeNull();
+    await userEvent.setup().click(screen.getByRole("button", { name: "Retry history" }));
+    expect(await screen.findByTestId("feedback-card")).toHaveTextContent("nope");
+    expect(calls.filter(call => call.method === "POST")).toHaveLength(0);
+  });
+
+  it("ignores a late saved-history result after Start Over replaces the session", async () => {
+    const sessionId = "session-late";
+    store(sessionId);
+    const history = deferred<Response>();
+    const calls = installFetch({ units: [acceptedUnit], attemptGet: history,
+      practiceView: jsonResponse({ session_id: sessionId, lesson_id: lessonId, open: true, cursor: 0, current: typedItem }),
+      startOverResult: jsonResponse({ session_id: "session-new", lesson_id: lessonId, open: true, cursor: 0, current: typedItem }) });
+    renderWorkspace();
+    await userEvent.setup().click(await screen.findByRole("button", { name: "Start Over" }));
+    await userEvent.setup().click(within(screen.getByRole("alertdialog", { name: "Start Over" })).getByRole("button", { name: "Start Over" }));
+    await waitFor(() => expect(localStorage.getItem(`lait.practice-session.${lessonId}`)).toBe("session-new"));
+    history.resolve(jsonResponse({ attempts: [{ ...historyAttempt(sessionId, "open", "attempt-exact"), category: "incorrect", submitted: "old answer" }] }));
+    await waitFor(() => expect(screen.getByRole("button", { name: "Submit Answer" })).toBeDisabled());
+    expect(screen.queryByTestId("feedback-card")).not.toBeInTheDocument();
+    expect(calls.filter(call => call.url.endsWith("/finish"))).toHaveLength(0);
+  });
+
+  it.each([undefined, ["good", 3], null])("rejects missing/corrupt saved chunks %s instead of synthesizing empty feedback", async (chunks) => {
+    const sessionId = "session-corrupt";
+    store(sessionId);
+    const calls = installFetch({ units: [acceptedUnit], practiceView: jsonResponse({ session_id: sessionId, lesson_id: lessonId, open: true, cursor: 0, current: typedItem }),
+      attemptList: [{ ...historyAttempt(sessionId, "open", "attempt-exact"), category: "incorrect", chunks_used: chunks }] });
+    renderWorkspace();
+    expect(await screen.findByRole("alert")).toHaveTextContent("Could not load practice history.");
+    expect(screen.queryByTestId("feedback-card")).not.toBeInTheDocument();
+    expect(localStorage.getItem(`lait.practice-session.${lessonId}`)).toBe(sessionId);
+    expect(calls.filter(call => call.method === "POST")).toHaveLength(0);
+  });
+
+  it("ignores a late submit after Start Over and cannot save its pending/reveal binding on the new session", async () => {
+    const sessionId = "session-submit-late";
+    localStorage.setItem(`lait.practice-session.${lessonId}`, sessionId);
+    const submit = deferred<Response>();
+    const calls = installFetch({ units: [acceptedUnit], submit,
+      practiceView: jsonResponse({ session_id: sessionId, lesson_id: lessonId, open: true, cursor: 0, current: typedItem }),
+      startOverResult: jsonResponse({ session_id: "session-new-submit", lesson_id: lessonId, open: true, cursor: 0, current: typedItem }) });
+    renderWorkspace();
+    const user = userEvent.setup();
+    const input = await screen.findByRole("textbox", { name: "Answer" });
+    await user.type(input, "rolling out");
+    await waitFor(() => expect(screen.getByRole("button", { name: "Submit Answer" })).toBeEnabled());
+    await user.click(screen.getByRole("button", { name: "Submit Answer" }));
+    await user.click(screen.getByRole("button", { name: "Start Over" }));
+    await user.click(within(screen.getByRole("alertdialog", { name: "Start Over" })).getByRole("button", { name: "Start Over" }));
+    await waitFor(() => expect(localStorage.getItem(`lait.practice-session.${lessonId}`)).toBe("session-new-submit"));
+    submit.resolve(jsonResponse(submittedAttempt));
+    await waitFor(() => expect(screen.getByRole("button", { name: "Submit Answer" })).toBeDisabled());
+    expect(screen.queryByTestId("feedback-card")).not.toBeInTheDocument();
+    expect(localStorage.getItem(`lait.practice-feedback.${lessonId}.${sessionId}`)).toBeNull();
+    expect(calls.filter(call => call.url.endsWith("/finish"))).toHaveLength(0);
+  });
+
+  it.each(["correct", "corrected"])("restores non-final %s on the captured item, not the next server item", async (category) => {
+    const sessionId = "session-prior-success";
+    store(sessionId, typedItem, category);
+    installFetch({ units: [acceptedUnit], practiceView: jsonResponse({ session_id: sessionId, lesson_id: lessonId, open: true, cursor: 1,
+      current: { ...typedItem, position: 1, target_text: "next phrase", learning_unit_id: "unit-next", sentence: "Next prompt", segments: [{ kind: "text", text: "Next prompt" }] } }),
+      attemptList: [{ ...historyAttempt(sessionId, "open", "attempt-exact"), category }] });
+    renderWorkspace();
+    expect(await screen.findByTestId("feedback-card")).toHaveTextContent("rolling out");
+    expect(screen.getByTestId("gap-fill-sentence")).not.toHaveTextContent("Next prompt");
+  });
+
+  it("local retry clears the pending pointer so remount cannot resurrect the old miss or reveal", async () => {
+    const sessionId = "session-local-retry";
+    store(sessionId);
+    installFetch({ units: [acceptedUnit], practiceView: jsonResponse({ session_id: sessionId, lesson_id: lessonId, open: true, cursor: 0, current: typedItem }),
+      attemptList: [{ ...historyAttempt(sessionId, "open", "attempt-exact"), category: "incorrect", submitted: "nope" }] });
+    const first = renderWorkspace();
+    await userEvent.setup().click(await screen.findByRole("button", { name: "Try again" }));
+    first.unmount();
+    renderWorkspace();
+    await screen.findByRole("textbox", { name: "Answer" });
+    expect(screen.queryByTestId("feedback-card")).not.toBeInTheDocument();
+    expect(localStorage.getItem(`lait.practice-feedback.${lessonId}.${sessionId}`)).toBeNull();
+  });
+
+  it("discards a pending snapshot whose target identity differs from the saved attempt", async () => {
+    const sessionId = "session-bad-identity";
+    store(sessionId, { ...typedItem, learning_unit_id: "other-unit" }, "correct");
+    installFetch({ units: [acceptedUnit], practiceView: jsonResponse({ session_id: sessionId, lesson_id: lessonId, open: true, cursor: 1, current: { ...typedItem, position: 1 } }),
+      attemptList: [historyAttempt(sessionId, "open", "attempt-exact")] });
+    renderWorkspace();
+    await screen.findByRole("textbox", { name: "Answer" });
+    await waitFor(() => expect(localStorage.getItem(`lait.practice-feedback.${lessonId}.${sessionId}`)).toBeNull());
+    expect(screen.queryByTestId("feedback-card")).not.toBeInTheDocument();
+  });
+
+  it("cannot persist a late submit after the workspace unmounts", async () => {
+    const submit = deferred<Response>();
+    installFetch({ units: [acceptedUnit], latest: { restorable: true, generation_id: "gen-1", accepted_unit_ids: ["unit-1"] }, submit,
+      startResult: jsonResponse({ session_id: "session-unmounted", lesson_id: lessonId, open: true, cursor: 0, current: typedItem }) });
+    const first = renderWorkspace();
+    const user = userEvent.setup();
+    await user.click(await screen.findByRole("button", { name: "Start Practice" }));
+    await user.type(screen.getByRole("textbox", { name: "Answer" }), "rolling out");
+    await user.click(screen.getByRole("button", { name: "Submit Answer" }));
+    first.unmount();
+    submit.resolve(jsonResponse(submittedAttempt));
+    await new Promise(resolve => setTimeout(resolve, 20));
+    expect(localStorage.getItem(`lait.practice-attempt.session-unmounted.0`)).toBeNull();
+    expect(localStorage.getItem(`lait.practice-feedback.${lessonId}.session-unmounted`)).toBeNull();
+  });
+
+  it.each(["session", "position", "unit", "mode", "span", "target"])("rejects a reveal with a mismatched %s binding", async (field) => {
+    const sessionId = "session-binding";
+    store(sessionId);
+    const item = { ...typedItem };
+    if (field === "position") item.position = 4;
+    if (field === "unit") item.learning_unit_id = "other";
+    if (field === "mode") item.mode = "drag";
+    if (field === "span") item.start = 22;
+    if (field === "target") item.target_text = "different target";
+    localStorage.setItem(`lait.practice-reveal.${sessionId}.0`, JSON.stringify({ version: 1, session_id: field === "session" ? "other" : sessionId, attempt_id: "attempt-exact", item }));
+    installFetch({ units: [acceptedUnit], practiceView: jsonResponse({ session_id: sessionId, lesson_id: lessonId, open: true, cursor: 0, current: typedItem }),
+      attemptList: [{ ...historyAttempt(sessionId, "open", "attempt-exact"), category: "incorrect", submitted: "nope" }] });
+    renderWorkspace();
+    expect((await screen.findByTestId("feedback-card")).innerHTML).not.toContain("rolling out");
+  });
+
+  it("persists a fresh successful display snapshot and restores its real saved payload on remount", async () => {
+    const focusSpy = vi.spyOn(focusModule, "FocusPracticeMode");
+    const sessionId = "session-fresh";
+    const result = { ...submittedAttempt, explanation: "Exact persisted teaching.", chunks_used: ["follow through"], natural_alternative: "deploying the change" };
+    const calls = installFetch({ units: [acceptedUnit], latest: { restorable: true, generation_id: "gen-1", accepted_unit_ids: ["unit-1"] },
+      startResult: jsonResponse({ session_id: sessionId, lesson_id: lessonId, open: true, cursor: 0, current: typedItem }), submitResult: result,
+      practiceView: jsonResponse({ session_id: sessionId, lesson_id: lessonId, open: true, cursor: 1, current: null }),
+      attemptList: [{ ...historyAttempt(sessionId, "open", result.attempt_id), ...result, session_id: sessionId }] });
+    const first = renderWorkspace();
+    const user = userEvent.setup();
+    await user.click(await screen.findByRole("button", { name: "Start Practice" }));
+    await user.type(screen.getByRole("textbox", { name: "Answer" }), "rolling out");
+    await user.click(screen.getByRole("button", { name: "Submit Answer" }));
+    await screen.findByTestId("feedback-card");
+    const pointer = JSON.parse(localStorage.getItem(`lait.practice-feedback.${lessonId}.${sessionId}`)!);
+    expect(pointer.attempt_id).toBe(result.attempt_id);
+    expect(pointer.response_cursor).toBe(1);
+    expect(pointer.item).toEqual(typedItem);
+    expect(pointer).not.toHaveProperty("chunks_used");
+    expect(pointer).not.toHaveProperty("explanation");
+    first.unmount();
+    renderWorkspace();
+    const card = await screen.findByTestId("feedback-card");
+    expect(screen.getByTestId("gap-fill-blank")).toHaveTextContent("rolling out");
+    expect(card).not.toHaveTextContent("Exact persisted teaching.");
+    expect(card).not.toHaveTextContent("follow through");
+    expect(card).not.toHaveTextContent("deploying the change");
+    expect(focusSpy.mock.lastCall?.[0].feedback).toMatchObject({
+      attempt_id: result.attempt_id, explanation: "Exact persisted teaching.",
+      chunks_used: ["follow through"], chunks_missed: result.chunks_missed,
+      natural_alternative: "deploying the change",
+    });
+    expect(calls.filter(call => call.url.endsWith("/finish"))).toHaveLength(0);
+  });
+
+  it.each([false, true])("Try again clears a saved inline result without mutations or stale reveal on resubmit (revealed=%s)", async (revealed) => {
+    const sessionId = "session-inline-retry";
+    store(sessionId);
+    if (revealed) localStorage.setItem(`lait.practice-reveal.${sessionId}.0`, JSON.stringify({ version: 1, session_id: sessionId, attempt_id: "attempt-exact", item: typedItem }));
+    const saved = { ...historyAttempt(sessionId, "open", "attempt-exact"), category: "incorrect", submitted: "nope" };
+    const snapshot = structuredClone(saved);
+    const result = { ...submittedAttempt, attempt_id: "new-miss", category: "incorrect", cursor: 0, submitted: "new miss" };
+    const calls = installFetch({ units: [acceptedUnit], submitResult: result,
+      practiceView: jsonResponse({ session_id: sessionId, lesson_id: lessonId, open: true, cursor: 0, current: typedItem }), attemptList: [saved] });
+    const first = renderWorkspace();
+    await screen.findByTestId("feedback-card");
+    expect(screen.getByTestId("gap-fill-blank")).toHaveTextContent(revealed ? "rolling out" : "nope");
+    await userEvent.setup().click(screen.getByRole("button", { name: "Try again" }));
+    expect(screen.getByTestId("gap-fill-blank")).toBeEmptyDOMElement();
+    expect(screen.getByRole("textbox", { name: "Answer" })).toHaveValue("");
+    expect(localStorage.getItem(`lait.practice-feedback.${lessonId}.${sessionId}`)).toBeNull();
+    expect(localStorage.getItem(`lait.practice-attempt.${sessionId}.0`)).toBeNull();
+    expect(localStorage.getItem(`lait.practice-session.${lessonId}`)).toBe(sessionId);
+    expect(calls.filter(call => call.method === "POST")).toHaveLength(0);
+    expect(saved).toEqual(snapshot);
+    first.unmount();
+    renderWorkspace();
+    await screen.findByRole("textbox", { name: "Answer" });
+    await waitFor(() => expect(screen.getByRole("button", { name: "Submit Answer" })).toBeDisabled());
+    expect(screen.queryByTestId("feedback-card")).not.toBeInTheDocument();
+    const user = userEvent.setup();
+    await user.type(screen.getByRole("textbox", { name: "Answer" }), "new miss");
+    await user.click(screen.getByRole("button", { name: "Submit Answer" }));
+    await screen.findByTestId("feedback-card");
+    expect(screen.getByTestId("gap-fill-blank")).toHaveTextContent("new miss");
+    expect(screen.getByTestId("feedback-card").innerHTML).not.toContain("rolling out");
+    expect(calls.filter(call => call.method === "POST")).toHaveLength(1);
+    expect(calls.filter(call => /\/(advance|finish|start-over)$/.test(call.url))).toHaveLength(0);
+  });
+
+  it("retained Show answer callback cannot disclose a new attempt after local retry", async () => {
+    const Original = focusModule.FocusPracticeMode;
+    let retained: (() => void) | undefined;
+    vi.spyOn(focusModule, "FocusPracticeMode").mockImplementation((props) => {
+      retained = props.onShowAnswer;
+      return <Original {...props} />;
+    });
+    const sessionId = "session-callback";
+    store(sessionId);
+    const result = { ...submittedAttempt, attempt_id: "new-miss", category: "incorrect", cursor: 0, submitted: "another miss" };
+    const calls = installFetch({ units: [acceptedUnit], submitResult: result,
+      practiceView: jsonResponse({ session_id: sessionId, lesson_id: lessonId, open: true, cursor: 0, current: typedItem }),
+      attemptList: [{ ...historyAttempt(sessionId, "open", "attempt-exact"), category: "incorrect", submitted: "nope" }] });
+    renderWorkspace();
+    await screen.findByTestId("feedback-card");
+    const old = retained!;
+    expect(old).toBeTypeOf("function");
+    const user = userEvent.setup();
+    await user.click(screen.getByRole("button", { name: "Try again" }));
+    await user.type(screen.getByRole("textbox", { name: "Answer" }), "another miss");
+    await user.click(screen.getByRole("button", { name: "Submit Answer" }));
+    await waitFor(() => expect(screen.getByTestId("feedback-card")).toHaveTextContent("another miss"));
+    act(() => old());
+    expect(screen.getByTestId("feedback-card").innerHTML).not.toContain("rolling out");
+    expect(localStorage.getItem(`lait.practice-reveal.${sessionId}.0`)).toBeNull();
+    await user.click(screen.getByRole("button", { name: "Show answer" }));
+    expect(screen.getByTestId("feedback-card")).toHaveTextContent("rolling out");
+    expect(calls.filter(call => call.method === "POST")).toHaveLength(1);
+  });
+
+  it("ignores a late getPractice from Continue after Start Over replaces the same-lesson session", async () => {
+    const sessionId = "session-get-late";
+    store(sessionId);
+    const next = deferred<Response>();
+    const calls = installFetch({ units: [acceptedUnit], nextPracticeGet: next,
+      practiceView: jsonResponse({ session_id: sessionId, lesson_id: lessonId, open: true, cursor: 0, current: typedItem }),
+      startOverResult: jsonResponse({ session_id: "session-new-get", lesson_id: lessonId, open: true, cursor: 0, current: typedItem }),
+      attemptList: [{ ...historyAttempt(sessionId, "open", "attempt-exact"), category: "incorrect", submitted: "nope" }] });
+    renderWorkspace();
+    const user = userEvent.setup();
+    await user.click(await screen.findByRole("button", { name: "Continue" }));
+    await waitFor(() => expect(calls.filter(call => call.url === `/api/practice-sessions/${sessionId}`)).toHaveLength(2));
+    await user.click(screen.getByRole("button", { name: "Start Over" }));
+    await user.click(within(screen.getByRole("alertdialog", { name: "Start Over" })).getByRole("button", { name: "Start Over" }));
+    await waitFor(() => expect(localStorage.getItem(`lait.practice-session.${lessonId}`)).toBe("session-new-get"));
+    next.resolve(jsonResponse({ session_id: sessionId, lesson_id: lessonId, open: true, cursor: 4, current: { ...typedItem, position: 4, segments: [{ kind: "text", text: "Stale old prompt" }] } }));
+    await new Promise(resolve => setTimeout(resolve, 20));
+    expect(screen.getByTestId("gap-fill-sentence")).not.toHaveTextContent("Stale old prompt");
+    expect(screen.queryByTestId("feedback-card")).not.toBeInTheDocument();
+    expect(localStorage.getItem(`lait.practice-session.${lessonId}`)).toBe("session-new-get");
+    expect(calls.filter(call => call.url.endsWith("/finish"))).toHaveLength(0);
+  });
+});
+
 function walk(directory: string): string[] {
   const entries = readdirSync(directory, { withFileTypes: true });
   return entries.flatMap((entry) => {
@@ -1176,6 +1516,10 @@ function historyAttempt(sessionId: string, disposition: string, attemptId: strin
     submitted: "rolling out",
     expected: "rolling out",
     explanation: "matched",
+    learning_unit_id: "unit-1",
+    chunks_used: ["follow through"],
+    chunks_missed: ["rolling out"],
+    natural_alternative: "deploying the change",
     unit_text: unitText,
     span_start: 23,
     span_end: 34,
@@ -1223,6 +1567,7 @@ function installFetch(options: {
   generate?: ReturnType<typeof deferred<Response>>;
   generateResult?: Response;
   practiceGet?: ReturnType<typeof deferred<Response>>;
+  nextPracticeGet?: ReturnType<typeof deferred<Response>>;
   practiceView?: Response;
   nextPracticeView?: Response;
   start?: ReturnType<typeof deferred<Response>>;
@@ -1230,6 +1575,10 @@ function installFetch(options: {
   latest?: unknown;
   attemptList?: unknown[];
   attemptListFailures?: number;
+  attemptGet?: ReturnType<typeof deferred<Response>>;
+  submit?: ReturnType<typeof deferred<Response>>;
+  submitResult?: unknown;
+  startOverResult?: Response;
   finishStatus?: number;
   finishStatuses?: number[];
 }): FetchCall[] {
@@ -1238,6 +1587,7 @@ function installFetch(options: {
   let attemptListFailuresLeft = options.attemptListFailures ?? 0;
   let finishStatusIndex = 0;
   let practiceReads = 0;
+  let attemptReads = 0;
   const lessonBody = { ...lesson, source: options.source ?? lesson.source };
   vi.stubGlobal(
     "fetch",
@@ -1305,6 +1655,8 @@ function installFetch(options: {
         return options.generateResult ?? jsonResponse({ status: "failed" }, 500);
       }
       if (url.includes("/lessons/") && url.endsWith("/attempts") && method === "GET") {
+        attemptReads += 1;
+        if (options.attemptGet && attemptReads === 1) return options.attemptGet.promise;
         if (attemptListFailuresLeft > 0) {
           attemptListFailuresLeft -= 1;
           return new Response("nope", { status: 500 });
@@ -1318,8 +1670,10 @@ function installFetch(options: {
         return options.startResult ?? new Response("missing", { status: 404 });
       }
       if (url.includes("/practice-sessions/") && url.endsWith("/attempts") && method === "POST") {
-        return jsonResponse(submittedAttempt);
+        if (options.submit) return options.submit.promise;
+        return jsonResponse(options.submitResult ?? submittedAttempt);
       }
+      if (url.endsWith("/start-over") && method === "POST") return options.startOverResult?.clone() ?? new Response("missing", { status: 404 });
       if (url.endsWith("/advance") && method === "POST") {
         return jsonResponse({
           session_id: "session-advanced",
@@ -1347,10 +1701,11 @@ function installFetch(options: {
         });
       }
       if (/\/api\/practice-sessions\/[^/]+$/.test(url) && method === "GET") {
+        practiceReads += 1;
+        if (practiceReads > 1 && options.nextPracticeGet) return options.nextPracticeGet.promise;
         if (options.practiceGet) {
           return options.practiceGet.promise;
         }
-        practiceReads += 1;
         if (practiceReads > 1 && options.nextPracticeView) {
           return options.nextPracticeView.clone();
         }

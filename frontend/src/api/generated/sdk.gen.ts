@@ -2,7 +2,7 @@
 
 import type { Client, ClientMeta, Options as Options2, RequestResult, TDataShape } from './client';
 import { client } from './client.gen';
-import type { AttemptListForLessonData, AttemptListForLessonErrors, AttemptListForLessonResponses, ExerciseGenerateData, ExerciseGenerateErrors, ExerciseGenerateResponses, ExerciseLatestCompletedData, ExerciseLatestCompletedErrors, ExerciseLatestCompletedResponses, ExerciseRegistryListVisibleForData, ExerciseRegistryListVisibleForErrors, ExerciseRegistryListVisibleForResponses, ExerciseSubmitAttemptData, ExerciseSubmitAttemptErrors, ExerciseSubmitAttemptResponses, HealthData, HealthResponses, LearningUnitAcceptData, LearningUnitAcceptErrors, LearningUnitAcceptResponses, LearningUnitAddData, LearningUnitAddErrors, LearningUnitAddResponses, LearningUnitListData, LearningUnitListErrors, LearningUnitListResponses, LearningUnitRemoveData, LearningUnitRemoveErrors, LearningUnitRemoveResponses, LessonCreateData, LessonCreateErrors, LessonCreateResponses, LessonGetData, LessonGetErrors, LessonGetResponses, LessonListData, LessonListResponses, ModuleRegistryDescribeData, ModuleRegistryDescribeResponses, PracticeFinishData, PracticeFinishErrors, PracticeFinishResponses, PracticeGetData, PracticeGetErrors, PracticeGetResponses, PracticeStartData, PracticeStartErrors, PracticeStartOverData, PracticeStartOverErrors, PracticeStartOverResponses, PracticeStartResponses } from './types.gen';
+import type { AttemptListForLessonData, AttemptListForLessonErrors, AttemptListForLessonResponses, ExerciseGenerateData, ExerciseGenerateErrors, ExerciseGenerateResponses, ExerciseLatestCompletedData, ExerciseLatestCompletedErrors, ExerciseLatestCompletedResponses, ExerciseRegistryListVisibleForData, ExerciseRegistryListVisibleForErrors, ExerciseRegistryListVisibleForResponses, ExerciseSubmitAttemptData, ExerciseSubmitAttemptErrors, ExerciseSubmitAttemptResponses, HealthData, HealthResponses, LearningUnitAcceptData, LearningUnitAcceptErrors, LearningUnitAcceptResponses, LearningUnitAddData, LearningUnitAddErrors, LearningUnitAddResponses, LearningUnitListData, LearningUnitListErrors, LearningUnitListResponses, LearningUnitRemoveData, LearningUnitRemoveErrors, LearningUnitRemoveResponses, LessonCreateData, LessonCreateErrors, LessonCreateResponses, LessonGetData, LessonGetErrors, LessonGetResponses, LessonListData, LessonListResponses, ModuleRegistryDescribeData, ModuleRegistryDescribeResponses, PracticeAdvanceData, PracticeAdvanceErrors, PracticeAdvanceResponses, PracticeFinishData, PracticeFinishErrors, PracticeFinishResponses, PracticeGetData, PracticeGetErrors, PracticeGetResponses, PracticeStartData, PracticeStartErrors, PracticeStartOverData, PracticeStartOverErrors, PracticeStartOverResponses, PracticeStartResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -109,6 +109,18 @@ export const practiceGet = <ThrowOnError extends boolean = false>(options: Optio
  */
 export const exerciseSubmitAttempt = <ThrowOnError extends boolean = false>(options: Options<ExerciseSubmitAttemptData, ThrowOnError>): RequestResult<ExerciseSubmitAttemptResponses, ExerciseSubmitAttemptErrors, ThrowOnError> => (options.client ?? client).post<ExerciseSubmitAttemptResponses, ExerciseSubmitAttemptErrors, ThrowOnError>({
     url: '/api/practice-sessions/{session_id}/attempts',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Post Practice Advance
+ */
+export const practiceAdvance = <ThrowOnError extends boolean = false>(options: Options<PracticeAdvanceData, ThrowOnError>): RequestResult<PracticeAdvanceResponses, PracticeAdvanceErrors, ThrowOnError> => (options.client ?? client).post<PracticeAdvanceResponses, PracticeAdvanceErrors, ThrowOnError>({
+    url: '/api/practice-sessions/{session_id}/advance',
     ...options,
     headers: {
         'Content-Type': 'application/json',

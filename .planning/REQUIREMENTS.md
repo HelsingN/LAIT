@@ -31,7 +31,7 @@
 ### Exercises and Sessions
 
 - [ ] **EXER-01**: Learner can generate exercises only from accepted learning units and can see a recoverable status while generation runs.
-- [x] **EXER-02**: Learner can start an exercise session for a lesson and receive one exercise at a time.
+- [ ] **EXER-02**: Learner can start an exercise session for a lesson and receive one exercise at a time.
 - [ ] **EXER-03**: Learner can complete Gap Fill exercises supplied through the Exercise Registry.
 - [ ] **EXER-04**: Learner can complete Chunk Completion exercises supplied through the Exercise Registry.
 - [ ] **EXER-05**: Learner can complete Sentence Reconstruction exercises supplied through the Exercise Registry.
@@ -48,7 +48,7 @@
 - [ ] **EVAL-02**: Learner receives normalized deterministic comparison that applies English-module rules for whitespace, capitalization, punctuation, contractions, and configured accepted variants.
 - [ ] **EVAL-03**: Learner can submit an open answer for semantic evaluation without requiring exact reproduction of the source wording.
 - [ ] **EVAL-04**: Learner receives one explicit result category: correct, acceptable, partial, incorrect, or uncertain.
-- [ ] **EVAL-05**: Learner can see the submitted answer, reference answer or meaning, concise explanation, target chunks used or missed, and an optional natural alternative.
+- [ ] **EVAL-05**: Learner can access the submitted answer, reference answer or meaning, concise meaningful explanation, actual target chunks used or missed, and an optional natural alternative within the session. **Original full requirement remains incomplete.** Approved Phase 1 scope narrowing (2026-10-07, 01-18-CONTEXT.md D-32–D-37): deterministic category plus a single inline response; Correct/Corrected fills the current blank with the accepted reference in green, without a separate answer card or duplicate input. Incorrect shows submitted inline and hides reference until Show answer; Try again clears blank/result before or after reveal. No Details, technical Chunks used/missed labels, new explanation templates or LLM in Phase 1. Detailed educational explanation, chunk analysis and optional alternative presentation are explicitly deferred to Phase 5; this is partial delivery, not full EVAL-05 completion. Preserve raw submitted and all saved explanation/chunks/nullable alternative through repository/query/HTTP/generated client and UI restore, exact item/attempt/retry-copy disclosure binding and stale-response guards. No fabricated empty arrays/null, saved-content rewriting, recall credit or domain mutation from reveal/retry. Frozen retry rounds, Continue, score, Start Over and Exit remain unchanged. Narrowed Phase 1 behavior still requires automatic checks and repeated blocking-human Docker approval; Phase 1 remains open.
 - [ ] **EVAL-06**: Learner can inspect the relevant original source while reviewing feedback.
 - [ ] **EVAL-07**: Learner's submitted attempt is saved before an external semantic-evaluation request, so provider failure cannot lose the answer.
 - [ ] **EVAL-08**: Learner receives `uncertain` or an unable-to-evaluate state when the semantic evaluator cannot support a reliable judgment.
@@ -182,7 +182,7 @@ Deferred beyond the initial release and not mapped to the v1 roadmap.
 | ANLY-08 | Phase 1 | Gaps Found |
 | ANLY-09 | Phase 7 | Pending |
 | EXER-01 | Phase 1 | Gaps Found |
-| EXER-02 | Phase 1 | Complete |
+| EXER-02 | Phase 1 | Gaps Found |
 | EXER-03 | Phase 1 | Gaps Found |
 | EXER-04 | Phase 3 | Pending |
 | EXER-05 | Phase 4 | Pending |
@@ -196,7 +196,7 @@ Deferred beyond the initial release and not mapped to the v1 roadmap.
 | EVAL-02 | Phase 3 | Pending |
 | EVAL-03 | Phase 5 | Pending |
 | EVAL-04 | Phase 1 | Gaps Found |
-| EVAL-05 | Phase 1 | Gaps Found |
+| EVAL-05 | Phase 1 partial; Phase 5 remaining education | Partial / deferred; narrowed Phase 1 checkpoint approved 2026-10-07; phase smoke pending |
 | EVAL-06 | Phase 3 | Pending |
 | EVAL-07 | Phase 5 | Pending |
 | EVAL-08 | Phase 5 | Pending |

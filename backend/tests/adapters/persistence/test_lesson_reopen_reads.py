@@ -3,7 +3,15 @@
 from __future__ import annotations
 
 import sqlite3
+from contextlib import closing
 from pathlib import Path
+
+import pytest
+
+LEGACY_EXPLANATION = 'Correct. The expected answer is "alpha". 👍'
+SAVED_USED = ("alpha", "naïve 👍", "alpha")
+SAVED_MISSED = ("follow through",)
+SAVED_ALTERNATIVE = "deploying the change"
 
 
 def _database(tmp_path: Path) -> tuple[object, str]:
@@ -129,10 +137,10 @@ def _seed(database_url: str) -> None:
                     "alpha",
                     "correct",
                     "alpha",
-                    "matched",
-                    "[]",
-                    "[]",
-                    None,
+                    LEGACY_EXPLANATION,
+                    '["alpha", "naïve 👍", "alpha"]',
+                    '["follow through"]',
+                    SAVED_ALTERNATIVE,
                     "2026-10-02T00:01:00+00:00",
                 ),
                 (
@@ -160,11 +168,13 @@ def _seed(database_url: str) -> None:
 
 
 def test_repository_reads_matching_generation_and_pass_dispositions(tmp_path: Path) -> None:
+    from lait.adapters.persistence.database import open_repository
     from lait.application.queries.attempt_list_for_lesson import handle as list_attempts
     from lait.application.queries.exercise_latest_completed import handle as latest_completed
 
-    repository, database_url = _database(tmp_path)
+    _original, database_url = _database(tmp_path)
     _seed(database_url)
+    repository = open_repository(database_url)
 
     latest = latest_completed("lesson-1", repository)
     listed = list_attempts("lesson-1", repository)
@@ -178,3 +188,71 @@ def test_repository_reads_matching_generation_and_pass_dispositions(tmp_path: Pa
         ("session-done", "completed", "drag"),
         ("session-early", "exited", "typed"),
     ]
+    rich, empty = listed.attempts
+    assert rich.attempt_id == "attempt-done"
+    assert rich.learning_unit_id == empty.learning_unit_id == "unit-1"
+    assert rich.explanation == LEGACY_EXPLANATION
+    assert rich.chunks_used == SAVED_USED
+    assert rich.chunks_missed == SAVED_MISSED
+    assert rich.natural_alternative == SAVED_ALTERNATIVE
+    assert empty.chunks_used == empty.chunks_missed == ()
+    assert empty.natural_alternative is None
+    assert empty.explanation == "missed"
+
+
+def test_reopened_repository_preserves_complete_feedback_records(tmp_path: Path) -> None:
+    from lait.adapters.persistence.database import open_repository
+
+    _original, database_url = _database(tmp_path)
+    _seed(database_url)
+    with closing(_connect(database_url)) as connection:
+        before = {
+            table: connection.execute(f"select * from {table} order by id").fetchall()
+            for table in ("attempts", "practice_sessions", "practice_pass_items")
+        }
+    reopened = open_repository(database_url)
+    records = reopened.list_attempt_records_for_lesson("lesson-1")
+    assert [record.attempt_id for record in records] == ["attempt-done", "attempt-early"]
+    rich, empty = records
+    assert rich.learning_unit_id == empty.learning_unit_id == "unit-1"
+    assert rich.chunks_used == SAVED_USED
+    assert rich.chunks_missed == SAVED_MISSED
+    assert rich.natural_alternative == SAVED_ALTERNATIVE
+    assert rich.explanation == LEGACY_EXPLANATION
+    assert rich.submitted == rich.expected == rich.unit_text == "alpha"
+    assert (rich.span_start, rich.span_end) == (0, 5)
+    assert (rich.cursor, rich.pass_item_count, rich.session_item_count) == (2, 1, 2)
+    assert rich.session_status == "closed"
+    assert empty.chunks_used == empty.chunks_missed == ()
+    assert empty.natural_alternative is None
+    assert empty.submitted == "nope"
+    assert empty.expected == empty.unit_text == "alpha"
+    assert empty.explanation == "missed"
+    assert reopened.list_attempt_records_for_lesson("lesson-1") == records
+    with closing(_connect(database_url)) as connection:
+        after = {
+            table: connection.execute(f"select * from {table} order by id").fetchall()
+            for table in ("attempts", "practice_sessions", "practice_pass_items")
+        }
+    assert after == before
+
+
+@pytest.mark.parametrize("column", ["chunks_used", "chunks_missed"])
+@pytest.mark.parametrize("raw", ["not-json", "null", "{}", '"alpha"', "[1]", '["alpha", null]'])
+def test_reopened_repository_rejects_malformed_saved_chunks(
+    tmp_path: Path, column: str, raw: str
+) -> None:
+    from lait.adapters.persistence.database import open_repository
+
+    _original, database_url = _database(tmp_path)
+    _seed(database_url)
+    with closing(_connect(database_url)) as connection:
+        connection.execute(f"update attempts set {column} = ? where id = ?", (raw, "attempt-done"))
+        connection.commit()
+    reopened = open_repository(database_url)
+    with pytest.raises(ValueError):
+        reopened.list_attempt_records_for_lesson("lesson-1")
+    with closing(_connect(database_url)) as connection:
+        assert connection.execute(
+            f"select {column} from attempts where id = ?", ("attempt-done",)
+        ).fetchone() == (raw,)

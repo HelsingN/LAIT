@@ -4,16 +4,16 @@ milestone: v1.0
 current_phase: 01
 current_phase_name: Mod-First Manual Learning Loop
 status: executing
-stopped_at: Plan 01-16 is approved. Phase 1 is not complete.
-last_updated: "2026-10-06T03:13:00.000Z"
-last_activity: 2026-10-06
-last_activity_desc: The user approved the 01-16 Docker checkpoint. Phase 1 remains open.
+stopped_at: 01-18 R2 Docker T3 approved by user; 18/18 plans complete. Separate phase smoke and re-verification pending; original EVAL-05 partial/deferred, Phase 1 open.
+last_updated: "2026-10-07T05:29:16+03:00"
+last_activity: 2026-10-07
+last_activity_desc: User explicitly authorized scoped commit and push after R2 approval; pre-commit backend 129/frontend 105 and typecheck passed. No full EVAL-05 completion or phase closure.
 state_head: 8b57705a3aec0ee5d77e92ea73ecdc7e5cdc1f49
 progress:
   total_phases: 9
   completed_phases: 0
-  total_plans: 16
-  completed_plans: 16
+  total_plans: 18
+  completed_plans: 18
 milestone_name: milestone
 spec_version: 0.2.0
 ---
@@ -31,10 +31,10 @@ Current planning/specification baseline: `.planning/VERSION.md` (`0.2.0`)
 ## Current Position
 
 Phase: 01 (Mod-First Manual Learning Loop) — EXECUTING
-Plan: 16 of 16 recorded. The 01-16 checkpoint is approved. Phase 1 is not complete.
-Status: Phase 1 is not complete
+Plan: 18 of 18 executed. Plan 01-18 R2 T3 is approved by the user without observations; all three tasks complete.
+Status: Plan execution complete; Phase 1 remains open pending separate phase smoke and re-verification. Detailed teaching/chunk analysis deferred to Phase 5; original full EVAL-05 remains incomplete.
 Current discussion area: Complete
-Last activity: 2026-10-06 — The user approved plan 01-16. Phase 1 remains open.
+Last activity: 2026-10-07 — User approved R2 without observations, then explicitly answered Да to commit/push now. Pre-commit full backend 129 and frontend 105 passed; typecheck passed. No implementation changes since Docker approval, 188-payload equality evidence retained. Scoped Git handoff covers 42 feedback/restore/code/test/planning files; five pre-existing historical audit files excluded. Separate phase smoke/re-verification not started; Phase 1 open, original EVAL-05 partial/deferred.
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -74,6 +74,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 01-mod-first-manual-learning-loop P08 | 33 min | 3 tasks | 32 files |
 | Phase 01 P09 | 12 min | 3 tasks | 13 files |
 | Phase 01 P12 | 35 min | 2 tasks | 11 files |
+| Phase 01 P17 | 11 min | 2 tasks | 9 implementation/test/schema files + summary |
 
 ## Accumulated Context
 
@@ -133,10 +134,13 @@ Recent decisions affecting current and future work:
 - [Governance]: Learner-visible plans end on a blocking-human Docker check; backend-only plans do not. Observations are classified before they become blockers. See `docs/governance/MANUAL_UI_VERIFICATION.md`.
 - [Phase 01]: UX-16/17 diagnosis is `01-13-DIAGNOSIS.md`. Follow-up plan `01-13-PLAN.md` is not executed. Slices 2–4 stay out of that plan.
 - [Phase 01]: A repeat round stays in the same session. Queue identity is learning-unit id plus mode. The opening pass size is the score denominator. A named target resolves the copy at the cursor.
+- [Phase 01]: Approved D-24–D-31 require compact submitted-once feedback, disclosure-safe Details and real persisted feedback restoration; see 01-17-CONTEXT.md. Retry rounds, score and Exit remain unchanged. PLAT-09 stays closed.
+- [Phase 01]: D-32–D-37 supersede prior Details/content acceptance after a not-approved checkpoint: one inline accepted/wrong/revealed phrase and category, no duplicate input/card/Details. Detailed teaching/chunk/alternative display deferred to Phase 5; original EVAL-05 is partial, not complete. All 01-17/01-18 data/restore fixes and frozen domain behavior stay. Multi-blank/true drag-and-drop proposed Phase 4/9 only; see 01-18-FOLLOWUPS.md.
 
 ### Pending Todos
 
-- Execute Phase 1 from `01-01-PLAN.md` through `01-11-PLAN.md`. Do not expand scope past `01-CONTEXT.md`.
+- Explicit execute-phase 01 --gaps-only and user option 3 authorized inline execution. Plans 01-01–01-18 are complete; final R2 T3 approved by user on 2026-10-07. Subsequent explicit Да authorizes scoped commit/push to existing origin/phase/01-execution; result belongs to Git history/handoff, not phase closure.
+- Next gate: separate phase-wide Docker learner smoke and re-verification under D-32–D-37, not automatically started by per-plan approval. Original EVAL-05 remains partial/deferred and Phase 1 open meanwhile.
 - After a working vertical learning slice exists, consider a small MCP integration spike as an architectural acceptance test; do not add it to current Phase 1 scope.
 
 ### Blockers/Concerns
@@ -166,9 +170,11 @@ Items acknowledged and carried forward from previous milestone close:
 | Domain | Decide whether `PracticeSession` becomes a first-class core entity | Deferred until concrete orchestration/practice requirements exist | Spec 0.2.0 |
 | UX | Feedback current pass shows a heading, score, and plain labels. Hard phrases and a next-step panel were not in 01-15. | Landed in 01-15 | 2026-10-06 |
 | UX | History rows still show the expected phrase in the stored explanation and again as the unit jump. The focus card does not. | Deferred. Not a 01-16 blocker. | 2026-10-06 |
+| Learning feedback | Detailed teaching/chunk/alternative presentation from original EVAL-05 | Deferred to Phase 5; original EVAL-05 not fully delivered | D-32, 2026-10-07 |
+| Exercise UX | Shared task with multiple blanks and actual drag-and-drop | Proposed Phase 4/9 follow-up; no current implementation | D-37, 2026-10-07 |
 
 ## Session Continuity
 
-Last session: 2026-10-06T03:13:00.000Z
-Stopped at: Plan 01-16 is approved. Phase 1 is not complete.
-Resume file: None
+Last session: 2026-10-07T05:29:16+03:00
+Stopped at: 01-18 R2 T3 explicitly approved, summary complete; R1 not approved. Scoped Git handoff explicitly authorized; separate phase-wide Docker smoke/re-verification pending. Original EVAL-05 partial/deferred, Phase 1 open.
+Resume file: .planning/phases/01-mod-first-manual-learning-loop/01-18-SUMMARY.md

@@ -80,6 +80,13 @@ def _ids(raw: str) -> tuple[str, ...]:
     return tuple(json.loads(raw))
 
 
+def _saved_chunks(raw: str) -> tuple[str, ...]:
+    payload = json.loads(raw)
+    if not isinstance(payload, list) or any(not isinstance(chunk, str) for chunk in payload):
+        raise ValueError("Saved feedback chunks must be a JSON array of strings")
+    return tuple(payload)
+
+
 def _dump_ids(values: tuple[str, ...]) -> str:
     return json.dumps(list(values))
 
@@ -473,6 +480,10 @@ class SqlAlchemyPracticeRepository:
                     submitted=attempt.submitted,
                     expected=attempt.expected,
                     explanation=attempt.explanation,
+                    chunks_used=_saved_chunks(attempt.chunks_used),
+                    chunks_missed=_saved_chunks(attempt.chunks_missed),
+                    natural_alternative=attempt.natural_alternative,
+                    learning_unit_id=attempt.learning_unit_id,
                     unit_text=attempt.unit_text,
                     span_start=attempt.span_start,
                     span_end=attempt.span_end,

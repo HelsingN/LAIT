@@ -31,11 +31,11 @@ This roadmap grows the product through vertical MVP slices that keep the learnin
 **Success Criteria** (what must be TRUE):
   1. Learner can start the health-checked application with Docker Compose, paste English text into a lesson, and reopen that lesson from the local lesson list.
   2. Learner can manually add and accept a source-linked learning unit, generate a Gap Fill exercise from it, and complete the exercise one item at a time.
-  3. Learner receives deterministic result-category feedback containing their answer, the reference, target chunks used or missed, a concise explanation, an optional natural alternative, and the next-exercise action without leaving the session.
+  3. Learner receives deterministic Correct/Incorrect/Corrected feedback and Continue within the session. Correct/Corrected fills the current blank with the accepted phrase in green; Incorrect shows submitted inline without the solution, Show answer fills the reference, and Try again clears the response before/after reveal. No separate answer card, duplicate graded input, Details or technical chunk labels. Full real saved payload and exact attempt/item-bound restore/reveal remain intact across entry/restart paths; retry rounds, score and Exit are unchanged. Approved scope narrowing D-32–D-37 defers detailed educational explanation/chunk/alternative presentation to Phase 5: original full EVAL-05 is not completed by Phase 1. No LLM or new explanation templates in Phase 1.
   4. Maintainer can inspect active modules and capabilities, invoke the workflow through documented commands and queries, add a proof exercise contribution through the public registry and renderer seams without changing core domain services, and see startup reject invalid or incompatible module catalogs.
   5. Maintainer can generate the TypeScript client from OpenAPI, have CI detect an unreviewed contract/client mismatch, and test the core, persistence adapter, and bundled modules independently.
 
-**Plans:** 16 plans
+**Plans:** 18 plans — all executed; 01-18 R2 checkpoint approved, separate phase smoke/re-verification pending
 
 Plans:
 - [x] 01-01-PLAN.md
@@ -54,6 +54,14 @@ Plans:
 - [x] 01-14-PLAN.md — Widen the workspace and make preparation actions obvious
 - [x] 01-15-PLAN.md — Close the five practice and feedback UX gaps from UAT G-01-1
 - [x] 01-16-PLAN.md — Retry a miss in the same pass, then continue into still-uncorrected items
+
+**Wave 12 — gap closure, executed after 01-16 (wave 11)**
+- [x] 01-17-PLAN.md — Recover complete saved feedback through repository, query, HTTP and generated DTO
+
+**Wave 13 — gap closure, automatic tasks green; final 01-18 R2 blocking-human Docker checkpoint approved 2026-10-07**
+- [x] 01-18-PLAN.md — Revised inline result UX, retained exact feedback restoration and repeated final blocking-human Docker checkpoint (D-32–D-37; original EVAL-05 partial/deferred)
+
+**Cross-cutting constraints:** Preserve real saved educational payload and item/attempt identity; no schema migration or retry/score/Exit changes. PLAT-09 is closed. Execution is explicitly authorized by execute-phase 01 --gaps-only; final R2 checkpoint approved by user without observations. Subsequent explicit Да authorizes scoped commit/push to the current branch, not phase closure. Separate phase Docker smoke/re-verification remains pending.
 
 **UI hint:** yes
 
@@ -217,7 +225,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Mod-First Manual Learning Loop | 12/12 | In Progress|  |
+| 1. Mod-First Manual Learning Loop | 18/18 | In Progress|  |
 | 2. AI-Assisted Learning-Unit Review | 0/TBD | Not started | - |
 | 3. Assisted Chunk Retrieval | 0/TBD | Not started | - |
 | 4. Resumable Sentence Reconstruction | 0/TBD | Not started | - |

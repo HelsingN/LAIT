@@ -460,7 +460,7 @@ it("clears a selected chip when start over repeats the first item", async () => 
   expect(screen.getByRole("button", { name: "Submit Answer" })).toBeDisabled();
 });
 
-it("renders server feedback as text and omits a null natural alternative", async () => {
+it("renders only accepted inline text and leaves saved education out of Phase 1 presentation", async () => {
   const user = userEvent.setup();
   installFetch({
     units: [rollingOut],
@@ -487,8 +487,16 @@ it("renders server feedback as text and omits a null natural alternative", async
   const card = await screen.findByTestId("feedback-card");
   expect(card.querySelector("script")).toBeNull();
   expect(card).toHaveTextContent("Correct");
-  expect(card).not.toHaveTextContent("<script>");
-  expect(card).not.toHaveTextContent("used");
+  expect(within(card).queryByText("Details")).not.toBeInTheDocument();
+  expect(card).not.toHaveTextContent("<script>alert(1)</script>");
+  expect(card.querySelector("script")).toBeNull();
+  expect(card).not.toHaveTextContent("Chunks used");
+  expect(within(card).queryByRole("list", { name: "Chunks used" })).not.toBeInTheDocument();
+  expect(screen.getByTestId("gap-fill-blank")).toHaveTextContent("rolling out");
+  expect(screen.getByTestId("gap-fill-blank").className).toMatch(/accepted/);
+  expect(screen.queryByRole("textbox", { name: "Answer" })).not.toBeInTheDocument();
+  expect(within(card).getAllByText("rolling out", { exact: true })).toHaveLength(1);
+  expect(within(card).queryByText("Natural alternative")).not.toBeInTheDocument();
   expect(card).not.toHaveTextContent("null");
   expect(screen.getAllByTestId("feedback-card")).toHaveLength(1);
 });

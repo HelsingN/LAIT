@@ -1,8 +1,8 @@
 ---
 phase: "01"
 slug: "mod-first-manual-learning-loop"
-status: draft
-nyquist_compliant: false
+status: validated
+nyquist_compliant: true
 wave_0_complete: false
 created: "2026-09-28"
 ---
@@ -79,6 +79,12 @@ Progressive gates. Do not run a later wave's command before the plan that create
 | 01-09-T2 | 01-09 | 8 | MODL-12 | T-01-23 | Handlers do not import HTTP or tables | unit | `uv run pytest backend/tests/application/test_handler_isolation.py -q` | ❌ W0 | ⬜ pending |
 | 01-09-T3 | 01-09 | 8 | PLAT-03 | T-01-24 | Full-phase Compose health | smoke | `docker compose up -d --wait` | ❌ W0 | ⬜ pending |
 | 01-09-T3 | 01-09 | 8 | PLAT-03 | T-01-01 | Full-phase pytest gate | unit | `uv run pytest -q` | ❌ W0 | ⬜ pending |
+| 01-17-T1 | 01-17 | 12 | EVAL-05 | T-01-46, T-01-47 | Real reopened SQLite → query → HTTP preserves nonempty chunks, non-null alternative, original explanation and identity | integration | `.venv/Scripts/python.exe -B -m pytest -p no:cacheprovider backend/tests/adapters/http/test_http_dto_mapping.py -q` | Existing file; assertions implemented | ✅ green — 5 passed (01-17 tracer rerun included) |
+| 01-17-T2 | 01-17 | 12 | EVAL-05 | T-01-46, T-01-47 | Independent saved-payload projections, genuine empty/null and unchanged retry/finish/score | repository/application | `.venv/Scripts/python.exe -B -m pytest -p no:cacheprovider backend/tests/adapters/persistence/test_lesson_reopen_reads.py backend/tests/application/test_lesson_reopen_reads.py backend/tests/application/test_practice_retry.py backend/tests/application/test_practice_finish_and_start_over.py -q` | Existing files; assertions implemented | ✅ green — 28 passed |
+| 01-17-T2 | 01-17 | 12 | EVAL-05 | T-01-47 | Regenerated feedback DTO is consumed by the existing generated alias; PLAT-09 stays closed | type/contract | `npm --prefix frontend run typecheck` | Existing script; DTO regenerated | ✅ green — generated required-field assertion and typecheck passed |
+| 01-18-T1 | 01-18 R2 | 13 | EVAL-05 partial, EVAL-01 | T-01-48, T-01-50 | Inline accepted reference in green; incorrect submitted/revealed reference; no Details/education/duplicate input/card; cleared Try again before/after reveal; inert answer text | component | `node frontend/node_modules/vitest/vitest.mjs run --root frontend src/registries/renderers/gapFillRenderer.test.tsx --maxWorkers=1` | Existing, revised per D-32–D-37 | ✅ green — 16 passed, tracer rerun 16 passed |
+| 01-18-T2 | 01-18 R2 | 13 | EVAL-05 partial, EXER-07 | T-01-49 | Exact pending/final-success restore, rich real payload at renderer seam, retry-copy/stale-response isolation; saved Try again clears without commands or stale reveal | component | `node frontend/node_modules/vitest/vitest.mjs run --root frontend src/features/lesson/LessonWorkspacePage.test.tsx src/features/lesson/FocusPracticeMode.test.tsx src/features/lesson/stages/FeedbackStage.test.tsx --maxWorkers=1` | Existing, revised assertions; production restore retained | ✅ green — 69 passed |
+| 01-18-T2 | 01-18 R2 | 13 | EVAL-05 partial, EXER-07 | T-01-49 | Frozen retry/score/Continue/Start Over/Exit and saved rich-payload regressions; no LLM/new template or domain change | full regression/type/build | `.venv/Scripts/python.exe -B -m pytest -p no:cacheprovider backend/tests -q`; `node frontend/node_modules/vitest/vitest.mjs run --root frontend --maxWorkers=1`; `npm --prefix frontend run typecheck`; `npm --prefix frontend run build` | Existing | ✅ green — backend 129, frontend 105; typecheck/build passed |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
@@ -106,8 +112,30 @@ Follow-up `01-13-PLAN.md` (not executed): automated reads are `uv run pytest bac
 |----------|-------------|------------|-------------------|
 | Viewport wrap/truncate backstops from UI-SPEC | UI-SPEC long-text rows | `verification: backstop` — abstain without human/viewport evidence | Spot-check Lesson List title truncate, create-title wrap, Gap Fill wrap at 320px after plan 01-07 |
 | Phase-close learner-flow smoke | LESS-01, LESS-02, ANLY-08, EXER-01, EXER-02, EXER-07, EVAL-01, EVAL-04, EVAL-05 | Vitest and pytest do not show Compose reopen | On `http://127.0.0.1:5173`, paste a lesson, add and accept a unit, finish one Gap Fill item, reload, open the same lesson from `/`, then `docker compose restart` without deleting the volume and open it again. Source and units must still be there. |
+| 01-18-T3 R2 inline-result checkpoint — APPROVED 2026-10-07, user report, no observations | Narrowed Phase 1 EVAL-05, EXER-07, EVAL-01; D-32–D-37 | Required blocking-human Docker approval; R1 remains not approved | User: “ручная проверка пройдена без замечаний approved.” Published R2 checklist approved as a whole: inline results/retry/disclosure and four states × reload/direct URL/list return/full browser-process restart/Docker restart with volume kept. Recorded as user-reported passes, not assistant-observed clicks; no per-route screenshots/logs supplied. Exact payload remains saved. Full teaching/chunk display explicitly deferred, not passed. See `01-18-CHECKPOINT.md` and `01-18-SUMMARY.md`. |
+| Final phase manual learner-flow smoke — PENDING, separate from 01-18 R2 approval | Narrowed Phase 01 success criteria 1–3; original EVAL-05 partial/deferred | Governance still requires a phase-wide Docker smoke before phase.complete | Docker, current images and volume kept: paste → capture/accept → generate → wrong response hidden inline → Show answer / clearing Try again / self-correction → accepted green inline → Continue/Exit with opening score/history intact. Check list reopen, reload, direct URL, actual browser-process and Docker/app restarts. Verify durable original payload, not deferred educational UI. No phase completion authorized. |
 
 ---
+
+## Current R2 Execution Evidence — 2026-10-07
+
+Latest acceptance D-32–D-37 intentionally narrows Phase 1: detailed teaching/chunk/alternative presentation is deferred; original full EVAL-05 is partial, not complete. First checkpoint was explicitly not approved; historical R1 results are below and do not approve R2.
+
+- Current automatic checks: renderer RED 10 failed/6 passed before inline implementation, GREEN/tracer rerun 16/16; restore/Focus/stage target 69 passed; full backend 129 and full frontend 105 passed; typecheck/build passed. Complete saved payload remains asserted at the renderer seam with exact original explanation/nonempty chunks/non-null alternative. Backend and restore production unchanged in R2.
+- Plan frontmatter/structure valid, D-32–D-37 decision coverage 6/6; current six failure directions valid; UI safety gate has no block. Inline review is not claimed as independent-agent review; three historical missing failure directions in executed 01-15/16 are recorded in 01-18-PLAN-CHECK.md, not reopened here.
+- Docker rebuilt and api/web restarted with volume kept; API ok, web HTTP 200 serving `index-I9J8SvOc.js` / `index-D6b_DoN8.css`. This run's baseline and post-restart reads contain identical 1 lesson / 188 attempts, including 152 nonempty used and 36 nonempty missed arrays; SHA256 `E6E8B582FB72B561867F3E3C6844E75D40AA3CD7BDE58DFB93130205D5F70B6B`. R1's 181 is historical, not reused as the new baseline. No user-data writes/deletion by the assistant.
+- R2 human four-state × five-route checklist approved by user report on 2026-10-07 without observations. No individual route logs/screenshots supplied; approval is not claimed as assistant-observed evidence. Non-null-alternative **display** remains explicitly deferred; its payload preservation stays automatically checked. Detailed approval: `01-18-CHECKPOINT.md`; old record: `01-18-CHECKPOINT-R1.md` (not approved).
+- 01-18 SUMMARY records all three tasks complete. No source edits or test rerun in this approval-recording turn, no commits/push or Phase 1 completion. Separate phase-close smoke and re-verification stay pending; PLAT-09 stays closed.
+
+## Historical R1 Gap Execution Evidence — 2026-10-07 (superseded presentation, not approved)
+
+01-17 automatic tasks are complete. 01-18 T1/T2 were implemented inline after the user selected option 3; T3 is the sole final blocking-human Docker gate and remains pending. Detailed commands, TDD results, restoration matrix and resume instructions: `01-18-CHECKPOINT.md`. This does not supersede historical audit evidence or sign off the phase.
+
+- Full current backend: 129 passed; full current frontend: 104 passed (9 files). Build and typecheck passed. Renderer/workspace targeted: 74 passed; module feedback/evaluate: 6 passed; FocusPracticeMode/FeedbackStage: 10 passed; backend retry/finish: 6 passed.
+- Current answer-free module test name is `test_correct_explanation_is_answer_free_and_records_used`; the older D-18 test name in the historical audit below describes that audit's baseline, not the current acceptance contract.
+- Docker serving images rebuilt, both healthy; production web HTTP 200 at `http://127.0.0.1:5173`, matching `index-BTGVBf0C.js`. Actual api/web restart retained the named volume. Read-only public queries returned identical full payloads for 1 lesson / 181 attempts before/after restart and after final rebuild (146 nonempty used, 35 nonempty missed arrays), SHA256 `4A9ED479A045AC6250051ECCDFF58BD66B6A2B50E1E888D675AE643B1F267FDD`.
+- Automatic Docker payload preservation is not human UI approval. All four card states × five re-entry/restart routes remain pending manual evidence, including genuine browser-process restart and final success before Continue. Live non-null-alternative fixture is unavailable (0), so its manual check remains pending; rich non-null automatic fixtures passed.
+- No volume deletion, learner-data writes, staging, commits or pushes. EVAL-05, Phase 1, manual sign-off and separate phase-close learner smoke remain open. PLAT-09 is not reopened.
 
 ## Validation Sign-Off
 
@@ -116,6 +144,46 @@ Follow-up `01-13-PLAN.md` (not executed): automated reads are `uv run pytest bac
 - [ ] Wave 0 covers all MISSING references
 - [ ] No watch-mode flags
 - [ ] Feedback latency < 120s
-- [ ] `nyquist_compliant: true` set in frontmatter
+- [x] `nyquist_compliant: true` set in frontmatter
 
 **Approval:** pending
+
+---
+
+## Validation Audit — 2026-10-06
+
+Nyquist stays false. Sixteen requirements have a passing behavioral test. PLAT-09 fails: live OpenAPI exposes `practice.advance`, and `frontend/src/api/generated/sdk.gen.ts` does not. `lessonApi.advancePractice` posts through the raw client instead of a generated function. Implementation was not patched.
+
+`docker compose up -d --wait` was not executed in this audit. PLAT-03 is filled by the entrypoint and Compose-contract test below.
+
+Known behavior left untouched: same-session uncorrected rounds, opening-size score, `test_named_target_on_a_repeat_copy_advances_once`, Answer `autocomplete="off"`.
+
+| Requirement | Test | Result |
+|-------------|------|--------|
+| LESS-01 | `backend/tests/application/test_lesson_create.py::test_lesson_create_persists_exact_utf8_source`; `backend/tests/adapters/http/test_http_dto_mapping.py::test_http_maps_create_dto_and_rejects_empty_source`; `frontend/src/features/lesson/LessonListPage.test.tsx` | FILLED |
+| LESS-02 | `backend/tests/application/test_lesson_list.py::test_lesson_list_and_get_round_trip`; `frontend/src/features/lesson/LessonListPage.test.tsx`; `frontend/src/features/lesson/LessonWorkspacePage.test.tsx` | FILLED |
+| ANLY-08 | `backend/tests/application/test_learning_unit_add.py::test_add_stores_exact_span_text_as_draft`; `frontend/src/features/lesson/LearningUnitsStage.test.tsx` | FILLED |
+| EXER-01 | `backend/tests/application/test_exercise_generate.py::test_generate_skips_drafts_and_persists_only_terminal_status`; `frontend/src/features/lesson/LessonWorkspacePage.test.tsx` | FILLED |
+| EXER-02 | `backend/tests/application/test_practice_start.py::test_practice_get_returns_one_current_typed_item_for_one_unit`; `frontend/src/features/lesson/FocusPracticeMode.test.tsx` | FILLED |
+| EXER-03 | `backend/tests/catalog/test_list_visible_for.py::test_learner_list_includes_gap_fill_and_omits_proof`; `backend/tests/modules/exercise_gap_fill/test_generate.py::test_one_accepted_unit_blanks_only_the_target_span`; `frontend/src/registries/renderers/gapFillRenderer.test.tsx` | FILLED |
+| EXER-07 | `backend/tests/application/test_submit_attempt.py::test_submit_stores_attempt_feedback_and_advances_while_session_stays_open`; `frontend/src/features/lesson/FocusPracticeMode.test.tsx` | FILLED |
+| EVAL-01 | `backend/tests/modules/exercise_gap_fill/test_evaluate.py::test_drag_is_correct_when_submitted_learning_unit_id_matches`; `test_typed_match_strips_ends_and_ignores_case_only` | FILLED |
+| EVAL-04 | `backend/tests/modules/exercise_gap_fill/test_evaluate.py::test_gap_fill_emits_only_correct_or_incorrect`; `frontend/src/features/lesson/FocusPracticeMode.test.tsx` | FILLED |
+| EVAL-05 | `backend/tests/modules/exercise_gap_fill/test_feedback.py::test_correct_explanation_matches_d18_and_records_used`; `frontend/src/features/lesson/FeedbackStage.test.tsx`; `frontend/src/features/lesson/FocusPracticeMode.test.tsx` | FILLED |
+| MODL-01 | `backend/tests/catalog/test_startup_validation.py::test_api_incompatible_manifest_refuses_startup` (also duplicate id, unresolved dependency, empty catalog) | FILLED |
+| MODL-02 | `backend/tests/catalog/test_describe.py::test_describe_returns_public_active_rows` | FILLED |
+| MODL-03 | `backend/tests/modules/exercise_proof/test_contract.py::test_proof_satisfies_the_same_public_exercise_protocol_as_gap_fill`; `backend/tests/catalog/test_proof_removal.py::test_proof_removal`; `frontend/src/registries/renderers/proofRenderer.test.ts` | FILLED |
+| MODL-12 | `backend/tests/application/test_handler_isolation.py::test_handler_isolation`; `backend/tests/application/test_lesson_list.py::test_http_routers_delegate_to_handlers_not_repositories` | FILLED |
+| PLAT-03 | `backend/tests/adapters/persistence/test_compose_migrate_then_health.py` | FILLED |
+| PLAT-09 | `backend/tests/adapters/http/test_openapi_client_drift.py::test_typescript_client_matches_openapi_and_ci_rejects_drift` | FILLED |
+| PLAT-10 | `backend/tests/application/test_handler_isolation.py::test_handler_isolation` | FILLED |
+
+### PLAT-09 closure
+
+The 2026-10-06 escalation failed because `sdk.gen.ts` had no `practiceAdvance`. Closed the same day by `uv run python -m lait.adapters.http.export_openapi` and `npm --prefix frontend run openapi:generate`. Generated files were not hand-edited. A second export+generate left the same SHA256 for `openapi.json` and the four generated files. `advancePractice` now calls `practiceAdvance`. `pytest backend/tests/adapters/http/test_openapi_client_drift.py -q` passed. `npm run typecheck` passed. Vitest `FocusPracticeMode.test.tsx` and `LessonWorkspacePage.test.tsx` passed, 38 tests.
+
+### Commands run
+
+- `uv run pytest` on the backend files in the map above, including `test_compose_migrate_then_health.py`: 80 passed.
+- `uv run pytest backend/tests/adapters/http/test_openapi_client_drift.py -q`: 1 failed.
+- `npx --prefix frontend vitest run` on the frontend files in the map, `--maxWorkers=1`: 8 files, 65 passed.

@@ -7,8 +7,8 @@ from lait.domain.exercise import ResultCategory
 
 def explanation(*, category: str, submitted: str, unit: str) -> str:
     if category == "correct":
-        return f'Correct. The expected answer is "{unit}".'
-    return f'Your answer: "{submitted}".'
+        return "The response matches the target for this exercise."
+    return "The response does not match the target for this exercise."
 
 
 def chunk_record(category: ResultCategory, unit: str) -> tuple[tuple[str, ...], tuple[str, ...]]:

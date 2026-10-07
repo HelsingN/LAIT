@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import inspect
 import sqlite3
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 from fastapi.testclient import TestClient
@@ -24,6 +25,129 @@ def _session_statuses(database_url: str) -> dict[str, str]:
     finally:
         connection.close()
     return {session_id: status for session_id, status in rows}
+
+
+def _practice_snapshot(database_url: str) -> dict[str, list[tuple]]:
+    connection = sqlite3.connect(database_url.removeprefix("sqlite:///"))
+    try:
+        return {
+            table: connection.execute(f"select * from {table} order by id").fetchall()
+            for table in ("attempts", "practice_sessions", "practice_pass_items")
+        }
+    finally:
+        connection.close()
+
+
+def test_reopened_http_lists_complete_saved_feedback_without_mutation(tmp_path: Path) -> None:
+    from lait.adapters.http.app import create_app
+    from lait.adapters.persistence.database import migrate
+    from lait.domain.practice_session import Attempt
+
+    database_url = f"sqlite:///{(tmp_path / 'saved-feedback.db').as_posix()}"
+    migrate(database_url)
+    original_app = create_app(database_url)
+    source = "We are rolling out the migration and will follow through."
+    text = "rolling out"
+    start = source.index(text)
+    with TestClient(original_app) as client:
+        created = client.post("/api/lessons", json={"source": source})
+        assert created.status_code == 201
+        lesson_id = created.json()["id"]
+        unit = client.post(
+            f"/api/lessons/{lesson_id}/learning-units",
+            json={"start": start, "end": start + len(text)},
+        )
+        assert unit.status_code == 201
+        unit_id = unit.json()["id"]
+        assert (
+            client.post(f"/api/lessons/{lesson_id}/learning-units/{unit_id}/accept").status_code
+            == 200
+        )
+        assert client.post(f"/api/lessons/{lesson_id}/exercises/generate").status_code == 200
+        started = client.post("/api/practice-sessions", json={"lesson_id": lesson_id})
+        assert started.status_code == 201
+        session_id = started.json()["session_id"]
+
+    # Use the public persistence port: the bundled evaluator does not generate alternatives.
+    when = datetime(2026, 10, 7, tzinfo=UTC)
+    fixtures = [
+        (
+            "saved-rich",
+            "correct",
+            "  Rolling out\n👍  ",
+            "The target was retrieved; one other chunk was missed.",
+            ("rolling out",),
+            ("follow through",),
+            "deploying the change",
+        ),
+        (
+            "saved-empty",
+            "incorrect",
+            "  nope\n  ",
+            'Your answer: "  nope\n  ". The expected answer is "rolling out".',
+            (),
+            (),
+            None,
+        ),
+    ]
+    for offset, fixture in enumerate(fixtures):
+        attempt_id, category, submitted, explanation, used, missed, alternative = fixture
+        original_app.state.lesson_repository.add_attempt(
+            Attempt(
+                id=attempt_id,
+                session_id=session_id,
+                learning_unit_id=unit_id,
+                span_start=start,
+                span_end=start + len(text),
+                unit_text=text,
+                mode="typed",
+                submitted=submitted,
+                category=category,
+                expected=text,
+                explanation=explanation,
+                chunks_used=used,
+                chunks_missed=missed,
+                natural_alternative=alternative,
+                created_at=when + timedelta(seconds=offset),
+            ),
+            cursor=0,
+        )
+
+    before = _practice_snapshot(database_url)
+    # A new app owns a new repository/engine; no cached handler result can satisfy this read.
+    with TestClient(create_app(database_url)) as reopened:
+        response = reopened.get(f"/api/lessons/{lesson_id}/attempts")
+        assert response.status_code == 200
+        rows = response.json()["attempts"]
+        assert [row["attempt_id"] for row in rows] == [fixture[0] for fixture in fixtures]
+        for row, fixture in zip(rows, fixtures, strict=True):
+            attempt_id, category, submitted, explanation, used, missed, alternative = fixture
+            assert {
+                key: row.get(key)
+                for key in (
+                    "learning_unit_id",
+                    "chunks_used",
+                    "chunks_missed",
+                    "natural_alternative",
+                )
+            } == {
+                "learning_unit_id": unit_id,
+                "chunks_used": list(used),
+                "chunks_missed": list(missed),
+                "natural_alternative": alternative,
+            }
+            assert row["attempt_id"] == attempt_id
+            assert row["session_id"] == session_id
+            assert row["category"] == category
+            assert row["submitted"] == submitted
+            assert row["expected"] == row["unit_text"] == text
+            assert row["explanation"] == explanation
+            assert (row["span_start"], row["span_end"]) == (start, start + len(text))
+            assert row["session_disposition"] == "open"
+            assert row["pass_item_count"] == 1
+        assert reopened.get(f"/api/lessons/{lesson_id}/attempts").json() == response.json()
+        assert reopened.get("/api/lessons/missing-lesson/attempts").status_code == 404
+    assert _practice_snapshot(database_url) == before
 
 
 def test_http_maps_create_dto_and_rejects_empty_source(tmp_path: Path) -> None:
@@ -188,6 +312,22 @@ def test_http_maps_generate_start_get_and_submit_only(tmp_path: Path) -> None:
     assert body["category"] == "correct"
     assert body["unit_text"] == text
     assert body["span_start"] == start_at
+
+    listed = client.get(f"/api/lessons/{lesson_id}/attempts")
+    assert listed.status_code == 200
+    saved = listed.json()["attempts"][0]
+    for key in (
+        "attempt_id",
+        "learning_unit_id",
+        "submitted",
+        "expected",
+        "explanation",
+        "chunks_used",
+        "chunks_missed",
+        "natural_alternative",
+    ):
+        assert saved[key] == body[key]
+    assert saved["natural_alternative"] is None
 
     nxt = client.get(f"/api/practice-sessions/{session_id}")
     assert nxt.json()["open"] is True

@@ -21,7 +21,10 @@ export function GapFillRenderer({
   const [answerEditable, setAnswerEditable] = useState(false);
   const drag = item.mode === "drag";
   const graded = feedback !== null;
-  const missed = feedback?.category === "incorrect" && !revealed;
+  const incorrect = feedback?.category === "incorrect";
+  const accepted = feedback?.category === "correct" || feedback?.category === "corrected";
+  const disclosed = accepted || revealed;
+  const inlineAnswer = feedback ? (disclosed ? feedback.expected : feedback.submitted) : "";
 
   useEffect(() => {
     if (feedback !== null) {
@@ -45,17 +48,23 @@ export function GapFillRenderer({
   }
 
   return (
-    <div className={styles.root}>
+    <div className={styles.root} data-testid={feedback ? "feedback-card" : undefined}>
       <p className={styles.sentence} data-testid="gap-fill-sentence">
         {item.segments.map((segment, index) =>
           segment.kind === "blank" ? (
-            <span key={index} className={styles.blank} data-testid="gap-fill-blank" />
+            <span
+              key={index}
+              className={[styles.blank, graded ? styles.answered : "", accepted ? styles.accepted : incorrect && !revealed ? styles.incorrect : ""].filter(Boolean).join(" ")}
+              data-testid="gap-fill-blank"
+            >
+              {inlineAnswer}
+            </span>
           ) : (
             <span key={index}>{stripEmphasis(segment.text)}</span>
           ),
         )}
       </p>
-      {drag ? (
+      {graded ? null : drag ? (
         <div className={styles.chipBank} data-testid="chip-bank">
           {item.chip_unit_ids.map((unitId) => (
             <ChipButton
@@ -101,17 +110,17 @@ export function GapFillRenderer({
           {submitError}
         </p>
       ) : null}
-      {feedback ? <FeedbackCard feedback={feedback} revealed={revealed} /> : null}
+      {feedback ? <p className={accepted ? styles.correct : styles.incorrect} role="status">{resultWord(feedback.category)}</p> : null}
       {feedback ? (
         <>
-          {missed ? (
+          {incorrect ? (
             <>
-              <button type="button" className={styles.primary} onClick={onTryAgain}>
+              <button type="button" className={styles.primary} onClick={() => onTryAgain?.()}>
                 Try again
               </button>
-              <button type="button" className={styles.primary} onClick={onShowAnswer}>
+              {!revealed ? <button type="button" className={styles.primary} onClick={() => onShowAnswer?.()}>
                 Show answer
-              </button>
+              </button> : null}
             </>
           ) : null}
           <button type="button" className={styles.primary} onClick={onContinue}>
@@ -167,25 +176,4 @@ function resultWord(category: string): string {
     return "Corrected";
   }
   return category;
-}
-
-function FeedbackCard({
-  feedback,
-  revealed,
-}: {
-  feedback: RendererProps["feedback"];
-  revealed: boolean;
-}) {
-  if (!feedback) {
-    return null;
-  }
-  const tone = feedback.category === "incorrect" ? styles.incorrect : styles.correct;
-  const showSubmitted = feedback.category === "incorrect" || feedback.category === "corrected";
-  return (
-    <article className={styles.card} data-testid="feedback-card">
-      <p className={tone}>{resultWord(feedback.category)}</p>
-      {showSubmitted ? <p>{feedback.submitted}</p> : null}
-      {revealed ? <p>{feedback.expected}</p> : null}
-    </article>
-  );
 }

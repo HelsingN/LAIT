@@ -79,7 +79,7 @@ def test_submit_stores_attempt_feedback_and_advances_while_session_stays_open(
     assert result.cursor == 1
     assert result.category == "correct"
     assert result.expected == "rolling out"
-    assert result.explanation == 'Correct. The expected answer is "rolling out".'
+    assert result.explanation == "The response matches the target for this exercise."
     assert result.natural_alternative is None
     assert result.chunks_used == ("rolling out",)
     assert result.chunks_missed == ()

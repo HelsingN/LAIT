@@ -26,7 +26,7 @@ import {
 import styles from "./LessonWorkspacePage.module.css";
 import { type CodePointRange } from "./selectionOffsets.ts";
 import { FeedbackStage } from "./stages/FeedbackStage.tsx";
-import type { RendererFeedback } from "../../registries/renderers/types.ts";
+import type { PracticeItemView, RendererFeedback } from "../../registries/renderers/types.ts";
 import { GenerateExercisesStage } from "./stages/GenerateExercisesStage.tsx";
 import { LearningUnitsStage } from "./stages/LearningUnitsStage.tsx";
 import { PracticeStage } from "./stages/PracticeStage.tsx";
@@ -34,10 +34,15 @@ import { SourceStage } from "./stages/SourceStage.tsx";
 import {
   attemptStorageKey,
   clearOpenPracticeSessionId,
+  clearPendingFeedback,
   isPracticeOpen,
   loadOpenPracticeSessionId,
   loadStageExpansion,
-  revealStorageKey,
+  loadPendingFeedback,
+  loadReveal,
+  samePracticeItem,
+  savePendingFeedback,
+  saveReveal,
   saveOpenPracticeSessionId,
   saveStageExpansion,
   type StageExpansion,
@@ -47,6 +52,19 @@ import {
 const LOAD_ERROR = "Could not load this lesson. Return to the lesson list and open it again.";
 const FINISH_ERROR = "Could not finish this practice. Try again.";
 const HISTORY_ERROR = "Could not load practice history. Try again.";
+
+function matchesAttempt(row: LessonAttempt, sessionId: string, item: PracticeItemView): boolean {
+  return row.session_id === sessionId && row.learning_unit_id === item.learning_unit_id && row.mode === item.mode
+    && row.span_start === item.start && row.span_end === item.end && row.unit_text === item.target_text && row.expected === item.target_text;
+}
+
+function savedFeedback(row: LessonAttempt): RendererFeedback {
+  if (typeof row.explanation !== "string" || !Array.isArray(row.chunks_used) || !row.chunks_used.every(chunk => typeof chunk === "string")
+    || !Array.isArray(row.chunks_missed) || !row.chunks_missed.every(chunk => typeof chunk === "string")
+    || (row.natural_alternative !== null && typeof row.natural_alternative !== "string")) throw new Error(HISTORY_ERROR);
+  return { attempt_id: row.attempt_id, category: row.category, submitted: row.submitted, expected: row.expected,
+    explanation: row.explanation, chunks_used: row.chunks_used, chunks_missed: row.chunks_missed, natural_alternative: row.natural_alternative };
+}
 
 function sameIdSet(left: string[], right: string[]): boolean {
   if (left.length !== right.length) {
@@ -125,6 +143,17 @@ export function LessonWorkspacePage() {
   );
   const [startPending, setStartPending] = useState(false);
   const startPendingRef = useRef(false);
+  const presentationEpoch = useRef(0);
+  const activeLesson = useRef(id);
+  activeLesson.current = id;
+  const renderEpoch = presentationEpoch.current;
+  const activeFeedback = useRef("");
+  const feedbackIdentity = JSON.stringify([id, session?.session_id, session?.current, feedback?.attempt_id]);
+  activeFeedback.current = feedbackIdentity;
+
+  function currentRequest(epoch: number, lessonId = id): boolean {
+    return presentationEpoch.current === epoch && activeLesson.current === lessonId;
+  }
 
   const lessonQuery = useQuery({
     queryKey: ["lesson", id],
@@ -156,70 +185,102 @@ export function LessonWorkspacePage() {
   });
 
   useEffect(() => {
+    const epoch = ++presentationEpoch.current;
+    setSession(null);
+    setFocused(false);
+    setFeedback(null);
+    setRevealed(false);
+    setSubmitPending(false);
+    setHistoryError(null);
+    setHistoryRetryId(null);
+    startPendingRef.current = false;
+    setStartPending(false);
+    hydratedFor.current = null;
     const sessionId = loadOpenPracticeSessionId(id);
     if (!sessionId) {
       setPendingStoredSession(false);
-      return;
+      return () => { presentationEpoch.current += 1; };
     }
-    let cancelled = false;
-    setPendingStoredSession(true);
-    void getPractice(sessionId)
-      .then(async (view) => {
-        if (cancelled) {
-          return;
-        }
-        if (view.open && view.current === null) {
-          void closeSession(sessionId, false);
-          return;
-        }
-        setPendingStoredSession(false);
-        if (view.open && view.current) {
-          setSession(view);
-          setFocused(true);
-          const listed = await listLessonAttempts(id);
-          if (cancelled) {
-            return;
-          }
-          const current = view.current;
-          const marked = localStorage.getItem(attemptStorageKey(view.session_id, current.position));
-          const rows = listed.filter(
-            (row) =>
-              row.session_id === view.session_id &&
-              row.mode === current.mode &&
-              row.span_start === current.start &&
-              row.span_end === current.end,
-          );
-          const latest = rows[rows.length - 1];
-          if (marked && latest?.attempt_id === marked && latest.category === "incorrect") {
-            const shown = localStorage.getItem(revealStorageKey(view.session_id, current.position)) === "1";
-            setRevealed(shown);
-            setFeedback({
-              category: latest.category,
-              submitted: latest.submitted,
-              expected: latest.expected,
-              explanation: latest.explanation,
-              chunks_used: [],
-              chunks_missed: [],
-              natural_alternative: null,
-            });
-          }
-          return;
-        }
-        clearOpenPracticeSessionId(id);
-      })
-      .catch(() => {
-        if (cancelled) {
-          return;
-        }
-        setPendingStoredSession(false);
-        clearOpenPracticeSessionId(id);
-      });
+    void restorePractice(sessionId, epoch);
     return () => {
-      cancelled = true;
+      presentationEpoch.current += 1;
     };
     // closeSession is recreated each render and only this lesson id is in scope.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
+
+  async function restorePractice(sessionId: string, epoch: number): Promise<void> {
+    let viewLoaded = false;
+    setPendingStoredSession(true);
+    setHistoryError(null);
+    try {
+      const view = await getPractice(sessionId);
+      if (!currentRequest(epoch)) return;
+      viewLoaded = true;
+      if (!view.open || view.lesson_id !== id || view.session_id !== sessionId) {
+        clearOpenPracticeSessionId(id);
+        clearPendingFeedback(id, sessionId);
+        setPendingStoredSession(false);
+        return;
+      }
+      const pending = loadPendingFeedback(id, sessionId);
+      if (!view.current && !pending) {
+        await closeSession(sessionId, false);
+        return;
+      }
+      setSession(view);
+      setFocused(true);
+      setFeedback(null);
+      setRevealed(false);
+      const listed = await listLessonAttempts(id);
+      if (!currentRequest(epoch)) return;
+      let display = view.current;
+      let row: LessonAttempt | undefined;
+      if (pending) {
+        const exact = listed.find(attempt => attempt.attempt_id === pending.attempt_id);
+        const success = exact?.category === "correct" || exact?.category === "corrected";
+        const cursor = pending.item.position + (success ? 1 : 0);
+        const marked = localStorage.getItem(attemptStorageKey(sessionId, pending.item.position));
+        if (exact && marked === pending.attempt_id && matchesAttempt(exact, sessionId, pending.item)
+          && (success || exact.category === "incorrect") && pending.response_cursor === cursor && view.cursor === cursor
+          && (success ? (view.current === null || view.current.position === cursor) : (view.current !== null && samePracticeItem(view.current, pending.item)))) {
+          row = exact;
+          display = pending.item;
+        } else {
+          clearPendingFeedback(id, sessionId);
+        }
+      }
+      if (!row && view.current) {
+        const marked = localStorage.getItem(attemptStorageKey(sessionId, view.current.position));
+        const exact = listed.find(attempt => attempt.attempt_id === marked);
+        if (exact?.category === "incorrect" && matchesAttempt(exact, sessionId, view.current)) row = exact;
+      }
+      if (row && display) {
+        const restored = savedFeedback(row);
+        setSession({ ...view, current: display });
+        setFeedback(restored);
+        setRevealed(loadReveal({ version: 1, session_id: sessionId, attempt_id: row.attempt_id, item: display }));
+      } else if (!view.current) {
+        await closeSession(sessionId, false);
+        return;
+      }
+      setPendingStoredSession(false);
+      setHistoryError(null);
+      setHistoryRetryId(null);
+    } catch (error) {
+      if (!currentRequest(epoch)) return;
+      if (!viewLoaded && requestStatus(error) === 404) {
+        clearOpenPracticeSessionId(id);
+        setPendingStoredSession(false);
+      } else {
+        setHistoryError(HISTORY_ERROR);
+        setHistoryRetryId(sessionId);
+        // Retain the session and presentation pointer so an explicit read retry
+        // can recover; never finish or manufacture missing educational data.
+        setPendingStoredSession(true);
+      }
+    }
+  }
 
   useEffect(() => {
     if (id === "" || !lessonQuery.isSuccess || !unitsQuery.isSuccess) {
@@ -230,10 +291,11 @@ export function LessonWorkspacePage() {
     }
     hydratedFor.current = id;
     const lessonId = id;
+    const epoch = presentationEpoch.current;
     void (async () => {
       try {
         const latest = await latestCompletedExercises(lessonId);
-        if (hydratedFor.current === lessonId && latest.restorable && latest.generation_id) {
+        if (currentRequest(epoch, lessonId) && hydratedFor.current === lessonId && latest.restorable && latest.generation_id) {
           setGeneration({
             id: latest.generation_id,
             lesson_id: lessonId,
@@ -253,7 +315,7 @@ export function LessonWorkspacePage() {
       }
       try {
         const listed = await listLessonAttempts(lessonId);
-        if (hydratedFor.current !== lessonId || listed.length === 0) {
+        if (!currentRequest(epoch, lessonId) || hydratedFor.current !== lessonId || listed.length === 0) {
           return;
         }
         setAttempts(listed);
@@ -291,29 +353,39 @@ export function LessonWorkspacePage() {
       return;
     }
     startPendingRef.current = true;
+    const epoch = ++presentationEpoch.current;
     setStartPending(true);
     setStartError(null);
     try {
       const view = await startPractice(id);
+      if (!currentRequest(epoch)) return;
       saveOpenPracticeSessionId(id, view.session_id);
       setSession(view);
       setFeedback(null);
       setRevealed(false);
       setSubmitError(null);
       setFocused(true);
+      setPendingStoredSession(false);
+      setHistoryError(null);
     } catch {
+      if (!currentRequest(epoch)) return;
       setStartError("Could not start practice. Try again.");
     } finally {
-      startPendingRef.current = false;
-      setStartPending(false);
+      if (currentRequest(epoch)) {
+        startPendingRef.current = false;
+        setStartPending(false);
+      }
     }
   }
 
   async function handleSubmit(answer: { text: string; submittedUnitId: string | null }) {
-    if (!session?.current) {
+    if (!session?.current || pendingStoredSession || submitPending) {
       return;
     }
     setSubmitPending(true);
+    const capturedSession = session;
+    const item = session.current;
+    const epoch = presentationEpoch.current;
     setSubmitError(null);
     try {
       const result = await submitAttempt(session.session_id, {
@@ -322,20 +394,26 @@ export function LessonWorkspacePage() {
         submittedUnitId: answer.submittedUnitId,
         targetLearningUnitId: session.current.learning_unit_id,
       });
+      if (!currentRequest(epoch)) return;
       localStorage.setItem(
         attemptStorageKey(session.session_id, session.current.position),
         result.attempt_id,
       );
+      savePendingFeedback(id, { version: 1, session_id: capturedSession.session_id,
+        attempt_id: result.attempt_id, item, response_cursor: result.cursor });
+      setSession({ ...capturedSession, cursor: result.cursor, current: item });
       setRevealed(false);
       setFeedback(result);
     } catch {
+      if (!currentRequest(epoch)) return;
       setSubmitError("Could not submit. Try again.");
     } finally {
-      setSubmitPending(false);
+      if (currentRequest(epoch)) setSubmitPending(false);
     }
   }
 
   async function revealPass(sessionId: string): Promise<void> {
+    const epoch = presentationEpoch.current;
     setCurrentPassSessionId(sessionId);
     setFeedbackUnlocked(true);
     setExpansion((current) => {
@@ -345,22 +423,27 @@ export function LessonWorkspacePage() {
     });
     try {
       const listed = await listLessonAttempts(id);
+      if (!currentRequest(epoch)) return;
       setAttempts(listed);
       setHistoryError(null);
       setHistoryRetryId(null);
     } catch {
-      setAttempts([]);
+      if (!currentRequest(epoch)) return;
       setHistoryError(HISTORY_ERROR);
       setHistoryRetryId(sessionId);
     }
   }
 
   async function closeSession(sessionId: string, stayOnFailure: boolean): Promise<void> {
+    const epoch = presentationEpoch.current;
     try {
       await finishPractice(sessionId);
+      if (!currentRequest(epoch)) return;
     } catch (error) {
+      if (!currentRequest(epoch)) return;
       if (requestStatus(error) === 404) {
         clearOpenPracticeSessionId(id);
+        clearPendingFeedback(id, sessionId);
         setFocused(false);
         setSession(null);
         setFeedback(null);
@@ -382,6 +465,7 @@ export function LessonWorkspacePage() {
       return;
     }
     clearOpenPracticeSessionId(id);
+    clearPendingFeedback(id, sessionId);
     setFocused(false);
     setSession(null);
     setFeedback(null);
@@ -403,20 +487,31 @@ export function LessonWorkspacePage() {
     if (!historyRetryId) {
       return;
     }
-    await revealPass(historyRetryId);
+    if (loadOpenPracticeSessionId(id) === historyRetryId) {
+      const epoch = ++presentationEpoch.current;
+      await restorePractice(historyRetryId, epoch);
+    } else {
+      await revealPass(historyRetryId);
+    }
   }
 
   async function handleTryAgain() {
+    presentationEpoch.current += 1;
+    if (session?.current) {
+      clearPendingFeedback(id, session.session_id);
+      localStorage.removeItem(attemptStorageKey(session.session_id, session.current.position));
+    }
     setFeedback(null);
     setRevealed(false);
     setSubmitError(null);
   }
 
   function handleShowAnswer() {
-    if (!session?.current || !feedback) {
+    if (!session?.current || !feedback?.attempt_id || feedback.category !== "incorrect"
+      || renderEpoch !== presentationEpoch.current || feedbackIdentity !== activeFeedback.current) {
       return;
     }
-    localStorage.setItem(revealStorageKey(session.session_id, session.current.position), "1");
+    saveReveal({ version: 1, session_id: session.session_id, attempt_id: feedback.attempt_id, item: session.current });
     setRevealed(true);
   }
 
@@ -425,13 +520,17 @@ export function LessonWorkspacePage() {
       return;
     }
     const position = session.current?.position;
+    const epoch = ++presentationEpoch.current;
     const skip =
       position !== undefined && (feedback?.category === "incorrect" || revealed);
     try {
       if (skip) {
         await advancePractice(session.session_id, position);
+        if (!currentRequest(epoch)) return;
       }
       const view = await getPractice(session.session_id);
+      if (!currentRequest(epoch)) return;
+      clearPendingFeedback(id, session.session_id);
       if (view.open && view.current === null) {
         await closeSession(view.session_id, true);
         return;
@@ -441,6 +540,7 @@ export function LessonWorkspacePage() {
       setRevealed(false);
       setSubmitError(null);
     } catch {
+      if (!currentRequest(epoch)) return;
       setSubmitError("Could not continue. Try again.");
     }
   }
@@ -449,6 +549,7 @@ export function LessonWorkspacePage() {
     if (!session) {
       return;
     }
+    presentationEpoch.current += 1;
     await closeSession(session.session_id, true);
   }
 
@@ -456,12 +557,20 @@ export function LessonWorkspacePage() {
     if (!session) {
       return;
     }
-    const view = await startOverPractice(session.session_id);
+    const epoch = ++presentationEpoch.current;
+    const oldSessionId = session.session_id;
+    const view = await startOverPractice(oldSessionId);
+    if (!currentRequest(epoch)) return;
+    clearPendingFeedback(id, oldSessionId);
     saveOpenPracticeSessionId(id, view.session_id);
     setSession(view);
     setFeedback(null);
     setRevealed(false);
     setSubmitError(null);
+    setSubmitPending(false);
+    setPendingStoredSession(false);
+    setHistoryError(null);
+    setHistoryRetryId(null);
   }
 
   function jumpToSpan(start: number, end: number) {
@@ -486,6 +595,7 @@ export function LessonWorkspacePage() {
   if (focused && session) {
     return (
       <main className={styles.page}>
+        {historyError ? <><p className={styles.alert} role="alert">{historyError}</p><button type="button" onClick={() => void retryHistory()}>Retry history</button></> : null}
         {finishError ? (
           <>
             <p className={styles.alert} role="alert">
@@ -501,7 +611,7 @@ export function LessonWorkspacePage() {
           item={focusItem}
           units={units.map((unit) => ({ id: unit.id, text: unit.text }))}
           learnerExerciseTypes={learnerExerciseTypes}
-          pending={submitPending}
+          pending={submitPending || pendingStoredSession}
           submitError={submitError}
           feedback={feedback}
           revealed={revealed}

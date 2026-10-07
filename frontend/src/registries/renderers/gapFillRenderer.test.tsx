@@ -11,6 +11,7 @@ import { MemoryRouter, Route, Routes } from "react-router";
 
 import { LessonWorkspacePage } from "../../features/lesson/LessonWorkspacePage.tsx";
 import { GapFillRenderer } from "./GapFillRenderer.tsx";
+import type { RendererFeedback } from "./types.ts";
 
 const lessonId = "lesson-1";
 const testDirectory = dirname(fileURLToPath(import.meta.url));
@@ -61,6 +62,105 @@ const dragItem = {
   ],
   chip_unit_ids: ["unit-1", "unit-2"],
 };
+
+function feedbackProps(feedback: RendererFeedback, revealed = false) {
+  return {
+    item: { ...dragItem, mode: "typed" }, units: [], pending: false, submitError: null,
+    feedback, revealed, onSubmit: vi.fn(), onContinue: vi.fn(),
+    onTryAgain: vi.fn(), onShowAnswer: vi.fn(),
+  };
+}
+
+const richFeedback: RendererFeedback = {
+  category: "incorrect", submitted: "ship it", expected: "rolling out",
+  explanation: 'Use a paragraph in context. Expected answer: “ROLLING OUT”.',
+  chunks_used: ["follow through"], chunks_missed: ["rolling out"],
+  natural_alternative: "deploying the change",
+};
+
+it.each(["correct", "corrected"])("fills the accepted phrase once inline for %s without a card/input", (category) => {
+  render(<GapFillRenderer {...feedbackProps({ ...richFeedback, category, submitted: "  Rolling OUT  " })} />);
+  const blank = screen.getByTestId("gap-fill-blank");
+  expect(blank.textContent).toBe("rolling out");
+  expect(blank.className).toMatch(/accepted/);
+  expect(screen.getByRole("status")).toHaveTextContent(category === "correct" ? "Correct" : "Corrected");
+  expect(screen.queryByRole("textbox", { name: "Answer" })).not.toBeInTheDocument();
+  expect(screen.queryByText("Details")).not.toBeInTheDocument();
+  expect(screen.queryByTestId("submitted-answer")).not.toBeInTheDocument();
+  expect(screen.queryByTestId("reference-answer")).not.toBeInTheDocument();
+  expect(screen.getByTestId("feedback-card").querySelector("article")).toBeNull();
+  expect(screen.getAllByText("rolling out", { exact: true })).toHaveLength(1);
+  expect(screen.queryByText("  Rolling OUT  ", { exact: true })).not.toBeInTheDocument();
+});
+
+it("keeps the solution and deferred education unmounted on an incorrect result", () => {
+  const feedback = { ...richFeedback, submitted: "  ship it  " };
+  render(<GapFillRenderer {...feedbackProps(feedback)} />);
+  expect(screen.getByTestId("gap-fill-blank").textContent).toBe(feedback.submitted);
+  expect(screen.getByRole("status")).toHaveTextContent("Incorrect");
+  expect(screen.queryByRole("textbox", { name: "Answer" })).not.toBeInTheDocument();
+  const result = screen.getByTestId("feedback-card");
+  for (const value of [feedback.expected, feedback.explanation, "follow through", "deploying the change", "Chunks used", "Chunks missed", "Details"]) {
+    expect(result.innerHTML).not.toContain(value);
+  }
+  expect(screen.getByRole("button", { name: "Try again" })).toBeEnabled();
+  expect(screen.getByRole("button", { name: "Show answer" })).toBeEnabled();
+});
+
+it("Show answer fills the blank without recall credit or commands and keeps Try again available", async () => {
+  const props = feedbackProps(richFeedback);
+  const original = structuredClone(richFeedback);
+  const { rerender } = render(<GapFillRenderer {...props} />);
+  await userEvent.setup().click(screen.getByRole("button", { name: "Show answer" }));
+  expect(props.onShowAnswer).toHaveBeenCalledExactlyOnceWith();
+  rerender(<GapFillRenderer {...props} revealed />);
+  expect(screen.getByTestId("gap-fill-blank")).toHaveTextContent("rolling out");
+  expect(screen.getByTestId("gap-fill-blank").className).not.toMatch(/accepted/);
+  expect(screen.getByRole("status")).toHaveTextContent("Incorrect");
+  expect(screen.getAllByText("rolling out", { exact: true })).toHaveLength(1);
+  expect(screen.queryByText("ship it", { exact: true })).not.toBeInTheDocument();
+  expect(screen.getByRole("button", { name: "Try again" })).toBeEnabled();
+  expect(screen.queryByRole("button", { name: "Show answer" })).not.toBeInTheDocument();
+  expect(props.onSubmit).not.toHaveBeenCalled();
+  expect(props.onContinue).not.toHaveBeenCalled();
+  expect(props.feedback).toEqual(original);
+});
+
+it.each([false, true])("Try again clears the inline answer/result and permits entry (revealed=%s)", async (revealed) => {
+  const props = feedbackProps(richFeedback, revealed);
+  const { rerender } = render(<GapFillRenderer {...props} />);
+  await userEvent.setup().click(screen.getByRole("button", { name: "Try again" }));
+  expect(props.onTryAgain).toHaveBeenCalledExactlyOnceWith();
+  expect(props.onSubmit).not.toHaveBeenCalled();
+  expect(props.onContinue).not.toHaveBeenCalled();
+  rerender(<GapFillRenderer {...props} feedback={null} revealed={false} />);
+  expect(screen.getByTestId("gap-fill-blank")).toBeEmptyDOMElement();
+  expect(screen.queryByRole("status")).not.toBeInTheDocument();
+  expect(screen.queryByTestId("feedback-card")).not.toBeInTheDocument();
+  expect(screen.getByRole("textbox", { name: "Answer" })).toHaveValue("");
+  await userEvent.setup().type(screen.getByRole("textbox", { name: "Answer" }), "new response");
+  await userEvent.setup().click(screen.getByRole("button", { name: "Submit Answer" }));
+  expect(props.onSubmit).toHaveBeenCalledExactlyOnceWith({ text: "new response", submittedUnitId: null });
+});
+
+it.each(["correct", "corrected", "incorrect"])("never displays deferred educational fields for %s even after disclosure", (category) => {
+  const feedback = { ...richFeedback, category, explanation: '<script>alert(1)</script> Original teaching' };
+  const snapshot = structuredClone(feedback);
+  render(<GapFillRenderer {...feedbackProps(feedback, true)} />);
+  const result = screen.getByTestId("feedback-card");
+  for (const text of ["Details", "Chunks used", "Chunks missed", "Natural alternative", "Original teaching", "follow through", "deploying the change", "alert(1)"]) {
+    expect(result.innerHTML).not.toContain(text);
+  }
+  expect(result.querySelector("details, article, script")).toBeNull();
+  expect(feedback).toEqual(snapshot);
+});
+
+it("renders hostile inline answer markup as inert text", () => {
+  const expected = "<img src=x onerror=alert(1)>";
+  render(<GapFillRenderer {...feedbackProps({ ...richFeedback, category: "correct", expected })} />);
+  expect(screen.getByTestId("gap-fill-blank").textContent).toBe(expected);
+  expect(screen.getByTestId("gap-fill-blank").querySelector("img")).toBeNull();
+});
 
 function jsonResponse(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
@@ -159,7 +259,8 @@ it("wraps the blank inline and scrolls the chip bank", async () => {
   expect(css).toMatch(/\.chipBank\s*\{[^}]*flex-wrap:\s*wrap/s);
   expect(css).toMatch(/\.chipBank\s*\{[^}]*max-height:\s*40vh/s);
   expect(css).toMatch(/\.chipBank\s*\{[^}]*overflow-y:\s*auto/s);
-  expect(css).toMatch(/\.card\s*\{[^}]*overflow-wrap:\s*anywhere/s);
+  expect(css).toMatch(/\.answered\s*\{[^}]*overflow-wrap:\s*anywhere/s);
+  expect(css).toMatch(/\.accepted\s*\{[^}]*color:\s*var\(--color-accent\)/s);
   expect(css).not.toMatch(/overflow-x:\s*scroll/);
 
   const focusCss = readFileSync(
@@ -218,7 +319,7 @@ it("strips emphasis markers and leaves identifier underscores", () => {
   expect(screen.getByTestId("gap-fill-blank").textContent ?? "").not.toMatch(/_/);
 });
 
-it("shows a labeled typed answer and locks it after a grade", () => {
+it("shows a labeled typed answer and replaces entry with the inline response after grading", () => {
   const { rerender } = render(
     <GapFillRenderer
       item={{ ...dragItem, mode: "typed" }}
@@ -259,7 +360,7 @@ it("shows a labeled typed answer and locks it after a grade", () => {
     />,
   );
 
-  expect(screen.getByRole("textbox", { name: "Answer" })).toBeDisabled();
+  expect(screen.queryByRole("textbox", { name: "Answer" })).not.toBeInTheDocument();
   expect(screen.getByRole("button", { name: "Continue" })).toBeEnabled();
   expect(screen.getByRole("button", { name: "Try again" })).toBeEnabled();
   expect(screen.getByRole("button", { name: "Show answer" })).toBeEnabled();
@@ -301,8 +402,7 @@ it("clears a typed draft when the grade is cleared for another try", async () =>
   expect(screen.getByRole("button", { name: "Submit Answer" })).toBeDisabled();
 });
 
-it("ignores chip clicks after a grade", async () => {
-  const user = userEvent.setup();
+it("removes chips after grading so accepted text is not duplicated", () => {
   render(
     <GapFillRenderer
       item={dragItem}
@@ -326,10 +426,9 @@ it("ignores chip clicks after a grade", async () => {
     />,
   );
 
-  const chips = within(screen.getByTestId("chip-bank")).getAllByRole("button");
-  expect(chips.every((chip) => chip.hasAttribute("disabled"))).toBe(true);
-  await user.click(chips[0]!);
-  expect(chips.every((chip) => chip.getAttribute("aria-pressed") !== "true")).toBe(true);
+  expect(screen.queryByTestId("chip-bank")).not.toBeInTheDocument();
+  expect(screen.getByTestId("gap-fill-blank")).toHaveTextContent("rolling out");
+  expect(screen.getAllByText("rolling out", { exact: true })).toHaveLength(1);
   expect(screen.getByRole("button", { name: "Continue" })).toBeEnabled();
   expect(screen.queryByRole("button", { name: "Retry" })).not.toBeInTheDocument();
 });

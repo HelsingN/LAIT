@@ -142,6 +142,10 @@ class AttemptRecord:
     submitted: str
     expected: str
     explanation: str
+    chunks_used: tuple[str, ...]
+    chunks_missed: tuple[str, ...]
+    natural_alternative: str | None
+    learning_unit_id: str
     unit_text: str
     span_start: int
     span_end: int

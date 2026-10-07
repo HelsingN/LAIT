@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from dataclasses import replace
 from datetime import UTC, datetime
 
 import pytest
@@ -74,7 +75,11 @@ def _record(
         category="correct",
         submitted="alpha",
         expected="alpha",
-        explanation="matched",
+        explanation='Correct. The expected answer is "alpha". 👍',
+        chunks_used=("alpha", "naïve 👍", "alpha"),
+        chunks_missed=("follow through",),
+        natural_alternative="deploying the change",
+        learning_unit_id="unit-1",
         unit_text="alpha",
         span_start=0,
         span_end=5,
@@ -212,3 +217,41 @@ def test_known_lesson_with_no_attempts_returns_an_empty_list() -> None:
     result = list_attempts(LESSON_ID, _Repository())
 
     assert result.attempts == ()
+
+
+def test_query_forwards_complete_saved_feedback_without_mutating_records() -> None:
+    rich = _record("attempt-rich", "session-1", OPEN, 1, 1, "typed")
+    empty = replace(
+        rich,
+        attempt_id="attempt-empty",
+        category="incorrect",
+        submitted="  nope\n  ",
+        explanation='Your answer: "  nope\n  ".',
+        chunks_used=(),
+        chunks_missed=(),
+        natural_alternative=None,
+    )
+    # A repeat copy grows the live count, while the opening denominator remains one.
+    rich = replace(rich, session_item_count=2)
+    empty = replace(empty, session_item_count=2)
+    repository = _Repository(records=[rich, empty])
+    before = tuple(repository.records)
+
+    result = list_attempts(LESSON_ID, repository)
+
+    assert [row.attempt_id for row in result.attempts] == ["attempt-rich", "attempt-empty"]
+    for listed, stored in zip(result.attempts, before, strict=True):
+        assert listed.learning_unit_id == stored.learning_unit_id
+        assert listed.session_id == stored.session_id
+        assert listed.chunks_used == stored.chunks_used
+        assert listed.chunks_missed == stored.chunks_missed
+        assert listed.natural_alternative == stored.natural_alternative
+        assert listed.explanation == stored.explanation
+        assert listed.submitted == stored.submitted
+        assert listed.expected == stored.expected
+        assert listed.unit_text == stored.unit_text
+        assert (listed.span_start, listed.span_end) == (stored.span_start, stored.span_end)
+        assert listed.created_at == stored.created_at
+        assert listed.session_disposition == "open"
+        assert listed.pass_item_count == 1
+    assert tuple(repository.records) == before

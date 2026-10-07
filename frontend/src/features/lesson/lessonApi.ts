@@ -11,6 +11,7 @@ import {
   lessonCreate,
   lessonGet,
   lessonList,
+  practiceAdvance,
   practiceFinish,
   practiceGet,
   practiceStart,
@@ -27,7 +28,6 @@ import {
   type SegmentResponse,
   type SubmitResponse,
 } from "../../api/generated/index.ts";
-import { client } from "../../api/generated/client.gen.ts";
 
 export type Lesson = LessonResponse;
 
@@ -280,11 +280,9 @@ export function startOverPractice(sessionId: string): Promise<PracticeView> {
 
 export function advancePractice(sessionId: string, position: number): Promise<PracticeView> {
   return readData(
-    client.post({
-      url: "/api/practice-sessions/{session_id}/advance",
+    practiceAdvance({
       path: { session_id: sessionId },
       body: { position },
-      headers: { "Content-Type": "application/json" },
-    }) as Promise<{ data?: PracticeView; response?: Response }>,
+    }),
   );
 }
