@@ -4,7 +4,7 @@ milestone: v1.0
 current_phase: 01
 current_phase_name: Mod-First Manual Learning Loop
 status: executing
-stopped_at: Plan 01-19 complete; final verification passed (5/5). Historical UAT discovery remains administrative phase-transition debt.
+stopped_at: Plan 01-19 complete; final verification passed (5/5). Historical UAT archived byte-for-byte; active UAT predicate passed, ready for formal phase closure.
 last_updated: "2026-10-08T02:29:12Z"
 last_activity: 2026-10-08
 last_activity_desc: Newly authorized plan 01-19 fixed WR-02; 57 affected backend and 69 frontend checks pass, probe cursor 2 to 2. Canonical verification passed 5/5; UAT 76/76 and approved EVAL-05 deferral retained. No prior plan rerun or phase.complete.
@@ -140,7 +140,7 @@ Recent decisions affecting current and future work:
 ### Pending Todos
 
 - Explicit execute-phase 01 --gaps-only and user option 3 authorized inline execution. Plans 01-01–01-18 are complete; final R2 T3 approved by user on 2026-10-07. Subsequent explicit Да authorizes scoped commit/push to existing origin/phase/01-execution; result belongs to Git history/handoff, not phase closure.
-- WR-02 closed by completed plan 01-19; canonical verification passed 5/5. Before a later phase transition, reconcile raw UAT-HISTORY archive discovery while preserving historical failed rows. All 14 human tests and prior phase smoke passed; compact Feedback remains UX debt with no approved phase owner. Phase 1 remains administratively open; original EVAL-05 is partial/deferred to Phase 5.
+- WR-02 closed by completed plan 01-19; canonical verification passed 5/5. Historical UAT discovery reconciled by byte-preserving history/ archive and link update; active UAT predicate passed, 76/76, zero blockers. User authorized formal Phase 1 closure and PR to main. Compact Feedback remains UX debt with no approved phase owner; original EVAL-05 is partial/deferred to Phase 5. Architecture notes must be evaluated during Phase 2 planning before MODL-06/MODL-07 and AI boundaries, without speculative Phase 1 refactoring.
 - After a working vertical learning slice exists, consider a small MCP integration spike as an architectural acceptance test; do not add it to current Phase 1 scope.
 
 ### Blockers/Concerns
@@ -149,6 +149,7 @@ Recent decisions affecting current and future work:
 - No unresolved discussion blocker. Phase 1 planning is complete.
 - Execution must preserve the Learning Unit, Gap Fill, proof-module, visibility, session, and application command/query decisions recorded in `01-CONTEXT.md`.
 - Future MCP schemas and DeepSeek Harness packaging remain deferred and must not expand Phase 1 scope.
+- Architectural audit findings below do not block the Phase 1 PR. Do not perform speculative abstraction/refactoring during Phase 1 closure. When planning Phase 2, explicitly evaluate both findings before implementing MODL-06, MODL-07 and AI provider/feature boundaries. Preserve framework-independent application handlers, Core unaware of concrete module IDs, registry-based exercise discovery, the removable proof module, and the future peer HTTP/MCP adapter boundary. No ModuleHost design or new ADR is selected by these notes.
 
 ### Quick Tasks Completed
 
@@ -161,7 +162,7 @@ Recent decisions affecting current and future work:
 
 ## Deferred Items
 
-Items acknowledged and carried forward from previous milestone close:
+Items acknowledged for later work, including those carried forward from previous milestone close:
 
 | Category | Item | Status | Deferred At |
 |----------|------|--------|-------------|
@@ -172,6 +173,8 @@ Items acknowledged and carried forward from previous milestone close:
 | UX | History rows still show the expected phrase in the stored explanation and again as the unit jump. The focus card does not. | Deferred. Not a 01-16 blocker. | 2026-10-06 |
 | Learning feedback | Detailed teaching/chunk/alternative presentation from original EVAL-05 | Deferred to Phase 5; original EVAL-05 not fully delivered | D-32, 2026-10-07 |
 | Exercise UX | Shared task with multiple blanks and actual drag-and-drop | Proposed Phase 4/9 follow-up; no current implementation | D-37, 2026-10-07 |
+| Architecture | **Application/persistence port drift:** `LearningUnitRepository` no longer describes the full persistence contract used by application handlers. Practice, generation and attempt operations share the repository object, in several places with `# type: ignore[attr-defined]`. Application handlers remain independent of SQLAlchemy/FastAPI, so this is not a Phase 1 architecture failure. Continued expansion could turn the repository into a god port. Reassess whether narrower `ExerciseGenerationRepository`, `PracticeRepository` and `AttemptRepository` ports are warranted when the next phase adds persistence behavior. | Deferred evaluation during Phase 2 planning, before MODL-06/MODL-07 and AI provider/feature implementation; not a Phase 1 PR blocker or a selected refactor | Architectural audit, 2026-10-08 |
+| Architecture | **Module resolution leakage into the application layer:** Exercise handlers depend on `lait.catalog.loader.load_generate/load_evaluate`, persist `module_package`, and resolve implementations through Python packages/importlib. Core remains module-ID agnostic and the Phase 1 proof-module seam works, so this is not a Phase 1 blocker. Before extending Mod-First to AI providers/features, reassess whether handlers should use an abstract ModuleHost/capability resolver instead of the concrete bundled loader, and whether durable records should reference stable module identity/version rather than a Python package as architectural identity. | Deferred evaluation during Phase 2 planning, before MODL-06/MODL-07 and AI provider/feature implementation; no premature ModuleHost design | Architectural audit, 2026-10-08 |
 
 ## Session Continuity
 

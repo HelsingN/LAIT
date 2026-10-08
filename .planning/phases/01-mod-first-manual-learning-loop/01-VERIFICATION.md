@@ -31,9 +31,6 @@ advisory:
   - finding: "O-01-9-visual: compact workspace Feedback requested."
     category: other
     reason: "Functional UAT passes. UX/visual debt; Phase 9 proposed, not approved."
-  - finding: "Historical UAT archive is included by the CLI active-artifact scan."
-    category: other
-    reason: "Administrative predicate debt before a later phase transition; preserve historical bytes, do not retroactively pass failed rows."
 human_verification: []
 covered_files:
   - .github/workflows/ci.yml
@@ -83,6 +80,8 @@ covered_files:
   - .planning/phases/01-mod-first-manual-learning-loop/01-SECURITY.md
   - .planning/phases/01-mod-first-manual-learning-loop/01-UAT.md
   - .planning/phases/01-mod-first-manual-learning-loop/01-VALIDATION.md
+  - .planning/phases/01-mod-first-manual-learning-loop/history/01-UAT-HISTORY-2026-10-06.md
+  - .planning/phases/01-mod-first-manual-learning-loop/history/README.md
   - .planning/phases/01-mod-first-manual-learning-loop/verification-evidence/wr02_cursor_probe.py
   - Dockerfile.api
   - Dockerfile.web
@@ -261,7 +260,7 @@ covered_files:
   - frontend/src/vite-env.d.ts
   - pyproject.toml
   - uv.lock
-covered_digest: "v2:sha256:3205ddd055174338cb20c9f4572cb15dbbab15e2447dca1b47e09a00ccdabeb2"
+covered_digest: "v2:sha256:fe256d80d7d78eec48439859c04553ec561ad7b86cd1aeea53cd9da6cdfd6b5d"
 ---
 
 # Phase 01: Mod-First Manual Learning Loop — Final Re-verification
@@ -272,7 +271,7 @@ covered_digest: "v2:sha256:3205ddd055174338cb20c9f4572cb15dbbab15e2447dca1b47e09
 
 ## Scope and evidence
 
-All 18 previously completed PLAN/SUMMARY contracts were retained and reconciled; only the newly authorized backend gap plan **01-19** executed. Current official execution inventory: 19 plans, 19 summaries, zero incomplete/runnable plans, zero duplicate threat IDs. The report covers current implementation and 225 files with the official v2 content fingerprint.
+All 18 previously completed PLAN/SUMMARY contracts were retained and reconciled; only the newly authorized backend gap plan **01-19** executed. Current official execution inventory: 19 plans, 19 summaries, zero incomplete/runnable plans, zero duplicate threat IDs. The report covers current implementation and 227 files with the official v2 content fingerprint, including the preserved UAT archive and its index.
 
 Current UAT is **76/76**, comprising 14 explicit user-reported functional Docker passes and 62 recorded automated coverage entries. Completed phase Docker learner smoke and the approved 01-18 R2 checkpoint remain valid evidence; this run adds no new manual/browser/Docker observation. Backend-only 01-19 changes no UI, schema, DTO, dependency or learner database, so no new blocking-human checkpoint applies.
 
@@ -372,9 +371,9 @@ No phase-level requirement checkbox was silently advanced by this verification v
 
 ### UAT-HISTORY and the completion predicate
 
-01-UAT-HISTORY-2026-10-06.md is preserved verbatim with its historical `status: diagnosed`, `result: issue`, and G-01-1 `status: resolved` / plan 01-15 resolution. Its symptoms are reconciled above against current code and UAT, not converted retroactively into pass.
+[history/01-UAT-HISTORY-2026-10-06.md](./history/01-UAT-HISTORY-2026-10-06.md) is preserved verbatim with its historical `status: diagnosed`, `result: issue`, and G-01-1 `status: resolved` / plan 01-15 resolution. Its symptoms are reconciled above against current code and UAT, not converted retroactively into pass.
 
-The official CLI scans every immediate-directory filename containing `-UAT` and ending `.md`, so it also treats this archive as active input. `phase.uat-passed 01 --require-verification` therefore reports the historical header/test as blockers even though its gap is resolved and current UAT is 76/76. These are **archive-discovery false positives**. WR-02 is now closed by fresh tests, not exempted. No GSD runtime modification, archive move or force bypass was made during this narrowly scoped 01-19 continuation. Before any later phase transition, archive discovery needs honest reconciliation (preserve original bytes and references), not rewriting the old failed test as passed.
+The official CLI scans immediate-directory filenames containing `-UAT` and ending `.md`. On 2026-10-08 the historical archive was moved into phase-local `history/`; current UAT links resolve there. Before/after SHA-256 is `DD8DEA68E6D76754BA95184D659D6B2D798A7018E368E0829ABFFFB613578818`. The old false-positive header/test blockers are therefore removed from active discovery without changing archived bytes, failed rows, GSD runtime or acceptance policy. Current `phase.uat-passed 01 --require-verification` is rechecked after the metadata fingerprint refresh. Original plan 01-19 evidence remains dated; this administrative closeout adds no implementation or manual acceptance claim.
 
 The prior canonical reports are preserved in `verification-evidence/verification-2026-10-06.md` and `verification-evidence/verification-2026-10-08-wr02.md`. Current verdict replaces the stale canonical body.
 
@@ -391,4 +390,4 @@ WR-01 readOnly retry guard and WR-03 weak drift-test oracle remain warnings, wit
 
 **No remaining evidenced product blocker. Canonical verdict: passed, 5/5.** WR-02 is closed by implementation and fresh regression evidence; original EVAL-05 is an approved Phase 5 deferral.
 
-A later phase transition still encounters the **administrative archive-discovery predicate**: CLI treats unchanged diagnosed UAT-HISTORY as active. This must be reconciled while preserving original evidence before phase.complete. No force bypass or phase closure was performed. UAT 76/76 and phase smoke are retained; no new human test is pending under current Phase 1/backend-only scope.
+The administrative archive-discovery problem is resolved by the byte-preserving move into `history/` and current link update. UAT 76/76 and the existing phase smoke are retained; no new human test is pending under current Phase 1/backend-only scope. Formal phase.complete is a separate authorized bookkeeping step after the passing predicate; no force bypass or original EVAL-05 completion is inferred.

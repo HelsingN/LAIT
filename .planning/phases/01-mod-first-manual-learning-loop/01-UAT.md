@@ -828,14 +828,14 @@ blocked: 0
 - Separate whole-phase learner smoke recorded in `01-VALIDATION.md` Manual-Only table. Plan 01-18 approval remains distinct from this UAT result.
 - Zero current-session gaps, pending, blocked or skipped tests. This completes the UAT session, not Phase 1: canonical verification remains `gaps_found` until re-verification; original full EVAL-05 remains partial/deferred to Phase 5.
 - O-01-9-visual remains UX/visual debt with phase ownership and acceptance impact undecided. Test 14 pass confirms expected workspace behavior; it does not authorize the proposed redesign or imply its deferral is accepted.
-- Historical `01-UAT-HISTORY-2026-10-06.md` is preserved verbatim. Its old issue is not a fresh current-session failure.
+- Historical `history/01-UAT-HISTORY-2026-10-06.md` is preserved verbatim. Its old issue is not a fresh current-session failure.
 - UI post-hook: user selected option 1 (View existing report). `01-UI-REVIEW.md` is retained unchanged at its historical 2026-10-06 score of 14/24; no fresh audit or current-score claim. Validation/security post-hook evidence is recorded in their respective reports.
 - Shared completion predicate still rejects phase transition: the historical UAT file is included as diagnosed/issue, and canonical `01-VERIFICATION.md` remains `gaps_found`. These bookkeeping/history and re-verification conditions do not change this current session's 76 passed results. Do not rewrite historical results or force phase.complete to bypass them.
 
 ## Session Scope and History
 
 - User selected option 1: a new whole-phase UAT, not a resume of the old single-check session.
-- Old session is preserved verbatim in [01-UAT-HISTORY-2026-10-06.md](./01-UAT-HISTORY-2026-10-06.md); G-01-1 remains resolved by 01-15. Historical observations are not fresh gaps.
+- Old session is preserved verbatim in [01-UAT-HISTORY-2026-10-06.md](./history/01-UAT-HISTORY-2026-10-06.md); G-01-1 remains resolved by 01-15. Historical observations are not fresh gaps.
 - 01-18 R2 blocking-human checkpoint was explicitly approved. That approval remains valid but does not substitute for this separate whole-phase learner smoke.
 - Serving target: Docker Compose http://127.0.0.1:5173; API http://127.0.0.1:8000/health. Readiness before this session: api healthy, web running, volume kept. No service restart or learner data write was performed by the assistant to create this session.
 - D-32–D-37 govern current acceptance: no focus Details/Chunks used/missed, no added LLM or explanation templates, a single inline result and genuine saved-payload restoration. Existing workspace history is not the focus answer card.
