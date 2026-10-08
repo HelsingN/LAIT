@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 from datetime import datetime
 
-from sqlalchemy import func, select
+from sqlalchemy import func, select, update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session, sessionmaker
 
@@ -52,6 +52,24 @@ def _still_uncorrected(categories: list[str]) -> bool:
     if "incorrect" not in categories:
         return False
     return "correct" not in categories and "corrected" not in categories
+
+
+def _open_session_for_write(session: Session, session_id: str) -> PracticeSessionRow:
+    # Take the database write lock before reading progression state. SQLite
+    # serializes writers; PostgreSQL locks this row. A no-op update keeps the
+    # cursor authoritative while concurrent commands wait for this transaction.
+    locked = session.execute(
+        update(PracticeSessionRow)
+        .where(PracticeSessionRow.id == session_id, PracticeSessionRow.status == OPEN)
+        .values(cursor=PracticeSessionRow.cursor)
+        .returning(PracticeSessionRow.id)
+        .execution_options(synchronize_session=False)
+    ).scalar_one_or_none()
+    if locked is None:
+        raise PracticeSessionNotFoundError(session_id)
+    row = session.get(PracticeSessionRow, session_id)
+    assert row is not None
+    return row
 
 
 def _to_unit(row: LearningUnitRow) -> LearningUnit:
@@ -334,9 +352,7 @@ class SqlAlchemyPracticeRepository:
 
     def advance_current_item(self, session_id: str, position: int) -> int:
         with self._session_factory() as session:
-            row = session.get(PracticeSessionRow, session_id)
-            if row is None or row.status != OPEN:
-                raise PracticeSessionNotFoundError(session_id)
+            row = _open_session_for_write(session, session_id)
             if row.cursor > position:
                 return row.cursor
             if row.cursor != position:
@@ -406,6 +422,8 @@ class SqlAlchemyPracticeRepository:
             return row.cursor
 
     def add_attempt(self, attempt: Attempt, cursor: int) -> None:
+        # Keep the existing port signature; an attempt never owns progression.
+        del cursor
         row = AttemptRow(
             id=attempt.id,
             session_id=attempt.session_id,
@@ -424,11 +442,8 @@ class SqlAlchemyPracticeRepository:
             created_at=attempt.created_at.isoformat(),
         )
         with self._session_factory() as session:
-            stored = session.get(PracticeSessionRow, attempt.session_id)
-            if stored is None:
-                raise LearningUnitNotFoundError(attempt.session_id)
+            _open_session_for_write(session, attempt.session_id)
             session.add(row)
-            stored.cursor = cursor
             session.commit()
 
     def list_attempt_records_for_lesson(self, lesson_id: str) -> list[AttemptRecord]:

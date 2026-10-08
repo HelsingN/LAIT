@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import pytest
+
 
 def _repository(tmp_path: Path):
     from lait.adapters.persistence.database import migrate, open_repository
@@ -346,3 +348,178 @@ def test_named_target_on_a_repeat_copy_advances_once(tmp_path: Path) -> None:
     practice = repository.get_practice_session(session_id)
     assert practice is not None
     assert len(practice.items) == 6
+
+
+@pytest.mark.parametrize("delayed_correct", [False, True])
+def test_delayed_submit_preserves_position_two_after_repository_reopen(
+    tmp_path: Path, delayed_correct: bool
+) -> None:
+    from concurrent.futures import ThreadPoolExecutor
+    from threading import Event
+
+    from lait.adapters.persistence.database import open_repository
+    from lait.application.queries.practice_get import handle as get_practice
+
+    repository, lesson, units, view, registry = _session(tmp_path, ("rolling out", "the migration"))
+    paused, release = Event(), Event()
+
+    class DelayedRepository:
+        def __getattr__(self, name):
+            return getattr(repository, name)
+
+        def add_attempt(self, attempt, cursor):
+            paused.set()
+            if not release.wait(10):
+                raise RuntimeError("submit barrier timed out")
+            return repository.add_attempt(attempt, cursor)
+
+    with ThreadPoolExecutor(max_workers=1) as pool:
+        old_request = pool.submit(
+            _submit,
+            DelayedRepository(),
+            registry,
+            view.session_id,
+            "drag",
+            units[0].text if delayed_correct else "wrong",
+            units[0].id if delayed_correct else units[1].id,
+        )
+        try:
+            assert paused.wait(10)
+            first = _submit(repository, registry, view.session_id, "drag", "wrong", units[1].id)
+            correction = _submit(
+                repository, registry, view.session_id, "drag", units[0].text, units[0].id
+            )
+            second = _submit(
+                repository, registry, view.session_id, "drag", units[1].text, units[1].id
+            )
+            assert first.category == "incorrect"
+            assert correction.category == "corrected"
+            assert second.cursor == 2
+            before = repository.list_attempt_records_for_lesson(lesson.id)
+        finally:
+            release.set()
+        delayed = old_request.result(timeout=10)
+
+    reopened = open_repository(f"sqlite:///{(tmp_path / 'retry.db').as_posix()}")
+    for reader in (repository, reopened):
+        stored = reader.get_practice_session(view.session_id)
+        assert stored is not None
+        assert stored.cursor == 2
+        current = get_practice(view.session_id, reader)
+        assert current.current is not None
+        assert current.current.position == 2
+        assert current.current.mode == "typed"
+        records = reader.list_attempt_records_for_lesson(lesson.id)
+        assert len(records) == 4
+        assert len({record.attempt_id for record in records}) == 4
+        assert [record for record in records if record.attempt_id != delayed.attempt_id] == before
+        assert all(record.pass_item_count == 4 for record in records)
+    assert delayed.cursor == 2
+
+
+def test_replayed_named_submit_keeps_cursor_two_and_each_attempt(tmp_path: Path) -> None:
+    from lait.adapters.persistence.database import open_repository
+
+    repository, lesson, units, view, registry = _session(tmp_path, ("rolling out", "the migration"))
+    first = _submit(repository, registry, view.session_id, "drag", units[0].text, units[0].id)
+    _submit(repository, registry, view.session_id, "drag", units[1].text, units[1].id)
+    replay = _submit(
+        repository,
+        registry,
+        view.session_id,
+        "drag",
+        units[0].text,
+        units[0].id,
+        target_learning_unit_id=units[0].id,
+    )
+    reopened = open_repository(f"sqlite:///{(tmp_path / 'retry.db').as_posix()}")
+    assert replay.cursor == 2
+    assert replay.attempt_id != first.attempt_id
+    assert reopened.get_practice_session(view.session_id).cursor == 2
+    records = reopened.list_attempt_records_for_lesson(lesson.id)
+    assert len(records) == 3
+    assert {first.attempt_id, replay.attempt_id}.issubset({record.attempt_id for record in records})
+
+
+def test_overlapping_final_continue_appends_one_missed_round(tmp_path: Path) -> None:
+    from concurrent.futures import ThreadPoolExecutor
+    from threading import Barrier
+
+    from lait.adapters.persistence.database import open_repository
+    from lait.application.commands.practice_advance import PracticeAdvance
+    from lait.application.commands.practice_advance import handle as advance
+
+    repository, _lesson, _units, view, registry = _session(tmp_path)
+    _submit(repository, registry, view.session_id, "typed", "wrong")
+    ready = Barrier(2)
+
+    class SynchronizedRepository:
+        def __getattr__(self, name):
+            return getattr(repository, name)
+
+        def advance_current_item(self, session_id, position):
+            ready.wait(timeout=10)
+            return repository.advance_current_item(session_id, position)
+
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        requests = [
+            pool.submit(
+                advance,
+                PracticeAdvance(session_id=view.session_id, position=0),
+                SynchronizedRepository(),
+            )
+            for _ in range(2)
+        ]
+        results = [request.result(timeout=10) for request in requests]
+    assert [result.cursor for result in results] == [1, 1]
+    reopened = open_repository(f"sqlite:///{(tmp_path / 'retry.db').as_posix()}")
+    stored = reopened.get_practice_session(view.session_id)
+    assert stored.cursor == 1
+    assert [item.position for item in stored.items] == [0, 1]
+    assert [(item.learning_unit_id, item.mode) for item in stored.items] == [
+        (stored.items[0].learning_unit_id, "typed"),
+        (stored.items[0].learning_unit_id, "typed"),
+    ]
+
+
+def test_delayed_submit_losing_to_exit_keeps_closed_history(tmp_path: Path) -> None:
+    from concurrent.futures import ThreadPoolExecutor
+    from threading import Event
+
+    from lait.adapters.persistence.database import open_repository
+    from lait.application.commands.practice_finish import PracticeFinish
+    from lait.application.commands.practice_finish import handle as finish
+    from lait.domain.practice_session import PracticeSessionNotFoundError
+
+    repository, lesson, _units, view, registry = _session(tmp_path)
+    initial = _submit(repository, registry, view.session_id, "typed", "wrong")
+    paused, release = Event(), Event()
+
+    class DelayedRepository:
+        def __getattr__(self, name):
+            return getattr(repository, name)
+
+        def add_attempt(self, attempt, cursor):
+            paused.set()
+            if not release.wait(10):
+                raise RuntimeError("submit barrier timed out")
+            return repository.add_attempt(attempt, cursor)
+
+    with ThreadPoolExecutor(max_workers=1) as pool:
+        late = pool.submit(
+            _submit, DelayedRepository(), registry, view.session_id, "typed", "rolling out"
+        )
+        try:
+            assert paused.wait(10)
+            finish(PracticeFinish(session_id=view.session_id), repository)
+        finally:
+            release.set()
+        with pytest.raises(PracticeSessionNotFoundError):
+            late.result(timeout=10)
+    reopened = open_repository(f"sqlite:///{(tmp_path / 'retry.db').as_posix()}")
+    stored = reopened.get_practice_session(view.session_id)
+    assert stored.status == "closed"
+    assert stored.cursor == 0
+    assert [row.attempt_id for row in reopened.list_attempt_records_for_lesson(lesson.id)] == [
+        initial.attempt_id
+    ]

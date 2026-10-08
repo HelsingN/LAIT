@@ -115,6 +115,13 @@ def handle(
     units.add_attempt(attempt, cursor)  # type: ignore[attr-defined]
     if advance and category in {"correct", "corrected"}:
         cursor = units.advance_current_item(practice.id, practice.cursor)  # type: ignore[attr-defined]
+    else:
+        # Another accepted request may have moved the session while this one
+        # evaluated. Return the stored cursor, never the earlier read snapshot.
+        current = units.get_practice_session(practice.id)  # type: ignore[attr-defined]
+        if current is None:
+            raise PracticeSessionNotFoundError(practice.id)
+        cursor = current.cursor
     return SubmitResult(
         attempt_id=attempt.id,
         session_open=True,
