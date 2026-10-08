@@ -4,10 +4,10 @@ milestone: v1.0
 current_phase: 2
 current_phase_name: AI-Assisted Learning-Unit Review
 status: planning
-stopped_at: Phase 01 complete, ready to plan Phase 2
-last_updated: "2026-10-08T03:14:12.494Z"
+stopped_at: Phase 01 complete; PR 3 open to main. Phase 2 ready to plan after explicitly evaluating deferred architecture findings.
+last_updated: "2026-10-08T03:27:20Z"
 last_activity: 2026-10-08
-last_activity_desc: Phase 01 complete, transitioned to Phase 2
+last_activity_desc: Phase 01 complete and shipped for review in PR 3 from ship/phase-01 to main; Phase 2 remains ready to plan, original EVAL-05 partial/deferred to Phase 5.
 progress:
   total_phases: 9
   completed_phases: 1
@@ -34,7 +34,7 @@ Phase: 2 — AI-Assisted Learning-Unit Review
 Plan: Not started
 Status: Ready to plan
 Current discussion area: Not started; evaluate deferred architecture findings before MODL-06/MODL-07 and AI provider/feature boundaries
-Last activity: 2026-10-08 — Phase 01 formally complete (19/19), verification passed 5/5 and active UAT 76/76, no blockers. Historical UAT archived byte-for-byte; architecture findings retained for Phase 2 planning. Full EVAL-05 remains partial/deferred to Phase 5. PR to main preparation authorized; no Phase 2 implementation started.
+Last activity: 2026-10-08 — Phase 01 formally complete (19/19), verification passed 5/5 and active UAT 76/76, no blockers. Historical UAT archived byte-for-byte; architecture findings retained for Phase 2 planning. [PR #3](https://github.com/HelsingN/LAIT/pull/3) is open from ship/phase-01 to main for review and CI; not merged. Full EVAL-05 remains partial/deferred to Phase 5; no Phase 2 implementation started. Unrelated local review/pattern/UI artifacts are preserved outside the clean ship checkout.
 
 Progress: [█░░░░░░░░░] 11%
 
@@ -140,7 +140,7 @@ Recent decisions affecting current and future work:
 ### Pending Todos
 
 - Explicit execute-phase 01 --gaps-only and user option 3 authorized inline execution. Plans 01-01–01-18 are complete; final R2 T3 approved by user on 2026-10-07. Subsequent explicit Да authorizes scoped commit/push to existing origin/phase/01-execution; result belongs to Git history/handoff, not phase closure.
-- WR-02 closed by completed plan 01-19; canonical verification passed 5/5. Historical UAT discovery reconciled by byte-preserving history/ archive and link update; active UAT predicate passed, 76/76, zero blockers. User authorized formal Phase 1 closure and PR to main. Compact Feedback remains UX debt with no approved phase owner; original EVAL-05 is partial/deferred to Phase 5. Architecture notes must be evaluated during Phase 2 planning before MODL-06/MODL-07 and AI boundaries, without speculative Phase 1 refactoring.
+- Phase 1 closed; WR-02 fixed, canonical verification passed 5/5, active UAT 76/76 with no blockers after byte-preserving archive reconciliation. PR #3 is open to main; review/CI and merge remain pending. Compact Feedback remains UX debt with no approved phase owner; original EVAL-05 is partial/deferred to Phase 5. Architecture notes must be evaluated during Phase 2 planning before MODL-06/MODL-07 and AI boundaries, without speculative Phase 1 refactoring.
 - After a working vertical learning slice exists, consider a small MCP integration spike as an architectural acceptance test; do not add it to current Phase 1 scope.
 
 ### Blockers/Concerns
@@ -181,5 +181,5 @@ Items acknowledged for later work, including those carried forward from previous
 ## Session Continuity
 
 Last session: 2026-10-08T02:29:12Z
-Stopped at: Phase 01 complete, ready to plan Phase 2
+Stopped at: Phase 01 complete; PR #3 open to main, not merged. Phase 2 ready to plan with deferred architecture evaluation before MODL-06/MODL-07/AI boundaries.
 Resume file: .planning/phases/01-mod-first-manual-learning-loop/01-VERIFICATION.md
