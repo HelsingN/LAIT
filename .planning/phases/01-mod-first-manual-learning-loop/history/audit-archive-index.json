@@ -1,0 +1,47 @@
+{
+  "archived": "2026-10-08",
+  "records": [
+    {
+      "source": ".planning/phases/01-mod-first-manual-learning-loop/01-REVIEW.md",
+      "provenance": "local pre-cleanup report",
+      "archive": ".planning/phases/01-mod-first-manual-learning-loop/history/01-REVIEW-2026-10-06.md",
+      "sha256": "3bcb53132a5680a22e34429ef669ba9d54e26adae72e5b2d57559abbd9af96ba",
+      "bytes": 6066
+    },
+    {
+      "source": ".planning/phases/01-mod-first-manual-learning-loop/01-REVIEW-DISPOSITION.md",
+      "provenance": "local pre-cleanup report",
+      "archive": ".planning/phases/01-mod-first-manual-learning-loop/history/01-REVIEW-DISPOSITION-2026-10-06.md",
+      "sha256": "c76b510be33f90ded3b88321ad621fae644456752764bf8572d91f50b4205440",
+      "bytes": 1171
+    },
+    {
+      "source": ".planning/phases/01-mod-first-manual-learning-loop/01-PATTERNS.md",
+      "provenance": "local pre-cleanup report",
+      "archive": ".planning/phases/01-mod-first-manual-learning-loop/history/01-PATTERNS-2026-10-07.md",
+      "sha256": "e657362d1e8cca8a480277570c1c44c29f2563ac561d6ae8edc482ff76dddea1",
+      "bytes": 11886
+    },
+    {
+      "source": ".planning/phases/01-mod-first-manual-learning-loop/01-UI-REVIEW.md",
+      "provenance": "local pre-cleanup report",
+      "archive": ".planning/phases/01-mod-first-manual-learning-loop/history/01-UI-REVIEW-2026-10-06.md",
+      "sha256": "013af941fdb1fc7a7af3a558f02fa2406455bec8b85c1174b8f16c511312fbab",
+      "bytes": 15679
+    },
+    {
+      "source": "HEAD:.planning/phases/01-mod-first-manual-learning-loop/01-REVIEW.md",
+      "provenance": "tracked October 2 report at merged main 02013fc",
+      "archive": ".planning/phases/01-mod-first-manual-learning-loop/history/01-REVIEW-2026-10-02.md",
+      "sha256": "bdc604163bd06dfe4898702cb99d4d06e6d4ebd12d78e0a5397d77f951015878",
+      "bytes": 13404
+    },
+    {
+      "source": "HEAD:.planning/phases/01-mod-first-manual-learning-loop/01-REVIEW-DISPOSITION.md",
+      "provenance": "tracked October 2 report at merged main 02013fc",
+      "archive": ".planning/phases/01-mod-first-manual-learning-loop/history/01-REVIEW-DISPOSITION-2026-10-02.md",
+      "sha256": "7520c120ac083f3381defcd94c93b3d5143bbed8105a2767499b2baff8a9be78",
+      "bytes": 2542
+    }
+  ]
+}

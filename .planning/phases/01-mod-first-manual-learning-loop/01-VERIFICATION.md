@@ -14,6 +14,7 @@ uat_human_passed: 14
 uat_recorded_automated_passed: 62
 phase_completion_performed: true
 phase_closed: 2026-10-08T03:14:12Z
+metadata_reconciled: 2026-10-08T16:59:59Z
 re_verification:
   previous_status: gaps_found
   previous_score: "4/5"
@@ -77,13 +78,25 @@ covered_files:
   - .planning/phases/01-mod-first-manual-learning-loop/01-19-PLAN-CHECK.md
   - .planning/phases/01-mod-first-manual-learning-loop/01-19-PLAN.md
   - .planning/phases/01-mod-first-manual-learning-loop/01-19-SUMMARY.md
-  - .planning/phases/01-mod-first-manual-learning-loop/01-CONTEXT.md
   - .planning/phases/01-mod-first-manual-learning-loop/01-CLOSURE.md
+  - .planning/phases/01-mod-first-manual-learning-loop/01-CONTEXT.md
+  - .planning/phases/01-mod-first-manual-learning-loop/01-PATTERNS.md
+  - .planning/phases/01-mod-first-manual-learning-loop/01-REVIEW-DISPOSITION.md
+  - .planning/phases/01-mod-first-manual-learning-loop/01-REVIEW.md
   - .planning/phases/01-mod-first-manual-learning-loop/01-SECURITY.md
   - .planning/phases/01-mod-first-manual-learning-loop/01-UAT.md
+  - .planning/phases/01-mod-first-manual-learning-loop/01-UI-REVIEW.md
   - .planning/phases/01-mod-first-manual-learning-loop/01-VALIDATION.md
+  - .planning/phases/01-mod-first-manual-learning-loop/history/.gitattributes
+  - .planning/phases/01-mod-first-manual-learning-loop/history/01-PATTERNS-2026-10-07.md
+  - .planning/phases/01-mod-first-manual-learning-loop/history/01-REVIEW-2026-10-02.md
+  - .planning/phases/01-mod-first-manual-learning-loop/history/01-REVIEW-2026-10-06.md
+  - .planning/phases/01-mod-first-manual-learning-loop/history/01-REVIEW-DISPOSITION-2026-10-02.md
+  - .planning/phases/01-mod-first-manual-learning-loop/history/01-REVIEW-DISPOSITION-2026-10-06.md
   - .planning/phases/01-mod-first-manual-learning-loop/history/01-UAT-HISTORY-2026-10-06.md
+  - .planning/phases/01-mod-first-manual-learning-loop/history/01-UI-REVIEW-2026-10-06.md
   - .planning/phases/01-mod-first-manual-learning-loop/history/README.md
+  - .planning/phases/01-mod-first-manual-learning-loop/history/audit-archive-index.json
   - .planning/phases/01-mod-first-manual-learning-loop/verification-evidence/wr02_cursor_probe.py
   - Dockerfile.api
   - Dockerfile.web
@@ -261,7 +274,7 @@ covered_files:
   - frontend/src/vite-env.d.ts
   - pyproject.toml
   - uv.lock
-covered_digest: "v2:sha256:0c8f7ff536b02efb2a6d60e1f7e465d21044fe143d35b02534a846b159e4f5d7"
+covered_digest: "v2:sha256:46ffda1418b7d564b597dbd87aad16c2e35958920b0680dc0f5fdc1e48c16331"
 ---
 
 # Phase 01: Mod-First Manual Learning Loop — Final Re-verification
@@ -272,7 +285,7 @@ covered_digest: "v2:sha256:0c8f7ff536b02efb2a6d60e1f7e465d21044fe143d35b02534a84
 
 ## Scope and evidence
 
-All 18 previously completed PLAN/SUMMARY contracts were retained and reconciled; only the newly authorized backend gap plan **01-19** executed. Current official execution inventory: 19 plans, 19 summaries, zero incomplete/runnable plans, zero duplicate threat IDs. The report covers current implementation and 227 versioned files with the official v2 content fingerprint, including preserved UAT history and formal closure evidence. Regenerable frontend/openapi.json is deliberately gitignored and excluded from portable fingerprint inputs; the tracked exporter, generated SDK, operation tests and CI generation/diff configuration remain covered.
+All 18 previously completed PLAN/SUMMARY contracts were retained and reconciled; only the newly authorized backend gap plan **01-19** executed. Current official execution inventory: 19 plans, 19 summaries, zero incomplete/runnable plans, zero duplicate threat IDs. The report covers current implementation and 239 versioned files with the official v2 content fingerprint, including preserved UAT history and formal closure evidence. Regenerable frontend/openapi.json is deliberately gitignored and excluded from portable fingerprint inputs; the tracked exporter, generated SDK, operation tests and CI generation/diff configuration remain covered.
 
 Current UAT is **76/76**, comprising 14 explicit user-reported functional Docker passes and 62 recorded automated coverage entries. Completed phase Docker learner smoke and the approved 01-18 R2 checkpoint remain valid evidence; this run adds no new manual/browser/Docker observation. Backend-only 01-19 changes no UI, schema, DTO, dependency or learner database, so no new blocking-human checkpoint applies.
 
@@ -368,7 +381,7 @@ No phase-level requirement checkbox was silently advanced by this verification v
 | WR-01 readOnly guard not re-armed on Try again | WARNING retained: answerEditable remains true across same renderer retry. No current functional acceptance failure or reproduction of unwanted autofill; not promoted to blocker. |
 | WR-02 overlapping submit/Continue | CLOSED by 01-19: delayed Incorrect/Correct now preserve 2, including fresh repository; named replay does not advance. Additional final-round double append and late closed-session history branches reproduced RED and fixed GREEN. |
 | WR-03 drift test matches methods globally | WARNING retained: weak oracle is visible in code. Current SDK bindings and stronger CI generated diff inspected; no current client mismatch demonstrated. |
-| 01-UI-REVIEW old 14/24 / no blockers | Historical visual report, not a fresh audit or evidence of present implementation failure. |
+| 01-UI-REVIEW old 14/24 / no blockers | [October 6 original](./history/01-UI-REVIEW-2026-10-06.md) archived byte-for-byte; stable current path indexes it. Historical visual report, not a fresh audit or evidence of present implementation failure. |
 
 ### UAT-HISTORY and the completion predicate
 
@@ -377,6 +390,12 @@ No phase-level requirement checkbox was silently advanced by this verification v
 The official CLI scans immediate-directory filenames containing `-UAT` and ending `.md`. On 2026-10-08 the historical archive was moved into phase-local `history/`; current UAT links resolve there. Before/after SHA-256 is `DD8DEA68E6D76754BA95184D659D6B2D798A7018E368E0829ABFFFB613578818`. The old false-positive header/test blockers are therefore removed from active discovery without changing archived bytes, failed rows, GSD runtime or acceptance policy. Current `phase.uat-passed 01 --require-verification` is rechecked after the metadata fingerprint refresh. Original plan 01-19 evidence remains dated; this administrative closeout adds no implementation or manual acceptance claim.
 
 The prior canonical reports are preserved in `verification-evidence/verification-2026-10-06.md` and `verification-evidence/verification-2026-10-08-wr02.md`. Current verdict replaces the stale canonical body.
+
+### Historical review/pattern/UI archive reconciliation
+
+Quick task 261008-rko preserves four local pre-closeout reports and the two earlier tracked October 2 review/ledger versions as dated snapshots. [history/README.md](./history/README.md) and [audit-archive-index.json](./history/audit-archive-index.json) identify each source and SHA-256; history attributes preserve original line endings through Git checkout. Old statuses, findings and UI score remain unchanged in the archives.
+
+[Current review](./01-REVIEW.md) and [disposition](./01-REVIEW-DISPOSITION.md) use October 6 meanings explicitly: WR-02 fixed by 01-19; WR-01/WR-03 remain open nonblocking advisories without an invented approved deferral. October 2 IDs have different titles and are retained separately, not silently reused or retrospectively passed. Stable [PATTERNS](./01-PATTERNS.md) and [UI-REVIEW](./01-UI-REVIEW.md) paths keep completed-plan/UAT references resolving while identifying D-32–D-37 supersession. No implementation test, fresh code/UI audit, scope/requirement change or completed-plan rerun accompanies this metadata reconciliation. Phase 1 acceptance remains passed 5/5, UAT 76/76, and original full EVAL-05 remains partial/deferred to Phase 5.
 
 
 ## Test quality, threats and limits
