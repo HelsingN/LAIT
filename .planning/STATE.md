@@ -140,7 +140,7 @@ Recent decisions affecting current and future work:
 ### Pending Todos
 
 - Explicit execute-phase 01 --gaps-only and user option 3 authorized inline execution. Plans 01-01–01-18 are complete; final R2 T3 approved by user on 2026-10-07. Subsequent explicit Да authorizes scoped commit/push to existing origin/phase/01-execution; result belongs to Git history/handoff, not phase closure.
-- Phase 1 closed; WR-02 fixed, canonical verification passed 5/5, active UAT 76/76 with no blockers after byte-preserving archive reconciliation. PR #3 is open to main; review/CI and merge remain pending. Compact Feedback remains UX debt with no approved phase owner; original EVAL-05 is partial/deferred to Phase 5. Architecture notes must be evaluated during Phase 2 planning before MODL-06/MODL-07 and AI boundaries, without speculative Phase 1 refactoring.
+- Phase 1 closed; WR-02 fixed, canonical verification passed 5/5, active UAT 76/76 with no blockers after byte-preserving archive reconciliation. [PR #3](https://github.com/HelsingN/LAIT/pull/3) is open to main. [PR CI](https://github.com/HelsingN/LAIT/actions/runs/37722761625) and [push CI](https://github.com/HelsingN/LAIT/actions/runs/37722734237) both passed on code head 01b205e; later commits update only STATE with ci skip. Review and merge remain pending. Compact Feedback remains UX debt with no approved phase owner; original EVAL-05 is partial/deferred to Phase 5. Architecture notes must be evaluated during Phase 2 planning before MODL-06/MODL-07 and AI boundaries, without speculative Phase 1 refactoring.
 - After a working vertical learning slice exists, consider a small MCP integration spike as an architectural acceptance test; do not add it to current Phase 1 scope.
 
 ### Blockers/Concerns
