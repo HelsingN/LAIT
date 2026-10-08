@@ -12,7 +12,8 @@ uat_status: complete
 uat_passed: 76
 uat_human_passed: 14
 uat_recorded_automated_passed: 62
-phase_completion_performed: false
+phase_completion_performed: true
+phase_closed: 2026-10-08T03:14:12Z
 re_verification:
   previous_status: gaps_found
   previous_score: "4/5"
@@ -77,6 +78,7 @@ covered_files:
   - .planning/phases/01-mod-first-manual-learning-loop/01-19-PLAN.md
   - .planning/phases/01-mod-first-manual-learning-loop/01-19-SUMMARY.md
   - .planning/phases/01-mod-first-manual-learning-loop/01-CONTEXT.md
+  - .planning/phases/01-mod-first-manual-learning-loop/01-CLOSURE.md
   - .planning/phases/01-mod-first-manual-learning-loop/01-SECURITY.md
   - .planning/phases/01-mod-first-manual-learning-loop/01-UAT.md
   - .planning/phases/01-mod-first-manual-learning-loop/01-VALIDATION.md
@@ -260,7 +262,7 @@ covered_files:
   - frontend/src/vite-env.d.ts
   - pyproject.toml
   - uv.lock
-covered_digest: "v2:sha256:fe256d80d7d78eec48439859c04553ec561ad7b86cd1aeea53cd9da6cdfd6b5d"
+covered_digest: "v2:sha256:f7f2903f7a302318bbb039a9f9ac2070e5246c9e3dd2ecc4174301947690f1cf"
 ---
 
 # Phase 01: Mod-First Manual Learning Loop — Final Re-verification
@@ -271,11 +273,11 @@ covered_digest: "v2:sha256:fe256d80d7d78eec48439859c04553ec561ad7b86cd1aeea53cd9
 
 ## Scope and evidence
 
-All 18 previously completed PLAN/SUMMARY contracts were retained and reconciled; only the newly authorized backend gap plan **01-19** executed. Current official execution inventory: 19 plans, 19 summaries, zero incomplete/runnable plans, zero duplicate threat IDs. The report covers current implementation and 227 files with the official v2 content fingerprint, including the preserved UAT archive and its index.
+All 18 previously completed PLAN/SUMMARY contracts were retained and reconciled; only the newly authorized backend gap plan **01-19** executed. Current official execution inventory: 19 plans, 19 summaries, zero incomplete/runnable plans, zero duplicate threat IDs. The report covers current implementation and 228 files with the official v2 content fingerprint, including preserved UAT history and formal closure evidence.
 
 Current UAT is **76/76**, comprising 14 explicit user-reported functional Docker passes and 62 recorded automated coverage entries. Completed phase Docker learner smoke and the approved 01-18 R2 checkpoint remain valid evidence; this run adds no new manual/browser/Docker observation. Backend-only 01-19 changes no UI, schema, DTO, dependency or learner database, so no new blocking-human checkpoint applies.
 
-D-32–D-37 remain the accepted Phase 1 scope. Full original EVAL-05 education/chunk/alternative presentation stays **partial/deferred to Phase 5**, not declared delivered. No phase.complete, Phase 2 transition, completed-plan rerun or push performed.
+D-32–D-37 remain the accepted Phase 1 scope. Full original EVAL-05 education/chunk/alternative presentation stays **partial/deferred to Phase 5**, not declared delivered. The subsequent user-authorized administrative closeout archived historical UAT byte-for-byte and ran official phase.complete on 2026-10-08: 19/19 plans, Phase 2 ready to plan. No completed-plan rerun or Phase 2 implementation. Details: [01-CLOSURE.md](./01-CLOSURE.md).
 
 ## Observable Truths
 
@@ -390,4 +392,4 @@ WR-01 readOnly retry guard and WR-03 weak drift-test oracle remain warnings, wit
 
 **No remaining evidenced product blocker. Canonical verdict: passed, 5/5.** WR-02 is closed by implementation and fresh regression evidence; original EVAL-05 is an approved Phase 5 deferral.
 
-The administrative archive-discovery problem is resolved by the byte-preserving move into `history/` and current link update. UAT 76/76 and the existing phase smoke are retained; no new human test is pending under current Phase 1/backend-only scope. Formal phase.complete is a separate authorized bookkeeping step after the passing predicate; no force bypass or original EVAL-05 completion is inferred.
+The administrative archive-discovery problem is resolved by the byte-preserving move into `history/` and current link update. UAT 76/76 and the existing phase smoke are retained; no new human test is pending under current Phase 1/backend-only scope. Subsequent official phase.complete succeeded after the passing predicate; no force bypass or original EVAL-05 completion. One nonblocking command-as-file metadata warning is recorded in 01-CLOSURE.md.

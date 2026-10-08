@@ -1,18 +1,19 @@
 ---
 gsd_state_version: "1.0"
 milestone: v1.0
-current_phase: 01
-current_phase_name: Mod-First Manual Learning Loop
-status: executing
-stopped_at: Plan 01-19 complete; final verification passed (5/5). Historical UAT archived byte-for-byte; active UAT predicate passed, ready for formal phase closure.
-last_updated: "2026-10-08T03:09:30.931Z"
+current_phase: 2
+current_phase_name: AI-Assisted Learning-Unit Review
+status: planning
+stopped_at: Phase 01 complete, ready to plan Phase 2
+last_updated: "2026-10-08T03:14:12.494Z"
 last_activity: 2026-10-08
-last_activity_desc: Newly authorized plan 01-19 fixed WR-02; 57 affected backend and 69 frontend checks pass, probe cursor 2 to 2. Canonical verification passed 5/5; UAT 76/76 and approved EVAL-05 deferral retained. No prior plan rerun or phase.complete.
+last_activity_desc: Phase 01 complete, transitioned to Phase 2
 progress:
   total_phases: 9
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 19
   completed_plans: 19
+  percent: 11
 milestone_name: milestone
 spec_version: 0.2.0
 ---
@@ -25,23 +26,23 @@ See: `.planning/PROJECT.md`
 Current planning/specification baseline: `.planning/VERSION.md` (`0.2.0`)
 
 **Core value:** A learner can turn their own professional English text into reliable progressive-retrieval practice that helps them recall and produce useful language independently.
-**Current focus:** Phase 01 — Mod-First Manual Learning Loop
+**Current focus:** Phase 2 — AI-Assisted Learning-Unit Review (planning not started)
 
 ## Current Position
 
-Phase: 01 (Mod-First Manual Learning Loop) — EXECUTING
-Plan: 19 of 19 executed. Only new backend gap plan 01-19 executed in this continuation; plans 01-01–01-18 were not re-run. Prior 01-18 R2 T3 user approval retained.
-Status: Plan execution and whole-phase manual Docker smoke complete. Final re-verification passed, 5/5 truths verified; WR-02 fixed with fresh delayed/replay/append/Exit regressions. Phase transition remains unperformed; historical UAT archive discovery is administrative debt. Detailed teaching/chunk analysis remains deferred to Phase 5; original full EVAL-05 remains incomplete.
-Current discussion area: Complete
-Last activity: 2026-10-08 — Created and completed narrow plan 01-19. Production commit d6abcc6 makes attempt insertion cursor-neutral and serializes open-session progression. RED 4 failures on old code; GREEN 57 affected backend + 69 frontend tests, Ruff and original probe 2 → 2. Both delayed outcomes assert exactly 2 including new database reads; retry and append-only accepted history retained. Canonical verification passed 5/5 with official 225-file fingerprint; no evidenced product blocker. UAT 76/76 (14 human + 62 recorded automated) and prior phase Docker smoke retained, no new manual observation. Raw UAT-HISTORY unchanged: CLI false positives are administrative debt before closure. EVAL-05 original education deferred to Phase 5; O-01-9 compact Feedback remains UX debt with undecided owner. Local GSD commits only; no completed-plan rerun, phase.complete or push.
+Phase: 2 — AI-Assisted Learning-Unit Review
+Plan: Not started
+Status: Ready to plan
+Current discussion area: Not started; evaluate deferred architecture findings before MODL-06/MODL-07 and AI provider/feature boundaries
+Last activity: 2026-10-08 — Phase 01 formally complete (19/19), verification passed 5/5 and active UAT 76/76, no blockers. Historical UAT archived byte-for-byte; architecture findings retained for Phase 2 planning. Full EVAL-05 remains partial/deferred to Phase 5. PR to main preparation authorized; no Phase 2 implementation started.
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [█░░░░░░░░░] 11%
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 0
+- Total plans completed: 19
 - Average duration: —
 - Total execution time: 0.0 hours
 
@@ -49,7 +50,7 @@ Progress: [░░░░░░░░░░] 0%
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| - | - | - | - |
+| 01 | 19 | - | - |
 
 **Recent Trend:**
 
@@ -148,6 +149,7 @@ Recent decisions affecting current and future work:
 - No unresolved discussion blocker. Phase 1 planning is complete.
 - Execution must preserve the Learning Unit, Gap Fill, proof-module, visibility, session, and application command/query decisions recorded in `01-CONTEXT.md`.
 - Future MCP schemas and DeepSeek Harness packaging remain deferred and must not expand Phase 1 scope.
+- Phase 1 completion returned one advisory: 01-17-SUMMARY includes a Vitest command parsed as a file reference. Actual test files exist and passing execution evidence is retained; this is metadata classification, not a missing implementation or Phase 1 PR blocker. See 01-CLOSURE.md.
 - Architectural audit findings below do not block the Phase 1 PR. Do not perform speculative abstraction/refactoring during Phase 1 closure. When planning Phase 2, explicitly evaluate both findings before implementing MODL-06, MODL-07 and AI provider/feature boundaries. Preserve framework-independent application handlers, Core unaware of concrete module IDs, registry-based exercise discovery, the removable proof module, and the future peer HTTP/MCP adapter boundary. No ModuleHost design or new ADR is selected by these notes.
 
 ### Quick Tasks Completed
@@ -179,5 +181,5 @@ Items acknowledged for later work, including those carried forward from previous
 ## Session Continuity
 
 Last session: 2026-10-08T02:29:12Z
-Stopped at: New plan 01-19 complete, WR-02 fixed; final verification passed 5/5 with no evidenced product blocker. UAT and prior phase smoke complete; original EVAL-05 remains partial/deferred to Phase 5. Historical UAT discovery remains administrative phase-transition debt; no prior plan rerun or phase closure.
+Stopped at: Phase 01 complete, ready to plan Phase 2
 Resume file: .planning/phases/01-mod-first-manual-learning-loop/01-VERIFICATION.md
