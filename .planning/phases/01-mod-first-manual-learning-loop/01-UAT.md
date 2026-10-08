@@ -829,7 +829,7 @@ blocked: 0
 - Zero current-session gaps, pending, blocked or skipped tests. This completes the UAT session, not Phase 1: canonical verification remains `gaps_found` until re-verification; original full EVAL-05 remains partial/deferred to Phase 5.
 - O-01-9-visual remains UX/visual debt with phase ownership and acceptance impact undecided. Test 14 pass confirms expected workspace behavior; it does not authorize the proposed redesign or imply its deferral is accepted.
 - Historical `history/01-UAT-HISTORY-2026-10-06.md` is preserved verbatim. Its old issue is not a fresh current-session failure.
-- UI post-hook: user selected option 1 (View existing report). `01-UI-REVIEW.md` is retained unchanged at its historical 2026-10-06 score of 14/24; no fresh audit or current-score claim. Validation/security post-hook evidence is recorded in their respective reports.
+- UI post-hook: user selected option 1 (View existing report). The [original 2026-10-06 UI review](./history/01-UI-REVIEW-2026-10-06.md) is retained byte-for-byte with its historical score of 14/24; the stable 01-UI-REVIEW.md path now indexes that archive. No fresh audit or current-score claim. Validation/security post-hook evidence is recorded in their respective reports.
 - Shared completion predicate still rejects phase transition: the historical UAT file is included as diagnosed/issue, and canonical `01-VERIFICATION.md` remains `gaps_found`. These bookkeeping/history and re-verification conditions do not change this current session's 76 passed results. Do not rewrite historical results or force phase.complete to bypass them.
 
 ## Session Scope and History

@@ -1,0 +1,2 @@
+# Preserve dated audit/UAT snapshots exactly, including their original line endings.
+01-*.md -text
