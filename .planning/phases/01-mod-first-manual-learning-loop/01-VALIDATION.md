@@ -113,7 +113,7 @@ Follow-up `01-13-PLAN.md` (not executed): automated reads are `uv run pytest bac
 | Viewport wrap/truncate backstops from UI-SPEC | UI-SPEC long-text rows | `verification: backstop` — abstain without human/viewport evidence | Spot-check Lesson List title truncate, create-title wrap, Gap Fill wrap at 320px after plan 01-07 |
 | Phase-close learner-flow smoke | LESS-01, LESS-02, ANLY-08, EXER-01, EXER-02, EXER-07, EVAL-01, EVAL-04, EVAL-05 | Vitest and pytest do not show Compose reopen | On `http://127.0.0.1:5173`, paste a lesson, add and accept a unit, finish one Gap Fill item, reload, open the same lesson from `/`, then `docker compose restart` without deleting the volume and open it again. Source and units must still be there. |
 | 01-18-T3 R2 inline-result checkpoint — APPROVED 2026-10-07, user report, no observations | Narrowed Phase 1 EVAL-05, EXER-07, EVAL-01; D-32–D-37 | Required blocking-human Docker approval; R1 remains not approved | User: “ручная проверка пройдена без замечаний approved.” Published R2 checklist approved as a whole: inline results/retry/disclosure and four states × reload/direct URL/list return/full browser-process restart/Docker restart with volume kept. Recorded as user-reported passes, not assistant-observed clicks; no per-route screenshots/logs supplied. Exact payload remains saved. Full teaching/chunk display explicitly deferred, not passed. See `01-18-CHECKPOINT.md` and `01-18-SUMMARY.md`. |
-| Final phase manual learner-flow smoke — PENDING, separate from 01-18 R2 approval | Narrowed Phase 01 success criteria 1–3; original EVAL-05 partial/deferred | Governance still requires a phase-wide Docker smoke before phase.complete | Docker, current images and volume kept: paste → capture/accept → generate → wrong response hidden inline → Show answer / clearing Try again / self-correction → accepted green inline → Continue/Exit with opening score/history intact. Check list reopen, reload, direct URL, actual browser-process and Docker/app restarts. Verify durable original payload, not deferred educational UI. No phase completion authorized. |
+| Final phase manual learner-flow smoke — PASS 2026-10-08, user report; separate from 01-18 R2 approval | Narrowed Phase 01 success criteria 1–3; original EVAL-05 partial/deferred | Whole-phase Docker smoke required before phase.complete; user-observed UI evidence | `01-UAT.md` tests 1–14 explicitly passed: retained-volume Docker restart; paste → capture/accept → generate → wrong response/reveal/retry/self-correction → inline accepted result → Continue/Exit with score/history and unit unfreeze. Test 12 confirms four feedback states across reload, direct URL, list return, actual browser-process and Docker/app restarts with volume kept; tests 13–14 cover 320px and workspace/Feedback. User reports only, no assistant-observed clicks or route screenshots. Real saved payload uses the existing automated checks, not a new manual inspection. Detailed teaching/chunk/alternative UI stays deferred. Canonical re-verification still required before phase completion. |
 
 ---
 
@@ -126,6 +126,23 @@ Latest acceptance D-32–D-37 intentionally narrows Phase 1: detailed teaching/c
 - Docker rebuilt and api/web restarted with volume kept; API ok, web HTTP 200 serving `index-I9J8SvOc.js` / `index-D6b_DoN8.css`. This run's baseline and post-restart reads contain identical 1 lesson / 188 attempts, including 152 nonempty used and 36 nonempty missed arrays; SHA256 `E6E8B582FB72B561867F3E3C6844E75D40AA3CD7BDE58DFB93130205D5F70B6B`. R1's 181 is historical, not reused as the new baseline. No user-data writes/deletion by the assistant.
 - R2 human four-state × five-route checklist approved by user report on 2026-10-07 without observations. No individual route logs/screenshots supplied; approval is not claimed as assistant-observed evidence. Non-null-alternative **display** remains explicitly deferred; its payload preservation stays automatically checked. Detailed approval: `01-18-CHECKPOINT.md`; old record: `01-18-CHECKPOINT-R1.md` (not approved).
 - 01-18 SUMMARY records all three tasks complete. No source edits or test rerun in this approval-recording turn, no commits/push or Phase 1 completion. Separate phase-close smoke and re-verification stay pending; PLAT-09 stays closed.
+
+## Validation Audit — 2026-10-08 UAT completion
+
+`gsd-validate-phase` post-UAT audit reused the existing requirement/task map and recorded implementation regression evidence. The current coverage classifier accepted all 18 SUMMARY blocks with zero parsing errors: 62 auto-passed entries and 11 human-judgment entries. Those human entries plus the startup/source-to-practice checks map to the 14 manual tests in `01-UAT.md`, now explicitly passed by the user.
+
+No uncovered behavior was identified within approved narrowed Phase 1 D-32–D-37 acceptance. Existing 01-17/18 tests cover rich/empty/malformed saved feedback, exact identity, disclosure, stale response isolation, clearing retry and frozen progression. No new tests or implementation edits were needed. Previously recorded backend 129/frontend 105/typecheck/build results are reused, not newly executed here.
+
+| Metric | Count / scope |
+| --- | --- |
+| SUMMARY coverage blocks classified | 18; zero errors |
+| Recorded automated UAT entries | 62 passed |
+| Human Docker learner-flow checks | 14 passed by user report |
+| Current-session issues/pending/blocked/skipped | 0 / 0 / 0 / 0 |
+| New required validation gaps under D-32–D-37 | 0 |
+| Original requirement still partial/deferred | EVAL-05 teaching/chunk/alternative presentation → Phase 5 |
+
+`nyquist_compliant: true` remains scoped to the approved Phase 1 acceptance; it does not claim delivery of original full EVAL-05. Historical Wave 0/per-task placeholder rows and dated audits above retain their original evidence; this audit and the completed UAT are the current completion record. Canonical verification must still be regenerated before phase transition.
 
 ## Historical R1 Gap Execution Evidence — 2026-10-07 (superseded presentation, not approved)
 
