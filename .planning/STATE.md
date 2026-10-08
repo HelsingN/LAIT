@@ -5,10 +5,9 @@ current_phase: 01
 current_phase_name: Mod-First Manual Learning Loop
 status: executing
 stopped_at: Plan 01-19 complete; final verification passed (5/5). Historical UAT archived byte-for-byte; active UAT predicate passed, ready for formal phase closure.
-last_updated: "2026-10-08T02:29:12Z"
+last_updated: "2026-10-08T03:09:30.931Z"
 last_activity: 2026-10-08
 last_activity_desc: Newly authorized plan 01-19 fixed WR-02; 57 affected backend and 69 frontend checks pass, probe cursor 2 to 2. Canonical verification passed 5/5; UAT 76/76 and approved EVAL-05 deferral retained. No prior plan rerun or phase.complete.
-state_head: e7fbe65ad2543c9f18b156305f4565bebef652e9
 progress:
   total_phases: 9
   completed_phases: 0
@@ -159,6 +158,7 @@ Recent decisions affecting current and future work:
 | 261005-sqr | UX-21: selection hint on the inactive Add button. Checkpoint not approved. | 2026-10-05 | Uncommitted — per user instruction | [261005-sqr-ux-21-show-the-empty-selection-hint-as-a](./quick/261005-sqr-ux-21-show-the-empty-selection-hint-as-a/) |
 | 261005-u2f | Ignore local GSD runtime artifacts and milestone lock; files retained locally | 2026-10-05 | Uncommitted — no commit requested | [261005-u2f-ignore-local-gsd-runtime-artifacts-and-m](./quick/261005-u2f-ignore-local-gsd-runtime-artifacts-and-m/) |
 | 261005-wza | Feedback collapsed on lesson entry; human checkpoint approved, task complete. | 2026-10-05 | Uncommitted — no commit requested | [261005-wza-collapse-feedback-by-default-when-openin](./quick/261005-wza-collapse-feedback-by-default-when-openin/) |
+| 261008-8c0 | Archive historical Phase 1 UAT byte-for-byte and retain deferred architecture audit context | 2026-10-08 | — | [261008-8c0-archive-historical-phase-1-uat-and-retai](./quick/261008-8c0-archive-historical-phase-1-uat-and-retai/) |
 
 ## Deferred Items
 
