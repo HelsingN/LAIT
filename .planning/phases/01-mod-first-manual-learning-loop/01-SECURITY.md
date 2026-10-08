@@ -88,6 +88,7 @@ updated: "2026-10-08"
 | T-01-48 | 01-18 R2 | Information Disclosure | medium | mitigate | closed | Renderer paints expected only for Correct/Corrected or reveal; incorrect educational payload is not mounted. UAT tests 7/12 passed by user report. |
 | T-01-49 | 01-18 R2 | Tampering | medium | mitigate | closed | Versioned exact attempt/session/item bindings and presentation epoch guards; exact-row/corrupt/stale restore tests exist, recorded green; UAT tests 11/12 passed. |
 | T-01-50 | 01-18 R2 | Active content | high | mitigate | closed | Inline answer uses React text nodes; hostile-markup renderer assertion checks inert text. No HTML insertion on this path. |
+| T-01-51 | 01-19 | Tampering | high | mitigate | closed | add_attempt never restores a captured cursor; _open_session_for_write locks before open-state/progression reads; captured-position advancement is guarded. Delayed Incorrect/Correct, replay, final-round overlap and losing-to-Exit tests pass with new repository reads. |
 | T-01-SC | 01-18 R2 | Supply chain | high | mitigate | closed | No new dependencies, installs or provider calls in R2; existing lockfiles retained. |
 
 *Status: closed · accepted · open. Only open threats at or above `high` count toward `threats_open`.*
@@ -113,6 +114,7 @@ updated: "2026-10-08"
 |------------|---------------|--------|----------|---------------|--------|
 | 2026-10-06 | 50 | 44 | 6 | 0 | gsd-security-auditor |
 | 2026-10-08 | 57 | 51 | 6 | 0 | Inline gsd-secure-phase completion audit; prior register retained, plans 01-17/18 added |
+| 2026-10-08 | 58 | 52 | 6 | 0 | Targeted 01-19 WR-02 mitigation audit; prior evidence retained, no fresh full-ASVS audit claimed |
 
 ### Audit scope — 2026-10-08
 

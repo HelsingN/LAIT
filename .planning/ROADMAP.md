@@ -35,7 +35,7 @@ This roadmap grows the product through vertical MVP slices that keep the learnin
   4. Maintainer can inspect active modules and capabilities, invoke the workflow through documented commands and queries, add a proof exercise contribution through the public registry and renderer seams without changing core domain services, and see startup reject invalid or incompatible module catalogs.
   5. Maintainer can generate the TypeScript client from OpenAPI, have CI detect an unreviewed contract/client mismatch, and test the core, persistence adapter, and bundled modules independently.
 
-**Plans:** 18 plans — all executed; 01-18 R2 checkpoint approved, separate phase smoke/re-verification pending
+**Plans:** 19 plans — all executed; 01-18 R2 checkpoint and phase smoke complete, UAT 76/76; final verification passed 5/5 after WR-02 fix in 01-19. Phase transition remains unperformed (historical UAT archive discovery debt).
 
 Plans:
 - [x] 01-01-PLAN.md
@@ -61,7 +61,10 @@ Plans:
 **Wave 13 — gap closure, automatic tasks green; final 01-18 R2 blocking-human Docker checkpoint approved 2026-10-07**
 - [x] 01-18-PLAN.md — Revised inline result UX, retained exact feedback restoration and repeated final blocking-human Docker checkpoint (D-32–D-37; original EVAL-05 partial/deferred)
 
-**Cross-cutting constraints:** Preserve real saved educational payload and item/attempt identity; no schema migration or retry/score/Exit changes. PLAT-09 is closed. Execution is explicitly authorized by execute-phase 01 --gaps-only; final R2 checkpoint approved by user without observations. Subsequent explicit Да authorizes scoped commit/push to the current branch, not phase closure. Separate phase Docker smoke/re-verification remains pending.
+**Wave 14 — narrow WR-02 gap closure, newly authorized 2026-10-08**
+- [x] 01-19-PLAN.md — Preserve cursor 2 under delayed/replayed submits and serialize final retry append; keep accepted attempts and retry semantics; fresh affected regressions and final verification.
+
+**Cross-cutting constraints:** Preserve real saved educational payload and item/attempt identity; no schema migration or retry/score/Exit changes. PLAT-09 is closed. Final R2 checkpoint and separate phase Docker learner smoke passed by user report; current UAT 76/76 retained. Only new 01-19 executed in this continuation, prior plans not re-run. Final verification passed 5/5; original full EVAL-05 remains partial/deferred to Phase 5. Before later phase closure, reconcile unchanged historical UAT archive discovery. No phase.complete or push in the WR-02 continuation.
 
 **UI hint:** yes
 
@@ -225,7 +228,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Mod-First Manual Learning Loop | 18/18 | In Progress|  |
+| 1. Mod-First Manual Learning Loop | 19/19 | Verified; phase transition pending |  |
 | 2. AI-Assisted Learning-Unit Review | 0/TBD | Not started | - |
 | 3. Assisted Chunk Retrieval | 0/TBD | Not started | - |
 | 4. Resumable Sentence Reconstruction | 0/TBD | Not started | - |

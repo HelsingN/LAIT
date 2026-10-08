@@ -9,6 +9,28 @@ created: "2026-09-28"
 
 # Phase 01 — Validation Strategy
 
+## WR-02 gap closure — 2026-10-08
+
+Plan 01-19 alone executed; plans 01-01–01-18 were not re-run. The dated audits below retain their original evidence; this section is the current ordering-regression evidence. Current UAT remains 76/76 (14 explicit user Docker functional reports + 62 recorded automated checks); the completed Manual-Only phase-smoke row is retained. No fresh browser/Docker human observation is claimed. Original full EVAL-05 education remains partial/deferred to Phase 5 under D-32–D-37.
+
+| Check | Current result |
+|---|---|
+| New delayed/replay/final-round/Exit tests on old implementation | RED: 4 failed, 1 passed, 4 deselected. Delayed Incorrect 2→0; delayed Correct 2→1; duplicate final-round insert; late history row after Exit. Replay case already passed. |
+| Full backend/tests/application/test_practice_retry.py after fix | GREEN: 9 passed; final post-format run 3.14s. Delayed Incorrect and Correct both leave response/current query/new repository cursor exactly 2. Prior attempts unchanged; replay inserts a distinct attempt without advancing. |
+| Affected backend group below | GREEN: 48 passed, 10.54s; HTTPX/Starlette deprecation warning only. |
+| Existing FocusPracticeMode, LessonWorkspacePage, stages/FeedbackStage UI regressions | GREEN: 69 passed, 3 files, 19.43s. |
+| Retained standalone wr02_cursor_probe.py | PASS, exit 0: cursor before delayed submit=2, after=2; request errors=[]. Writes only a newly migrated temporary database. |
+| Ruff check --no-cache and format --check on three modified backend files | PASS; 3 files already formatted. |
+| git diff --check | PASS. |
+
+Backend prefix: `.venv/Scripts/python.exe -B -m pytest -p no:cacheprovider`, suffix `-q`. Affected group: `backend/tests/application/test_submit_attempt.py`, `test_practice_start.py`, `test_practice_finish_and_start_over.py`, `test_lesson_reopen_reads.py`, `test_handler_isolation.py` (all under that application directory), `backend/tests/adapters/persistence`, `backend/tests/adapters/http/test_http_dto_mapping.py`.
+
+Frontend command: `node frontend/node_modules/vitest/vitest.mjs run --root frontend src/features/lesson/FocusPracticeMode.test.tsx src/features/lesson/LessonWorkspacePage.test.tsx src/features/lesson/stages/FeedbackStage.test.tsx --maxWorkers=1 --reporter=dot`.
+
+Probe command: `.venv/Scripts/python.exe -B .planning/phases/01-mod-first-manual-learning-loop/verification-evidence/wr02_cursor_probe.py`.
+
+These are 57 affected backend + 69 affected frontend passes, not a new full-suite run. No UI/schema/DTO/dependency changes or learner-database edits. Backend-only plan needs no new human checkpoint. Canonical verification/fingerprint is refreshed after these checks; administrative UAT-HISTORY discovery remains distinct from a product blocker. No phase.complete or push.
+
 > Per-phase validation contract for feedback sampling during execution. Seeded from `01-RESEARCH.md` ## Validation Architecture. Task rows mapped to plans written 2026-09-29.
 
 ---

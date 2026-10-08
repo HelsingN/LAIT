@@ -4,16 +4,16 @@ milestone: v1.0
 current_phase: 01
 current_phase_name: Mod-First Manual Learning Loop
 status: executing
-stopped_at: Phase 1 UAT complete with 76/76 passed; canonical re-verification and Feedback UX disposition pending.
-last_updated: "2026-10-08T01:33:10Z"
+stopped_at: Plan 01-19 complete; final verification passed (5/5). Historical UAT discovery remains administrative phase-transition debt.
+last_updated: "2026-10-08T02:29:12Z"
 last_activity: 2026-10-08
-last_activity_desc: Recorded Test 14 pass and completed UAT: 14 human plus 62 recorded automated passes, no issues or pending tests. Docker smoke recorded in VALIDATION.md; canonical verification still gaps_found, no phase closure.
-state_head: 8b57705a3aec0ee5d77e92ea73ecdc7e5cdc1f49
+last_activity_desc: Newly authorized plan 01-19 fixed WR-02; 57 affected backend and 69 frontend checks pass, probe cursor 2 to 2. Canonical verification passed 5/5; UAT 76/76 and approved EVAL-05 deferral retained. No prior plan rerun or phase.complete.
+state_head: e7fbe65ad2543c9f18b156305f4565bebef652e9
 progress:
   total_phases: 9
   completed_phases: 0
-  total_plans: 18
-  completed_plans: 18
+  total_plans: 19
+  completed_plans: 19
 milestone_name: milestone
 spec_version: 0.2.0
 ---
@@ -31,10 +31,10 @@ Current planning/specification baseline: `.planning/VERSION.md` (`0.2.0`)
 ## Current Position
 
 Phase: 01 (Mod-First Manual Learning Loop) — EXECUTING
-Plan: 18 of 18 executed. Plan 01-18 R2 T3 is approved by the user without observations; all three tasks complete.
-Status: Plan execution and whole-phase manual Docker smoke complete; Phase 1 remains open pending canonical re-verification. Detailed teaching/chunk analysis deferred to Phase 5; original full EVAL-05 remains incomplete.
+Plan: 19 of 19 executed. Only new backend gap plan 01-19 executed in this continuation; plans 01-01–01-18 were not re-run. Prior 01-18 R2 T3 user approval retained.
+Status: Plan execution and whole-phase manual Docker smoke complete. Final re-verification passed, 5/5 truths verified; WR-02 fixed with fresh delayed/replay/append/Exit regressions. Phase transition remains unperformed; historical UAT archive discovery is administrative debt. Detailed teaching/chunk analysis remains deferred to Phase 5; original full EVAL-05 remains incomplete.
 Current discussion area: Complete
-Last activity: 2026-10-08 — User explicitly reported pass for Test 14. UAT complete: 14 human functional passes plus 62 recorded automated coverage passes, zero pending/issues/blocked/skipped. Separate Docker learner-flow smoke recorded in 01-VALIDATION.md. O-01-10-exit remains a workflow clarification; O-01-9-visual compact Feedback acceptance impact remains unresolved. Canonical 01-VERIFICATION.md still gaps_found; no automatic phase completion. No tests rerun, learner-data writes or application code changes.
+Last activity: 2026-10-08 — Created and completed narrow plan 01-19. Production commit d6abcc6 makes attempt insertion cursor-neutral and serializes open-session progression. RED 4 failures on old code; GREEN 57 affected backend + 69 frontend tests, Ruff and original probe 2 → 2. Both delayed outcomes assert exactly 2 including new database reads; retry and append-only accepted history retained. Canonical verification passed 5/5 with official 225-file fingerprint; no evidenced product blocker. UAT 76/76 (14 human + 62 recorded automated) and prior phase Docker smoke retained, no new manual observation. Raw UAT-HISTORY unchanged: CLI false positives are administrative debt before closure. EVAL-05 original education deferred to Phase 5; O-01-9 compact Feedback remains UX debt with undecided owner. Local GSD commits only; no completed-plan rerun, phase.complete or push.
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -140,7 +140,7 @@ Recent decisions affecting current and future work:
 ### Pending Todos
 
 - Explicit execute-phase 01 --gaps-only and user option 3 authorized inline execution. Plans 01-01–01-18 are complete; final R2 T3 approved by user on 2026-10-07. Subsequent explicit Да authorizes scoped commit/push to existing origin/phase/01-execution; result belongs to Git history/handoff, not phase closure.
-- Next gate: canonical Phase 1 re-verification against completed plans, narrowed D-32–D-37 acceptance and finished UAT. All 14 manual tests passed. Separately resolve compact Feedback acceptance impact without auto-fixing. Phase 1 open, original EVAL-05 partial/deferred.
+- WR-02 closed by completed plan 01-19; canonical verification passed 5/5. Before a later phase transition, reconcile raw UAT-HISTORY archive discovery while preserving historical failed rows. All 14 human tests and prior phase smoke passed; compact Feedback remains UX debt with no approved phase owner. Phase 1 remains administratively open; original EVAL-05 is partial/deferred to Phase 5.
 - After a working vertical learning slice exists, consider a small MCP integration spike as an architectural acceptance test; do not add it to current Phase 1 scope.
 
 ### Blockers/Concerns
@@ -175,6 +175,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-10-08T01:33:10Z
-Stopped at: UAT complete with 76/76 passed; Docker learner smoke recorded. Canonical re-verification and Feedback UX acceptance impact remain pending; no application implementation or phase closure.
-Resume file: .planning/phases/01-mod-first-manual-learning-loop/01-UAT.md
+Last session: 2026-10-08T02:29:12Z
+Stopped at: New plan 01-19 complete, WR-02 fixed; final verification passed 5/5 with no evidenced product blocker. UAT and prior phase smoke complete; original EVAL-05 remains partial/deferred to Phase 5. Historical UAT discovery remains administrative phase-transition debt; no prior plan rerun or phase closure.
+Resume file: .planning/phases/01-mod-first-manual-learning-loop/01-VERIFICATION.md
