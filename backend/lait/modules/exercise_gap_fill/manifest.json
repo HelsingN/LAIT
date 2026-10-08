@@ -1,0 +1,10 @@
+{
+  "module_id": "official.exercise.gap-fill",
+  "name": "Gap Fill",
+  "module_version": "0.1.0",
+  "api_version": 1,
+  "publisher": "ai-language-coach",
+  "category": "exercise",
+  "capabilities": ["exercise.generate", "exercise.evaluate"],
+  "dependencies": ["core.exercise-api>=0.1.0"]
+}

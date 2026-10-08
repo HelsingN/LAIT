@@ -83,7 +83,8 @@ No login, no language picker, no maintainer page.
 - Two passes: drag chips (all accepted units as chips; grade by `learning_unit_id`), then typed. One accepted unit → skip drag pass.
 - Item order: source span position, then `learning_unit_id`.
 - Typed match: trim + case-insensitive only.
-- Categories shown: `correct` | `incorrect` only. Feedback body uses D-18 templates; natural alternative omitted when null.
+- Categories shown: Correct / Incorrect / Corrected, retaining 01-16 retry semantics. Latest authority is 01-18-CONTEXT.md D-32–D-37: for Correct/Corrected fill the current blank once with feedback.expected in accent green and show category text. For Incorrect show feedback.submitted inline; only Show answer replaces it with expected, while category stays Incorrect. Try again remains available before/after reveal and clears the response/result. Hide graded answer input/chip bank; no separate answer card, Details or technical chunk labels. Detailed teaching/chunk/alternative presentation is deferred to Phase 5, not full EVAL-05 delivery. No new explanation templates or LLM.
+- Restore the exact saved feedback and valid item-and-attempt-bound reveal across reload, direct URL, Lesson List return, actual browser-process restart on the same profile and Docker/app restart keeping the named volume. Keep complete real educational payload at the data/renderer seam, including genuinely stored empty arrays/null; missing fields remain an error, never synthetic defaults. Saved content is not rewritten. Correct/corrected final-success cards stay until Continue; retry copies and late responses cannot inherit an old result. Preserve frozen retry/score/Continue/Start Over/Exit.
 - **Exit Practice** → `practice.finish`: restore workspace, unfreeze units.
 - **Start Over** → abandon in-progress non-attempt state + `practice.start` again on the same frozen accepted set (do not return to unit editing; do not delete Attempts).
 
@@ -94,7 +95,7 @@ No login, no language picker, no maintainer page.
 ### Out of learner UI
 
 - Proof exercise renderer: registry + Vitest only; never in `list_visible_for("learner")`.
-- No AI unit generation, no other exercise types, no retry/reveal/resume chrome.
+- No AI unit generation or other exercise types. Established retry/reveal behavior from 01-16, complete feedback persistence from 01-17 and exact restoration guards from 01-18 remain in scope. Shared multi-blank tasks and actual drag-and-drop are future follow-ups only (proposed Phase 4/9).
 
 ---
 
@@ -167,8 +168,10 @@ Do not use accent for secondary buttons, body links that are not CTAs, or decora
 | Submit failed | Could not submit. Try again. |
 | Feedback before attempts | No attempts yet. Start Practice to begin. |
 | Practice frozen hint | Learning units are locked while practice is open. Exit Practice to edit them. |
-| Feedback correct | Correct. The expected answer is "{unit}". |
-| Feedback incorrect | Your answer: "{submitted}". Expected: "{unit}". |
+| Feedback correct/corrected | Correct / Corrected; accepted reference phrase once inside the blank, highlighted green. No duplicate answer card/input. |
+| Feedback incorrect | Incorrect; submitted inline, reference hidden until Show answer. Try again clears result/blank before or after reveal. |
+| Phase 1 educational detail | No Details, Chunks used/missed labels, new templates or LLM. Full teaching/chunk/alternative presentation deferred to Phase 5. |
+| Feedback Show answer | Show answer — reveals only the displayed attempt, persists presentation binding and creates no domain mutation. |
 | Destructive confirmation | Delete learning unit: Remove this unit? It will not appear in new exercises. Past attempts are kept. |
 | Start Over confirmation | Start over: Abandon this practice run and start a new session on the same units? Submitted answers stay saved. |
 | Exit Practice | Exit Practice |
@@ -230,11 +233,13 @@ Untitled fallback title: `Untitled Lesson` (D-03).
 - Feedback empty — resolved (explicit): Before any Attempt, Feedback stays locked. After unlock with zero attempts it shows "No attempts yet. Start Practice to begin."
 - Feedback loading — resolved (explicit): Feedback does not render its own spinner. Submit Answer shows "Checking…" until the payload arrives.
 - Feedback error — resolved (explicit): A failed submit does not open a feedback card. The practice error stays inline.
-- Feedback populated — resolved (explicit): The card shows the submitted answer, the expected unit, the D-18 explanation, and used or missed. Continue moves to the next item without leaving the session.
-- Feedback partial — resolved (explicit): A null natural alternative is omitted. The other four fields still render.
-- Feedback overflow — resolved (explicit): Feedback text wraps inside the card.
-- Feedback zero-one-many — resolved (explicit): The learner sees one feedback card at a time.
-- Feedback long-text — resolved (explicit): Submitted and expected text wrap inside the card.
+- Feedback populated — revised R2 checkpoint approved 2026-10-07 by user report without observations: one inline graded phrase with category text, accepted reference green for Correct/Corrected; submitted for Incorrect until its own Show answer. Graded input/chips and separate answer card absent. Try again clears the result before/after reveal. Continue retains existing session behavior.
+- Feedback partial — approved revised acceptance: preserve real explanation/chunks/nullable alternative through the saved-data and renderer seam; do not display deferred educational fields. Genuine empty/null remain valid, missing fields remain an error. Original EVAL-05 content is partially delivered, not completed.
+- Feedback overflow — resolved (explicit): Inline result phrase and category wrap inside the exercise.
+- Feedback zero-one-many — resolved (explicit): The learner sees one item's inline result at a time.
+- Feedback long-text — resolved (explicit): Inline accepted/submitted/revealed text wraps without horizontal scroll; hidden reference and deferred education do not leak through DOM/attributes.
+
+Feedback acceptance was first amended via D-24–D-31, then explicitly narrowed after an unapproved 01-18 checkpoint by D-32–D-37 (2026-10-07). Latest scope is inline result UX and retained durable payload/restore, with detailed teaching deferred. Subsequent user report “ручная проверка пройдена без замечаний approved” approves the repeated R2 Docker checklist at http://127.0.0.1:5173, volume kept; see 01-18-CHECKPOINT.md. This is not original full EVAL-05 completion or approval of the separate phase-close smoke, which remains pending. Historical visual sign-off below is not the source of the revised behavior approval.
 
 ---
 

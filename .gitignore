@@ -64,9 +64,14 @@ src-tauri/target/
 src-tauri/gen/
 exports/
 generated/
+!frontend/src/api/generated/
+!frontend/src/api/generated/**
 prompts/generated/
+frontend/openapi.json
 .gsd/cache/
 .gsd/tmp/
 .gsd/generated/
 .mcp/
 .codex/
+/.gsd/
+/.planning/milestone.lock

@@ -79,6 +79,7 @@ The intended logical architecture is a responsive client over public application
 - **Performance**: Normal lesson analysis and exercise generation must not freeze the UI; a normal lesson should yield a usable exercise set in under five minutes.
 - **Quality**: At least 80% of generated exercises should be usable after learning-unit review, and the core plus modules must be independently testable.
 - **Portability**: User content remains user-owned, provider transmission is disclosed, and local-first deployment remains viable.
+- **Manual UI verification**: A plan that changes learner-visible UI, navigation, interaction state, or persistence/reopen behavior ends on a blocking Docker human check before the next dependent wave. Vitest and pytest do not replace it. Backend-only plans do not get that checkpoint. Policy: `docs/governance/MANUAL_UI_VERIFICATION.md`.
 
 ## Key Decisions
 
@@ -95,6 +96,7 @@ The intended logical architecture is a responsive client over public application
 | Use public capabilities, commands, events, and versioned manifests for module integration | Official-module parity is an architectural acceptance criterion and prevents private cross-module coupling | — Pending |
 | Prefer deterministic evaluation and use semantic AI only where needed | Reliability, cost control, traceability, and graceful degradation improve when AI is not the default grader | — Pending |
 | Start with a simple replaceable scheduler | Review behavior must exist in MVP, but advanced adaptive algorithms should not block the end-to-end learning loop | — Pending |
+| Stop learner-visible plans for a Docker human check | Automated tests missed a reopen bug that only showed up on the Compose app | `docs/governance/MANUAL_UI_VERIFICATION.md` |
 
 ## Evolution
 

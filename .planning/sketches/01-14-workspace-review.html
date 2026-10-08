@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>01-14 layout review</title>
+  <style>
+    body { margin: 0; background: #d9d3c7; font-family: "Segoe UI", sans-serif; color: #1c1b19; }
+    h1 { font-size: 16px; margin: 16px; }
+    .sheet { display: flex; flex-wrap: wrap; gap: 16px; padding: 0 16px 16px; }
+    figure { margin: 0; background: white; padding: 8px; }
+    figcaption { font-size: 13px; font-weight: 600; margin-bottom: 8px; }
+    .clip { overflow: hidden; }
+    iframe { border: 0; transform-origin: top left; }
+  </style>
+</head>
+<body>
+  <h1>01-14 workspace — viewport checks</h1>
+  <div class="sheet">
+    <figure>
+      <figcaption>1280 × 800, list scrolled to the end</figcaption>
+      <div class="clip" style="width:640px;height:400px">
+        <iframe id="wide" title="1280 by 800" src="01-14-workspace-layout.html" style="width:1280px;height:800px;transform:scale(0.5)"></iframe>
+      </div>
+    </figure>
+    <figure>
+      <figcaption>960 × 700, threshold</figcaption>
+      <div class="clip" style="width:480px;height:350px">
+        <iframe id="edge" title="960 by 700" src="01-14-workspace-layout.html" style="width:960px;height:700px;transform:scale(0.5)"></iframe>
+      </div>
+    </figure>
+    <figure>
+      <figcaption>959 × 700, just under the threshold</figcaption>
+      <div class="clip" style="width:480px;height:350px">
+        <iframe id="under" title="959 by 700" src="01-14-workspace-layout.html" style="width:959px;height:700px;transform:scale(0.5)"></iframe>
+      </div>
+    </figure>
+    <figure>
+      <figcaption>1280 × 520, short window</figcaption>
+      <div class="clip" style="width:640px;height:260px">
+        <iframe id="short" title="1280 by 520" src="01-14-workspace-layout.html" style="width:1280px;height:520px;transform:scale(0.5)"></iframe>
+      </div>
+    </figure>
+  </div>
+</body>
+</html>

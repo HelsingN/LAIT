@@ -2,6 +2,16 @@
 
 This changelog records material changes to the planning/specification baseline. It is not the application release changelog.
 
+## Process — 2026-10-02
+
+### Added
+
+- `docs/governance/MANUAL_UI_VERIFICATION.md`. Future plans that change learner-visible UI, navigation, interaction state, or persistence/reopen behavior end on a `checkpoint:human-verify` with `gate="blocking-human"`, executed on Docker Compose. Vitest and pytest do not replace it. Backend-only plans do not get that checkpoint. Checkpoint observations are classified (bug, UX debt, visual, workflow, deferred) before they are treated as blockers. `workflow.human_verify_mode` is `mid-flight`.
+
+### Spec version
+
+- Unchanged. `0.2.0` remains the specification baseline.
+
 ## 0.2.0 — 2026-09-28
 
 ### Added

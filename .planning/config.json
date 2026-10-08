@@ -29,7 +29,7 @@
     "ui_safety_gate": true,
     "ai_integration_phase": true,
     "api_coverage_gate": true,
-    "human_verify_mode": "end-of-phase",
+    "human_verify_mode": "mid-flight",
     "context_guard_mode": "warn",
     "text_mode": false,
     "research_before_questions": false,
@@ -46,7 +46,9 @@
     "post_planning_gaps": true,
     "security_enforcement": true,
     "security_asvs_level": 1,
-    "security_block_on": "high"
+    "security_block_on": "high",
+    "_auto_chain_active": false,
+    "use_worktrees": false
   },
   "ship": {
     "pr_body_sections": [
