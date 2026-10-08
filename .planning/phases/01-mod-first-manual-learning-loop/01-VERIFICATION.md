@@ -194,7 +194,6 @@ covered_files:
   - docker/api_entrypoint.py
   - docker/web-nginx.conf
   - frontend/openapi-ts.config.ts
-  - frontend/openapi.json
   - frontend/package-lock.json
   - frontend/package.json
   - frontend/scripts/openapi-generate.mjs
@@ -262,7 +261,7 @@ covered_files:
   - frontend/src/vite-env.d.ts
   - pyproject.toml
   - uv.lock
-covered_digest: "v2:sha256:f7f2903f7a302318bbb039a9f9ac2070e5246c9e3dd2ecc4174301947690f1cf"
+covered_digest: "v2:sha256:6cabd3251f18e811f7c0baa1cb38670756a86bc3781b55e2564c6a3ffddb3609"
 ---
 
 # Phase 01: Mod-First Manual Learning Loop — Final Re-verification
@@ -273,7 +272,7 @@ covered_digest: "v2:sha256:f7f2903f7a302318bbb039a9f9ac2070e5246c9e3dd2ecc417430
 
 ## Scope and evidence
 
-All 18 previously completed PLAN/SUMMARY contracts were retained and reconciled; only the newly authorized backend gap plan **01-19** executed. Current official execution inventory: 19 plans, 19 summaries, zero incomplete/runnable plans, zero duplicate threat IDs. The report covers current implementation and 228 files with the official v2 content fingerprint, including preserved UAT history and formal closure evidence.
+All 18 previously completed PLAN/SUMMARY contracts were retained and reconciled; only the newly authorized backend gap plan **01-19** executed. Current official execution inventory: 19 plans, 19 summaries, zero incomplete/runnable plans, zero duplicate threat IDs. The report covers current implementation and 227 versioned files with the official v2 content fingerprint, including preserved UAT history and formal closure evidence. Regenerable frontend/openapi.json is deliberately gitignored and excluded from portable fingerprint inputs; the tracked exporter, generated SDK, operation tests and CI generation/diff configuration remain covered.
 
 Current UAT is **76/76**, comprising 14 explicit user-reported functional Docker passes and 62 recorded automated coverage entries. Completed phase Docker learner smoke and the approved 01-18 R2 checkpoint remain valid evidence; this run adds no new manual/browser/Docker observation. Backend-only 01-19 changes no UI, schema, DTO, dependency or learner database, so no new blocking-human checkpoint applies.
 
