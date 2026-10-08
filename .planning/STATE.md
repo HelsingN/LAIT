@@ -4,7 +4,7 @@ milestone: v1.0
 current_phase: 2
 current_phase_name: AI-Assisted Learning-Unit Review
 status: planning
-stopped_at: Phase 01 merged in PR 3; historical audit cleanup prepared for a separate docs PR. Phase 2 ready to plan with explicit architecture evaluation.
+stopped_at: Phase 01 merged in PR 3; historical audit cleanup open in docs PR 4. Phase 2 ready to plan with explicit architecture evaluation.
 last_updated: "2026-10-08T17:07:10.711Z"
 last_activity: 2026-10-08
 last_activity_desc: Phase 01 merged in PR 3; quick 261008-rko archives historical audits and reconciles current dispositions without implementation changes. Phase 2 ready to plan; original EVAL-05 partial/deferred to Phase 5.
@@ -34,7 +34,7 @@ Phase: 2 — AI-Assisted Learning-Unit Review
 Plan: Not started
 Status: Ready to plan
 Current discussion area: Not started; evaluate deferred architecture findings before MODL-06/MODL-07 and AI provider/feature boundaries
-Last activity: 2026-10-08 — [PR #3](https://github.com/HelsingN/LAIT/pull/3) merged to main as 02013fc. Quick task 261008-rko preserves four local audit/pattern/UI reports and two earlier tracked review versions in dated history, reconciles current WR-02 as fixed and WR-01/WR-03 as open nonblocking advisories, and retains stable archive links. Phase 01 remains complete (19/19), verification passed 5/5, active UAT 76/76; original full EVAL-05 is partial/deferred to Phase 5. No implementation, completed-plan rerun or Phase 2 work; architecture notes retained. A separate docs PR is prepared for this cleanup.
+Last activity: 2026-10-08 — [PR #3](https://github.com/HelsingN/LAIT/pull/3) merged to main as 02013fc. Quick task 261008-rko preserves four local audit/pattern/UI reports and two earlier tracked review versions in dated history, reconciles current WR-02 as fixed and WR-01/WR-03 as open nonblocking advisories, and retains stable archive links. Phase 01 remains complete (19/19), verification passed 5/5, active UAT 76/76; original full EVAL-05 is partial/deferred to Phase 5. No implementation, completed-plan rerun or Phase 2 work; architecture notes retained. Separate [docs PR #4](https://github.com/HelsingN/LAIT/pull/4) is open for this cleanup; CI pending.
 
 Progress: [█░░░░░░░░░] 11%
 
@@ -140,7 +140,7 @@ Recent decisions affecting current and future work:
 ### Pending Todos
 
 - Explicit execute-phase 01 --gaps-only and user option 3 authorized inline execution. Plans 01-01–01-18 are complete; final R2 T3 approved by user on 2026-10-07. Subsequent explicit Да authorizes scoped commit/push to existing origin/phase/01-execution; result belongs to Git history/handoff, not phase closure.
-- Phase 1 merged in [PR #3](https://github.com/HelsingN/LAIT/pull/3), merge 02013fc. WR-02 fixed; verification passed 5/5, active UAT 76/76 with no blockers. [PR CI](https://github.com/HelsingN/LAIT/actions/runs/37722761625) and [push CI](https://github.com/HelsingN/LAIT/actions/runs/37722734237) passed on code head 01b205e. Audit cleanup is a separate docs PR, without new implementation or acceptance claims. Compact Feedback remains UX debt with no approved phase owner; original EVAL-05 is partial/deferred to Phase 5. Evaluate preserved architecture notes during Phase 2 planning before MODL-06/MODL-07 and AI boundaries.
+- Phase 1 merged in [PR #3](https://github.com/HelsingN/LAIT/pull/3), merge 02013fc. WR-02 fixed; verification passed 5/5, active UAT 76/76 with no blockers. [PR CI](https://github.com/HelsingN/LAIT/actions/runs/37722761625) and [push CI](https://github.com/HelsingN/LAIT/actions/runs/37722734237) passed on code head 01b205e. Audit cleanup is open in separate [docs PR #4](https://github.com/HelsingN/LAIT/pull/4), with CI pending and no new implementation or acceptance claims. Compact Feedback remains UX debt with no approved phase owner; original EVAL-05 is partial/deferred to Phase 5. Evaluate preserved architecture notes during Phase 2 planning before MODL-06/MODL-07 and AI boundaries.
 - After a working vertical learning slice exists, consider a small MCP integration spike as an architectural acceptance test; do not add it to current Phase 1 scope.
 
 ### Blockers/Concerns
@@ -181,6 +181,6 @@ Items acknowledged for later work, including those carried forward from previous
 
 ## Session Continuity
 
-Last session: 2026-10-08T16:59:59Z
-Stopped at: Phase 01 merged in PR #3. Historical audit cleanup prepared for a separate docs PR; Phase 2 ready to plan with deferred architecture evaluation before MODL-06/MODL-07/AI boundaries.
+Last session: 2026-10-08T17:09:25Z
+Stopped at: Phase 01 merged in PR #3. Historical audit cleanup open in docs PR #4; Phase 2 ready to plan with deferred architecture evaluation before MODL-06/MODL-07/AI boundaries.
 Resume file: .planning/phases/01-mod-first-manual-learning-loop/01-VERIFICATION.md
