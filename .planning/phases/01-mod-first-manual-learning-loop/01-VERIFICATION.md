@@ -261,7 +261,7 @@ covered_files:
   - frontend/src/vite-env.d.ts
   - pyproject.toml
   - uv.lock
-covered_digest: "v2:sha256:6cabd3251f18e811f7c0baa1cb38670756a86bc3781b55e2564c6a3ffddb3609"
+covered_digest: "v2:sha256:0c8f7ff536b02efb2a6d60e1f7e465d21044fe143d35b02534a846b159e4f5d7"
 ---
 
 # Phase 01: Mod-First Manual Learning Loop — Final Re-verification
